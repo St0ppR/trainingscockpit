@@ -469,7 +469,7 @@ async function initDb(){
   try { db = await window.claude.use('db'); } catch(e){ db = null; }
   if (!db){ dbState='aus'; render(); return; }
   dbState='an';
-  tcInitDb(); tcFlush(); diagStart();
+  tcInitDb(); tcFlush();
   db.collection('journal').onSnapshot(s=>{ store.journal={}; s.docs.forEach(d=>store.journal[d.id]=own(d.data())); emit(); }, ()=>{});
   db.collection('coach').onSnapshot(s=>{ store.coach={}; s.docs.forEach(d=>store.coach[d.id]=own(d.data())); emit(); }, ()=>{});
   db.collection('meals').onSnapshot(s=>{ store.meals={}; s.docs.forEach(d=>store.meals[d.id]=own(d.data())); emit(); }, ()=>{});
@@ -879,20 +879,10 @@ function renderUebersicht(){
   return `<div class="grid tc">${tiles}${insHTML}${heat}${head}${sl}${reps}</div>`;
 }
 
-/* Vorübergehende Diagnose (iPhone-Tippen): zählt Berührungen und Klicks und legt sie mit Fehlern in diag/last ab */
-const diag={pointer:0,touch:0,click:0,tcClick:0,errors:[],targets:[]};
-['pointerdown','touchstart','click'].forEach(t=>document.addEventListener(t,e=>{ diag[t==='pointerdown'?'pointer':t==='touchstart'?'touch':'click']++;
-  if(t==='click'){ const el=e.target; diag.targets=diag.targets.concat(((el&&el.tagName)||'?')+'.'+((el&&el.className&&String(el.className))||'')+'['+((el&&el.closest&&el.closest('[data-tc]')&&el.closest('[data-tc]').dataset.tc)||'')+']').slice(-8); }
-  diagSave(); },true));
-window.addEventListener('error',e=>{ diag.errors=diag.errors.concat(String(e.message||e)).slice(-5); diagSave(); });
-window.addEventListener('unhandledrejection',e=>{ diag.errors=diag.errors.concat('rej: '+String((e.reason&&(e.reason.code||e.reason.message))||e.reason)).slice(-5); diagSave(); });
-let diagT=null;
-function diagSave(){ if(!db) return; clearTimeout(diagT); diagT=setTimeout(()=>{ db.doc('diag/last').set(Object.assign({},diag,{at:new Date().toISOString(),ua:navigator.userAgent,view,dirty:[...tcDirty],saveErr:tcSaveErr||null,w:innerWidth,h:innerHeight})).catch(e=>{}); },1500); }
-function diagStart(){ diagSave(); }
 /* ---------- Bedienung ---------- */
 // direkt an jedem Knopf statt über document: in der eingebetteten Ansicht der iPhone-App kommen Tipps sonst nicht immer an
 function tcClick(e){
-  const b=e.currentTarget; diag.tcClick++; diagSave();
+  const b=e.currentTarget;
   const k=b.dataset.k, v=b.dataset.v, a=b.dataset.tc;
   if(a==='sc'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=x.checkin[k]===+v&&k==='pain'?null:+v; }); }
   else if(a==='tg'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=!x.checkin[k]; }); }
