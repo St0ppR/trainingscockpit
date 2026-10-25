@@ -477,7 +477,7 @@ const latestWeekPlan = () => { const ks=Object.keys(store.coach).sort().reverse(
 
 /* ================= TAGESCOACH: Heute als Tagesablauf ================= */
 /* Check-in → Tagesmodus → ein Vorschlag → Training in 3 Stufen → Kopf → Gewohnheiten. Speicher: db `days/<JJJJ-MM-TT>`, sonst Browser. */
-const TC_GOALS={startWeight:128,startDate:'2026-10-12',targetWeight:105,weekPush:500,weekSquat:750,weekDays:5,water:8,bedtime:'22:30'};
+const TC_GOALS={startWeight:128,startDate:'2026-10-12',targetWeight:105,weekPush:500,weekSquat:750,stepStart:'2026-10-26',stepPush:100,stepSquat:150,weekDays:5,water:8,bedtime:'22:30'};
 const TC_LAST_TRAINING_BEFORE='2026-09-27'; /* letzte Garmin-Einheit vor dem Tagescoach */
 const TC_HABITS=[
   {id:'meds',t:'Tablette nüchtern',s:'gleich nach dem Aufstehen, wie gewohnt'},
@@ -536,9 +536,9 @@ function tcNudgeList(m){
   let body;
   if(band==='red'||c.sick||c.night) body=pick('walk');
   else if(c.pain>=4) body=pick('kneewall');
-  else { const gp=1-tcWeekSum('push')/TC_GOALS.weekPush, gs=1-tcWeekSum('squat')/TC_GOALS.weekSquat;
+  else { const gp=1-tcWeekSum('push')/tcWeekGoal('push'), gs=1-tcWeekSum('squat')/tcWeekGoal('squat');
     body=pick(gp>=gs?'push':'squat'); body.n=TC_NUDGE_N[band][body.rep];
-    body.why=`Wochenziel ${body.rep==='push'?'Liegestütze':'Kniebeugen'}: noch ${nf(Math.max(0,body.rep==='push'?TC_GOALS.weekPush-tcWeekSum('push'):TC_GOALS.weekSquat-tcWeekSum('squat')))}`; }
+    body.why=`Wochenziel ${body.rep==='push'?'Liegestütze':'Kniebeugen'}: noch ${nf(Math.max(0,body.rep==='push'?tcWeekGoal('push')-tcWeekSum('push'):tcWeekGoal('squat')-tcWeekSum('squat')))}`; }
   const mob=pick(!(x.habits||{}).ankle&&!(c.pain>=4)?(k%2?'calf':'kneewall'):(k%2?'hipflex':'tspine'));
   const head=pick(c.stress>=4?'box':h>=13&&!(x.habits||{}).plate?'protein':(k%2?'sigh':'arrive'));
   // Abgehaktes bleibt stehen, auch wenn sich die Auswahl danach ändern würde
@@ -605,6 +605,14 @@ function tcSession(m){
   return Object.assign({key},TC_LIB[key]);
 }
 const tcWeek=(ref=TD())=>{ const m=tcMonday(ref); return [...Array(7)].map((_,i)=>addDays(m,i)); };
+/* Stufenplan: Start 100 Liegestütze / 150 Kniebeugen pro Woche. Wer ~80 % schafft, bekommt nächste Woche 20 % mehr,
+   sonst bleibt das Ziel. 500 / 750 (TC_GOALS.weekPush/weekSquat) bleibt das Fernziel und die Obergrenze. */
+function tcWeekGoal(f,ref=TD()){
+  const far=f==='push'?TC_GOALS.weekPush:TC_GOALS.weekSquat; let g=f==='push'?TC_GOALS.stepPush:TC_GOALS.stepSquat;
+  for(let w=tcMonday(TC_GOALS.stepStart), cur=tcMonday(ref); w<cur; w=addDays(w,7))
+    if(tcWeekSum(f,w)>=0.8*g) g=Math.min(far,Math.round(g*1.2/10)*10);
+  return g;
+}
 const tcWeekSum=(f,ref)=>tcWeek(ref).reduce((a,d)=>a+((store.days[d]&&store.days[d].reps&&store.days[d].reps[f])||0),0);
 function tcWeights(){
   const w={};
@@ -769,8 +777,8 @@ function tcTrainCard(m){
 }
 function tcCounters(){
   const pr=tcWeekSum('push'), sq=tcWeekSum('squat'), r=tcDay().reps||{};
-  return `<div class="counters" style="margin-top:14px">${[['push','Liegestütze diese Woche',pr,TC_GOALS.weekPush],['squat','Kniebeugen diese Woche',sq,TC_GOALS.weekSquat]].map(([k,l,val,goal])=>`<div class="ctr"><div class="k">${l}</div><div class="v">${nf(val)} <small>/ ${goal}</small></div><div class="bar"><i style="width:${Math.min(100,val/goal*100)}%"></i></div><div class="row">${[10,25].map(n=>`<button type="button" data-tc="rep" data-k="${k}" data-v="${n}">+${n}</button>`).join('')}<button type="button" data-tc="rep" data-k="${k}" data-v="-10" aria-label="10 abziehen">−10</button></div></div>`).join('')}</div>
-    <p class="small muted" style="margin-top:6px">Zählt alles: Einheit, Büro, abends vorm Fernseher. Heute: ${nf(r.push||0)} Liegestütze, ${nf(r.squat||0)} Kniebeugen.</p>`;
+  return `<div class="counters" style="margin-top:14px">${[['push','Liegestütze diese Woche',pr,tcWeekGoal('push')],['squat','Kniebeugen diese Woche',sq,tcWeekGoal('squat')]].map(([k,l,val,goal])=>`<div class="ctr"><div class="k">${l}</div><div class="v">${nf(val)} <small>/ ${goal}</small></div><div class="bar"><i style="width:${Math.min(100,val/goal*100)}%"></i></div><div class="row">${[10,25].map(n=>`<button type="button" data-tc="rep" data-k="${k}" data-v="${n}">+${n}</button>`).join('')}<button type="button" data-tc="rep" data-k="${k}" data-v="-10" aria-label="10 abziehen">−10</button></div></div>`).join('')}</div>
+    <p class="small muted" style="margin-top:6px">Zählt alles: Einheit, Büro, abends vorm Fernseher. Heute: ${nf(r.push||0)} Liegestütze, ${nf(r.squat||0)} Kniebeugen. Das Ziel legt dein Trainer fest und passt es jede Woche an. Du machst einfach, was dran ist.</p>`;
 }
 function tcRecRow(){
   const L=DATA.lastWithData, x=DATA.days[L]; if(!x) return '';
@@ -837,7 +845,7 @@ function renderUebersicht(){
     <div class="minis" style="margin-top:8px"><span><b>${breaths}</b> Atemübungen</span><span><b>${notes}</b> Abendnotizen</span><span><b>${nCi}</b> Check-ins</span><span class="muted">diese Woche bzw. 14 Tage</span></div></section>`;
   const weeks=[3,2,1,0].map(k=>addDays(tcMonday(TD()),-7*k));
   const reps=`<section class="card s6"><h2>Liegestütze & Kniebeugen</h2>${barChart({pts:weeks.map(w=>({x:w,stack:[[tcWeekSum('push',w),'var(--accent)'],[tcWeekSum('squat',w),'var(--good)']],tip:`Woche ab ${dshort(w)}: ${tcWeekSum('push',w)} Liegestütze, ${tcWeekSum('squat',w)} Kniebeugen`})),label:'Wiederholungen pro Woche',h:170,xfmt:d=>'KW ab '+dt(d).getDate()+'.'+(dt(d).getMonth()+1)+'.',ymax:Math.max(TC_GOALS.weekPush+TC_GOALS.weekSquat, ...weeks.map(w=>tcWeekSum('push',w)+tcWeekSum('squat',w)))*1.1})}
-    <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Liegestütze (Ziel ${TC_GOALS.weekPush})</span><span><i class="sw" style="background:var(--good)"></i>Kniebeugen (Ziel ${TC_GOALS.weekSquat})</span></div></section>`;
+    <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Liegestütze (Ziel diese Woche ${tcWeekGoal('push')}, Fernziel ${TC_GOALS.weekPush})</span><span><i class="sw" style="background:var(--good)"></i>Kniebeugen (Ziel diese Woche ${tcWeekGoal('squat')}, Fernziel ${TC_GOALS.weekSquat})</span></div></section>`;
   const sl=`<section class="card s6"><h2>Schlaf · 14 Nächte</h2>${lineChart({pts:d14.map(d=>({x:d,y:slp(d)})),label:'Schlaf',yfmt:v=>hc(v),avg:false,h:170,color:'var(--s-rem)',refLine:n7||8,ymin:Math.min(4,...d14.map(slp).filter(v=>v!=null)),ymax:Math.max((n7||8)+0.5,...d14.map(slp).filter(v=>v!=null))})}
     <p class="small muted">Gestrichelt: dein Schlafbedarf. ${DATA.plan&&DATA.plan.bedSD!=null?`Einschlafzeit schwankt um ± ${nf(DATA.plan.bedSD)} min${DATA.plan.bedSD>45?' – gleichmäßiger wäre besser.':'.'}`:''}</p></section>`;
   return `<div class="grid tc">${tiles}${insHTML}${heat}${head}${sl}${reps}</div>`;
