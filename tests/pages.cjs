@@ -6,8 +6,9 @@ const ROOT = path.resolve(__dirname, '..');
 const DATA = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const wrap = html => '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>' + html + '</body></html>';
 
-async function open(browser, app, data, width = 390, time = null) {
+async function open(browser, app, data, width = 390, time = null, init = null) {
   const page = await browser.newPage({ viewport: { width, height: 844 } });
+  if (init) await page.addInitScript(init);
   // Uhrzeit fest auf 08:00, damit „Heute“ immer dieselbe Tagesphase zeigt (nur Date; Timer laufen normal)
   if (!time) { time = new Date(); time.setHours(8, 0, 0, 0); }
   await page.clock.setFixedTime(time);
@@ -139,6 +140,26 @@ const tests = {
     assert.strictEqual(await page.locator('.nudges').count(), 0, 'abends keine Büro-Vorschläge');
     assert.ok(await page.locator('#tcMind').count() === 1);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Antippen klappt auch mit eingefrorenen Datenbank-Daten (wie auf dem iPhone)'(b) {
+    // Die echte Laufzeit liefert Dokumente eingefroren; vorher scheiterte daran jedes Antippen
+    const init = () => { const freeze = o => { if (o && typeof o === 'object') { Object.values(o).forEach(freeze); Object.freeze(o); } return o; };
+      const d = new Date(), today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      const days = { [today]: { date: today, water: 1, updatedAt: '2000-01-01T00:00:00Z' } }; window.__writes = 0;
+      const snap = c => ({ docs: Object.entries(c === 'days' ? days : {}).map(([id, v]) => ({ id, data: () => freeze(JSON.parse(JSON.stringify(v))) })) });
+      window.claude = { use: async n => n !== 'db' ? null : {
+        collection: c => ({ onSnapshot: cb => { setTimeout(() => cb(snap(c)), 20); return () => {}; } }),
+        doc: p => ({ onSnapshot: cb => { setTimeout(() => cb({ exists: false, data: () => null }), 20); return () => {}; },
+          set: async v => { window.__writes++; const [c, id] = p.split('/'); if (c === 'days') days[id] = v; } }) } }; };
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, null, init);
+    await page.waitForSelector('#tcCheck'); await page.waitForTimeout(200);
+    await page.click('[data-tc="sc"][data-k="sleep"][data-v="3"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="sc"][data-k="sleep"][data-v="3"]', 'aria-pressed'), 'true');
+    await page.click('[data-tc="morning"][data-v="protein"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="morning"][data-v="protein"]', 'aria-pressed'), 'true');
+    await page.waitForTimeout(1200);
+    assert.ok(await page.evaluate(() => window.__writes) >= 1, 'gespeichert');
     assert.deepStrictEqual(errors, []);
   },
   async 'Cockpit Übersicht: Kacheln, Erkenntnisse mit Alltagstipp'(b) {
