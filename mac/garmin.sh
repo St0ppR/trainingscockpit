@@ -12,6 +12,7 @@ run() {
   .venv/bin/python sync.py || echo "Sync fehlgeschlagen - analysiere mit dem letzten Stand."
   .venv/bin/python analyze.py ${MINUTES:+--minutes $MINUTES}
   .venv/bin/python check_fresh.py || true
+  .venv/bin/python nudges.py || true
 }
 if [[ "$MODE" == "--auto" ]]; then
   run >> logs/morgenlauf.log 2>&1
