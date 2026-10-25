@@ -1,0 +1,20 @@
+# Persoenliche Rohdaten und Ergebnisse: bleiben nur auf dem Mac
+data.json
+history.json
+dashboard-data.json
+dashboard.html
+summary.txt
+today_input.txt
+url.txt
+plan.json
+plan-*.json
+logs/
+*.log
+# Garmin-Anmeldung und Umgebung
+.garminconnect/
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+node_modules/
+test-results/
