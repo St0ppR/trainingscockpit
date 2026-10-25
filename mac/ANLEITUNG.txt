@@ -1,0 +1,40 @@
+Trainingscockpit
+================
+
+So laeuft es jeden Morgen:
+  07:30  Mac: garmin.sh holt die Garmin-Daten (sync.py) und rechnet alles (analyze.py)
+         -> dashboard-data.json + lokales dashboard.html
+  07:50  Claude: holt dashboard-data.json, aktualisiert die Webseite "Trainingscockpit"
+         und schreibt die Tagesempfehlung (Leitfaden: COACH.md)
+
+Vorher sollte die Uhr mit der Garmin-App synchronisiert haben (passiert meist von selbst).
+
+VON HAND AKTUALISIEREN (Terminal):
+  cd ~/garmin && ./garmin.sh
+
+AUTOMATIK EINRICHTEN (einmalig, falls noch nicht geschehen):
+  chmod +x ~/garmin/garmin.sh
+  mkdir -p ~/garmin/logs ~/Library/LaunchAgents
+  cp ~/garmin/de.garmin.dashboard.plist ~/Library/LaunchAgents/
+  launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/de.garmin.dashboard.plist
+  Test:  launchctl kickstart gui/$(id -u)/de.garmin.dashboard
+  Log:   tail -20 ~/garmin/logs/morgenlauf.log
+  Abschalten: launchctl bootout gui/$(id -u)/de.garmin.dashboard
+
+DATEIEN
+  sync.py              Garmin -> data.json
+  analyze.py           rechnet alles (Parameter oben in der Datei) -> dashboard-data.json, dashboard.html
+  dashboard_template.html / cockpit_page.html   die Seite
+  history.json         lange Historie seit 2021 (waechst mit jedem Sync)
+  COACH.md             Leitfaden fuer den Coach - darfst du aendern
+  ~/.garminconnect     Anmelde-Token (wie ein Login - nicht weitergeben)
+  build.py             alte Version, wird nicht mehr benutzt
+
+IPHONE-AUSLOESER (Schlafmodus aus -> Update)
+  Mac: Systemeinstellungen > Allgemein > Teilen > "Entfernte Anmeldung" an.
+  iPhone, Kurzbefehle > Automation > Fokus "Schlafen" > "Beim Deaktivieren" > "Sofort ausfuehren":
+    1. App oeffnen: Connect (Garmin)       -> Uhr synchronisiert
+    2. Warten: 60 Sekunden
+    3. Skript ueber SSH ausfuehren: /bin/zsh ~/garmin/garmin.sh --phone
+    4. Mitteilung anzeigen: Shell-Script-Ergebnis
+  Claude schreibt danach (stuendlich 06:10-11:10 geprueft) die ausfuehrliche Empfehlung.
