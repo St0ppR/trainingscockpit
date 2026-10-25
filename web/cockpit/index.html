@@ -2006,7 +2006,7 @@ function render(){
   document.querySelectorAll('#bnav button').forEach(b=>{ if (b.dataset.t===tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   const x = DATA.days[cur];
   $('#banner').innerHTML = ['food','coach','workout','trn','trd','jrn','uebersicht'].includes(view) ? '' : DATA.today!==DATA.lastWithData && (view==='heute' || cur===DATA.lastWithData)
-    ? `<div class="banner"><b>Noch keine Daten von heute.</b> Angezeigt wird ${dshort(DATA.lastWithData)}. Garmin-App öffnen, damit die Uhr abgleicht.</div>`
+    ? `<div class="banner"><b>Noch keine Daten von heute.</b> Angezeigt wird ${dshort(DATA.lastWithData)} Garmin-App öffnen, damit die Uhr abgleicht.</div>`
     : (DAYVIEWS.includes(view) && x && x.recovery==null ? `<div class="banner"><b>Für ${dlong(cur)} liegen noch keine Daten vor.</b></div>` : '');
   const v = $('#view');
   v.innerHTML = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='uebersicht'?renderUebersicht():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
