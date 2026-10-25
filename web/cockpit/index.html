@@ -296,6 +296,9 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .ht{flex:1;min-width:0}
 .tc .ht small{display:block;color:var(--ink-3);font-size:12px}
 .tc .habit .st{font:600 13px var(--f-display);color:var(--ink-3);white-space:nowrap}
+.tc .morning .num{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 14px var(--f-display);background:var(--accent-soft);color:var(--ink-2)}
+.tc .morning [aria-pressed="true"] .num{background:var(--good);color:#fff}
+.tc .morning [aria-pressed="true"] .ht{color:var(--ink-3)}
 .tc .water{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .tc .water button{width:30px;height:36px;border-radius:7px 7px 10px 10px;border:2px solid var(--accent);background:transparent;cursor:pointer;padding:0}
 .tc .water button.f{background:var(--accent)}
@@ -657,8 +660,24 @@ function renderHeute(){
   const movedN=tcWeek().filter(tcMoved).length;
   const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?'':dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
   const restart=m.gap>=7?`<div class="tc-banner s12"><b>Wiedereinstieg nach ${m.gap} Tagen.</b> Diese Woche zählt nur eins: jeden Tag etwas machen. Minimum oder Normal mit 2–3 Wiederholungen Reserve, dann steigern.</div>`:'';
-  return `<div class="grid tc">${head}${restart}${tcCheckCard(m)}${tcTipCard(m)}${tcTrainCard(m)}${tcRecRow()}${tcNudgeCard(m)}${tcMindCard()}${tcHabitCard()}${foodTile()}
+  return `<div class="grid tc">${head}${restart}${tcMorningCard()}${tcCheckCard(m)}${tcTipCard(m)}${tcTrainCard(m)}${tcRecRow()}${tcNudgeCard(m)}${tcMindCard()}${tcHabitCard()}${foodTile()}
     <button class="card s12 rowlink" data-goview="uebersicht"><span style="flex:1"><b>Übersicht</b><br><span class="small muted">Deine Woche, Trends und was deine Daten über dich sagen</span></span><span class="chev">›</span></button></div>`;
+}
+/* Morgen-Ablauf: vier feste Schritte nach dem Aufstehen, jeder zum Abhaken oder Hinspringen */
+function tcMorningSteps(){
+  const x=tcDay(), c=x.checkin||{};
+  return [
+    {id:'water',t:'Ein großes Glas Wasser',s:'direkt nach dem Aufstehen, noch im Bad oder in der Küche',on:(x.water||0)>=1},
+    {id:'check',t:'Check-in im Cockpit',s:'6 kurze Fragen, 30 Sekunden – danach steht dein Tagesmodus',on:!!(c.sleep&&c.energy&&c.mood&&c.stress)},
+    {id:'train',t:'Training im Keller',s:'die vorgeschlagene Stufe, danach „erledigt“ tippen',on:!!(x.training&&x.training.tier)},
+    {id:'protein',t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier',on:!!(x.habits&&x.habits.protein)}];
+}
+function tcMorningCard(){
+  const st=tcMorningSteps(), n=st.filter(s=>s.on).length;
+  if(n===st.length&&!tcUi.showMorning) return `<button class="card s12 rowlink" data-tc="act" data-a="showMorning"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Morgen erledigt</b><br><span class="small muted">Alle 4 Schritte geschafft.</span></span><span class="chev">›</span></button>`;
+  return `<section class="card s12 morning" id="tcMorning"><h2>Dein Morgen <span class="chip">${n} von ${st.length}</span></h2>
+    <p class="small muted" style="margin-top:-4px">Nach dem endgültigen Aufstehen, in dieser Reihenfolge. Tippen hakt ab oder springt zum Schritt.</p>
+    <div class="habits">${st.map((s,i)=>`<button type="button" class="habit" data-tc="morning" data-v="${s.id}" aria-pressed="${s.on}"><span class="num">${s.on?'✓':i+1}</span><span class="ht">${esc(s.t)}<small>${esc(s.s)}</small></span></button>`).join('')}</div></section>`;
 }
 function tcCheckCard(m){
   const c=tcDay().checkin||{}, done=c.sleep&&c.energy&&c.mood&&c.stress;
@@ -671,7 +690,7 @@ function tcCheckCard(m){
       <div><h3>${msg}</h3><ul class="why">${m.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div></div></section>`;
   }
   const g=tcGarmin();
-  return `<section class="card s12" id="tcCheck"><h2>Morgen-Check-in <span class="chip">30 Sekunden</span></h2>
+  return `<section class="card s12" id="tcCheck"><h2>Morgen-Check-in <span class="chip">6 Fragen · 30 Sekunden</span></h2>
     ${g?`<p class="small muted" style="margin-top:-4px">Die Uhr sagt: Erholung ${nf(g.recovery)} % (${BAND[g.band].t}). Wie fühlst du dich selbst?</p>`:''}
     <div class="q"><label>Wie erholt fühlst du dich? <span>1 kaputt · 5 frisch</span></label><div class="scale">${tcScale('sleep',c.sleep)}</div></div>
     <div class="q"><label>Energie <span>1 leer · 5 voll</span></label><div class="scale">${tcScale('energy',c.energy)}</div></div>
@@ -689,10 +708,10 @@ function tcTrainCard(m){
   const c=store.coach[TD()];
   const coachLine=c&&c.headline?`<p class="small" style="margin:4px 0 0"><span class="muted">Trainer:</span> ${esc(c.headline)}</p>`:'';
   const head=`<h2>Training <span class="chip">${esc(s.focus)}</span></h2><h3>${esc(s.title)}</h3>${s.note?`<p class="small muted">${esc(s.note)}</p>`:''}${coachLine}`;
-  if(tr&&tr.tier) return `<section class="card s12">${head}<div class="done"><span class="ck">✓</span><div><b>Erledigt: ${TIERN[tr.tier]}</b>${tr.rpe?` · Anstrengung ${tr.rpe}/10`:''}<div class="small muted">${tr.rpe&&tr.rpe<=5?'Fiel leicht – nächstes Mal eine Stufe mehr.':tr.rpe>=8?'War hart – nächstes Mal etwas zurücknehmen.':'Gut gemacht. Morgen geht es weiter.'}</div></div></div>
+  if(tr&&tr.tier) return `<section class="card s12" id="tcTrain">${head}<div class="done"><span class="ck">✓</span><div><b>Erledigt: ${TIERN[tr.tier]}</b>${tr.rpe?` · Anstrengung ${tr.rpe}/10`:''}<div class="small muted">${tr.rpe&&tr.rpe<=5?'Fiel leicht – nächstes Mal eine Stufe mehr.':tr.rpe>=8?'War hart – nächstes Mal etwas zurücknehmen.':'Gut gemacht. Morgen geht es weiter.'}</div></div></div>
     ${tr.rpe?'':`<div class="q" style="margin-top:12px"><label>Wie anstrengend war es? <span>1 locker · 10 maximal</span></label><div class="scale s6">${[3,5,6,7,8,9].map(i=>`<button type="button" data-tc="rpe" data-v="${i}">${i}</button>`).join('')}</div></div>`}
     <div class="row" style="margin-top:10px"><button class="btn ghost" data-tc="act" data-a="undoTrain">Rückgängig</button></div>${tcCounters()}</section>`;
-  return `<section class="card s12">${head}<div class="tiers" role="group" aria-label="Umfang wählen">
+  return `<section class="card s12" id="tcTrain">${head}<div class="tiers" role="group" aria-label="Umfang wählen">
     ${['min','std','full'].map(k=>s[k]?`<button type="button" class="tier ${k===recTier?'rec':''}" data-tc="tier" data-v="${k}" aria-pressed="${k===sel}"><b>${TIERN[k]}</b><span>${s[k].min} min</span></button>`:'').join('')}</div>
     ${v?tcExList(v.blocks):''}
     <button class="btn go bigbtn" style="margin-top:14px" data-tc="done" data-v="${sel}">✓ ${TIERN[sel]} erledigt</button>
@@ -794,7 +813,13 @@ document.addEventListener('click',e=>{
     tcPatch(x=>{ x.nudges=x.nudges||{}; const on=!x.nudges[v]; x.nudges[v]=on; const s=on?1:-1;
       if(n.rep){ x.reps=x.reps||{}; x.reps[n.rep[0]]=Math.max(0,(x.reps[n.rep[0]]||0)+s*n.rep[1]); }
       if(n.water) x.water=Math.max(0,(x.water||0)+s); x.habits=x.habits||{}; if(on) x.habits.breaks=true; }); }
+  else if(a==='morning'){ const go=id=>setTimeout(()=>{ const el=document.getElementById(id); el&&el.scrollIntoView({behavior:'smooth',block:'start'}); },30);
+    if(v==='water') tcPatch(x=>{ x.water=(x.water||0)>=1?(x.water||0)-1:1; });
+    else if(v==='protein') tcPatch(x=>{ x.habits=x.habits||{}; x.habits.protein=!x.habits.protein; });
+    else if(v==='check'){ tcUi.editCheck=true; render(); go('tcCheck'); }
+    else if(v==='train') go('tcTrain'); }
   else if(a==='act'){ const w=b.dataset.a;
+    if(w==='showMorning'){ tcUi.showMorning=true; render(); return; }
     if(w==='editCheck'){ tcUi.editCheck=true; render(); }
     else if(w==='closeCheck'){ tcUi.editCheck=false; render(); }
     else if(w==='undoTrain'){ tcPatch(x=>{ delete x.training; }); }

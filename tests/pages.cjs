@@ -74,6 +74,21 @@ const tests = {
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
+  async 'Cockpit Heute: Morgen-Ablauf in 4 Schritten'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#tcMorning');
+    assert.match(await page.locator('#tcMorning h2').innerText(), /0 von 4/);
+    await page.click('[data-tc="morning"][data-v="water"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="morning"][data-v="water"]', 'aria-pressed'), 'true');
+    await page.click('[data-tc="morning"][data-v="check"]');
+    for (const k of ['sleep', 'energy', 'mood', 'stress']) await page.click(`[data-tc="sc"][data-k="${k}"][data-v="3"]`);
+    await page.click('[data-tc="act"][data-a="closeCheck"]');
+    await page.click('[data-tc="done"]');
+    await page.click('[data-tc="morning"][data-v="protein"]');
+    assert.match(await page.locator('#view').innerText(), /Morgen erledigt/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
   async 'Cockpit Übersicht: Kacheln, Erkenntnisse mit Alltagstipp'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForSelector('#bnav button[data-t="uebersicht"]');
