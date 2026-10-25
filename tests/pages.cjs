@@ -74,6 +74,7 @@ const tests = {
     await page.waitForSelector('.tc .badge');
     assert.match(await page.locator('#view').innerText(), /Erledigt/);
     assert.match(await page.locator('.counters').innerText(), /25/);
+    assert.match(await page.locator('.counters').innerText(), /\/ 100\b[\s\S]*\/ 150\b/);   // Stufenplan-Start, nicht 500/750
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
