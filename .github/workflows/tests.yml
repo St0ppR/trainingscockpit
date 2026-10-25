@@ -1,0 +1,31 @@
+name: Tests
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python-Tests (Formeln, analyze.py auf Testdaten, Frische-Warnung)
+        run: |
+          pip install pytest
+          python -m pytest -q
+      - name: Testdaten für die Seiten erzeugen
+        run: |
+          mkdir -p /tmp/fx
+          python tests/make_fixture.py /tmp/fx
+          cp mac/analyze.py mac/formulas.py /tmp/fx/
+          cd /tmp/fx && python analyze.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Seitentests (Cockpit, Tagescoach)
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+          node tests/pages.cjs /tmp/fx/dashboard-data.json
