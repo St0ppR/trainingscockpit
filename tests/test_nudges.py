@@ -12,17 +12,30 @@ def payload(band="green", hours=7.5, fresh=True):
             "days": {DAY: {"band": band, "sleep": {"asleep": hours * 3600}}}}
 
 
-def test_band_bestimmt_die_liste():
-    for band in ("red", "yellow", "green"):
+def test_band_bestimmt_die_dosis():
+    for band, n in (("green", ("20", "25")), ("yellow", ("12", "15"))):
         b, slots, _ = nudges.pick(payload(band), DAY)
-        assert b == band
-        titles = [t for t, _ in nudges.NUDGES[band]]
-        assert all(t in titles for _, t, _ in slots)
+        assert b == band and slots[0][1].split()[0] in n
+    b, slots, _ = nudges.pick(payload("red"), DAY)
+    assert b == "red" and slots[0][1].startswith("5 Minuten raus")
+
+
+def test_keine_allerweltstipps():
+    alle = " ".join(t + d for t, d in nudges.POOL.values()).lower()
+    assert "treppe" not in alle and "aufzug" not in alle
+
+
+def test_nachmittag_wechselt_ueber_drei_tage():
+    import datetime as dt
+    d0 = dt.date.fromisoformat(DAY)
+    seen = {nudges.pick({}, (d0 + dt.timedelta(days=i)).isoformat())[1][1][1] for i in range(3)}
+    assert len(seen) == 3
 
 
 def test_zwei_verschiedene_vorschlaege():
     _, slots, _ = nudges.pick(payload(), DAY)
     assert [s for s, _, _ in slots] == ["vormittag", "nachmittag"]
+    assert "{n}" not in slots[0][1]
     assert slots[0][1] != slots[1][1]
 
 
@@ -33,8 +46,8 @@ def test_ohne_frische_daten_gelb():
 
 
 def test_kurze_nacht_bremst_gruen():
-    b, _, note = nudges.pick(payload("green", hours=5.2), DAY)
-    assert b == "yellow" and "5.2 h" in note
+    b, slots, note = nudges.pick(payload("green", hours=5.2), DAY)
+    assert b == "yellow" and "5.2 h" in note and slots[0][1].startswith("5 Minuten raus")
 
 
 def test_dateien_fuers_iphone(tmp_path):
@@ -50,10 +63,10 @@ def test_dateien_fuers_iphone(tmp_path):
 
 def test_gleiche_liste_wie_im_cockpit():
     html = (ROOT / "web/cockpit/index.html").read_text(encoding="utf-8")
-    block = html[html.index("const TC_NUDGES"):html.index("};", html.index("const TC_NUDGES"))]
-    for band, items in nudges.NUDGES.items():
-        line = re.search(rf"\b{band}:\[(.*)\]", block).group(1)
-        assert re.findall(r"[{,]t:'([^']+)'", line) == [t for t, _ in items], band
+    block = html[html.index("const TC_NUDGE_POOL"):html.index("};", html.index("const TC_NUDGE_POOL"))]
+    page = dict(re.findall(r"(\w+):\{t:'([^']+)',s:'([^']+)'", block) and
+                [(i, (t, d)) for i, t, d in re.findall(r"(\w+):\{t:'([^']+)',s:'([^']+)'", block)])
+    assert page == nudges.POOL
 
 
 def test_nicht_schreibbar_bricht_nicht_ab(tmp_path):

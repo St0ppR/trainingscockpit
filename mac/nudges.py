@@ -14,33 +14,46 @@ from pathlib import Path
 
 ICLOUD = Path.home() / "Library/Mobile Documents/com~apple~CloudDocs/Trainingscockpit"
 
-# gleiche Liste wie TC_NUDGES in web/cockpit/index.html
-NUDGES = {
-    "red": [("2 Minuten Box-Atmung", "4 s ein · 4 halten · 4 aus · 4 halten"),
-            ("5 Minuten gehen", "einmal ums Gebäude oder den Flur entlang"),
-            ("Ein großes Glas Wasser", "hilft auch gegen den Nachmittags-Hunger")],
-    "yellow": [("10 Kniebeugen am Schreibtisch", "langsam, Stuhl als Ziel"),
-               ("Treppe statt Aufzug", "2 Stockwerke, ruhig atmen"),
-               ("Hüftbeuger-Dehnung", "45 s pro Seite gegen das Sitzen")],
-    "green": [("20 Kniebeugen", "zügig, volle Tiefe"),
-              ("15 Liegestütze an der Schreibtischkante", "Körper gerade"),
-              ("Treppe hoch, 2× hintereinander", "zügig, oben kurz durchatmen")],
+# gleiche Liste wie TC_NUDGE_POOL in web/cockpit/index.html; {n} = Wiederholungen je nach Erholung
+POOL = {
+    "push": ("{n} Liegestütze an der Schreibtischkante", "Körper gerade, Brust zur Kante"),
+    "squat": ("{n} Kniebeugen zum Stuhl", "Po tippt kurz an, Knie nach außen"),
+    "calf": ("Wadenheben einbeinig, 2 × 12 pro Seite", "3 s runter – macht das Sprunggelenk stabil"),
+    "kneewall": ("Knie zur Wand, 10 pro Seite", "Ferse bleibt unten – mehr Beweglichkeit im Sprunggelenk"),
+    "hipflex": ("Hüftbeuger dehnen, 45 s pro Seite", "gegen das lange Sitzen und den steifen Rücken"),
+    "tspine": ("Oberkörper drehen am Stuhl, 8 pro Seite", "Hände vor der Brust, aus dem oberen Rücken drehen"),
+    "sigh": ("3 tiefe Doppel-Einatmer", "zweimal kurz durch die Nase ein, lang durch den Mund aus – runter vom Stress"),
+    "box": ("2 Minuten Box-Atmung", "4 s ein · 4 halten · 4 aus · 4 halten"),
+    "arrive": ("1 Minute ankommen", "Füße spüren, 5 Dinge sehen, 3 hören – dann erst weiter"),
+    "protein": ("Eiweiß-Snack um halb vier", "Skyr, Quark oder Nüsse – dann kippt der Abend seltener"),
+    "walk": ("5 Minuten raus, ohne Handy", "nach einer kurzen Nacht besser als jede Übung"),
 }
+REPS = {"green": {"push": 20, "squat": 25}, "yellow": {"push": 12, "squat": 15}}
 SHORT_SLEEP_H = 6.5
 
 
+def item(nid, band):
+    t, d = POOL[nid]
+    return nid, t.replace("{n}", str(REPS.get(band, REPS["yellow"]).get(nid, ""))), d
+
+
 def pick(payload, today):
-    """-> (band, [(Zeitfenster, Titel, Detail), ...], Hinweis oder None) für den Tag."""
+    """-> (band, [(Zeitfenster, Titel, Detail), ...], Hinweis oder None).
+    Vormittags etwas für Kraft und Wochenziele (rot/kurze Nacht: raus an die Luft),
+    nachmittags im Wechsel Sprunggelenk, Eiweiß vor dem Heißhunger, Hüfte gegen das Sitzen."""
     day = (payload.get("days") or {}).get(today) or {}
     fresh = payload.get("lastWithData") == today
-    band = day.get("band") if fresh and day.get("band") in NUDGES else "yellow"
+    band = day.get("band") if fresh and day.get("band") in ("red", "yellow", "green") else "yellow"
     sleep = day.get("sleep") or {}
     hours = sleep["asleep"] / 3600 if fresh and sleep.get("asleep") else None
-    if hours is not None and hours < SHORT_SLEEP_H and band == "green":
+    short = hours is not None and hours < SHORT_SLEEP_H
+    if short and band == "green":
         band = "yellow"   # kurze Nacht: kein Vollgas, auch wenn die Werte gut sind
-    note = f"Kurze Nacht ({hours:.1f} h) – heute lieber ruhig." if hours is not None and hours < SHORT_SLEEP_H else None
-    lst, k = NUDGES[band], dt.date.fromisoformat(today).toordinal()
-    slots = [("vormittag",) + lst[k % 3], ("nachmittag",) + lst[(k + 1) % 3]]
+    note = f"Kurze Nacht ({hours:.1f} h) – heute lieber ruhig." if short else None
+    k = dt.date.fromisoformat(today).toordinal()
+    am = "walk" if band == "red" or short else ("squat" if k % 2 else "push")
+    pm = ("calf", "protein", "hipflex")[k % 3]
+    slots = [("vormittag",) + item(am, band)[1:], ("nachmittag",) + item(pm, band)[1:]]
     return band, slots, note
 
 

@@ -65,8 +65,10 @@ const tests = {
     assert.match(await page.locator('.tc .badge').innerText(), /Voll|Normal|Minimum/i);
     await page.click('[data-tc="done"]');
     assert.match(await page.locator('#view').innerText(), /Erledigt/);
-    await page.click('[data-tc="nudge"][data-v="1"]');
-    assert.strictEqual(await page.getAttribute('[data-tc="nudge"][data-v="1"]', 'aria-pressed'), 'true');
+    const nid = await page.getAttribute('[data-tc="nudge"] >> nth=1', 'data-v');
+    await page.click(`[data-tc="nudge"][data-v="${nid}"]`);
+    assert.strictEqual(await page.getAttribute(`[data-tc="nudge"][data-v="${nid}"]`, 'aria-pressed'), 'true');
+    assert.doesNotMatch(await page.locator('.nudges').innerText(), /Treppe|\{n\}|undefined/);
     await page.click('[data-tc="rep"][data-k="push"][data-v="25"]');
     await page.reload();
     await page.waitForSelector('.tc .badge');
