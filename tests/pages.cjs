@@ -129,6 +129,10 @@ const tests = {
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(13)));
     await page.waitForSelector('.nudges');
     assert.strictEqual(await page.locator('#tcEve').count(), 0);
+    assert.ok(await page.evaluate(() => document.querySelector('#tcMorning').nextElementSibling.id === 'tcCheck'), 'tagsüber: Check-in direkt unter dem Morgen-Ablauf');
+    await page.click('[data-tc="morning"][data-v="check"]');
+    await page.click('[data-tc="sc"][data-k="sleep"][data-v="3"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="sc"][data-k="sleep"][data-v="3"]', 'aria-pressed'), 'true');
     assert.deepStrictEqual(errors, []); await page.close();
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(20)));
     await page.waitForSelector('#tcEve');
