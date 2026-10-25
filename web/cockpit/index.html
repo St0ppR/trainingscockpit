@@ -778,7 +778,7 @@ function tcTrainCard(m){
 function tcCounters(){
   const pr=tcWeekSum('push'), sq=tcWeekSum('squat'), r=tcDay().reps||{};
   return `<div class="counters" style="margin-top:14px">${[['push','Liegestütze diese Woche',pr,tcWeekGoal('push')],['squat','Kniebeugen diese Woche',sq,tcWeekGoal('squat')]].map(([k,l,val,goal])=>`<div class="ctr"><div class="k">${l}</div><div class="v">${nf(val)} <small>/ ${goal}</small></div><div class="bar"><i style="width:${Math.min(100,val/goal*100)}%"></i></div><div class="row">${[10,25].map(n=>`<button type="button" data-tc="rep" data-k="${k}" data-v="${n}">+${n}</button>`).join('')}<button type="button" data-tc="rep" data-k="${k}" data-v="-10" aria-label="10 abziehen">−10</button></div></div>`).join('')}</div>
-    <p class="small muted" style="margin-top:6px">Zählt alles: Einheit, Büro, abends vorm Fernseher. Heute: ${nf(r.push||0)} Liegestütze, ${nf(r.squat||0)} Kniebeugen. Schaffst du rund 80 %, steigt das Ziel nächste Woche um 20 % – Fernziel ${TC_GOALS.weekPush} / ${TC_GOALS.weekSquat}.</p>`;
+    <p class="small muted" style="margin-top:6px">Zählt alles: Einheit, Büro, abends vorm Fernseher. Heute: ${nf(r.push||0)} Liegestütze, ${nf(r.squat||0)} Kniebeugen. Das Ziel legt dein Trainer fest und passt es jede Woche an. Du machst einfach, was dran ist.</p>`;
 }
 function tcRecRow(){
   const L=DATA.lastWithData, x=DATA.days[L]; if(!x) return '';
