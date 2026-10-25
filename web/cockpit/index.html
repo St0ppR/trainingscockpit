@@ -515,12 +515,38 @@ const TC_LIB={
 const TC_ROT={1:'kraftA',2:'zone2',3:'swing',4:'kraftB',5:'zone2',6:'kraftA',0:'mob'};
 const TC_MODE={green:{c:'var(--good)',t:'Voll',sub:'gut erholt',tier:'full'},yellow:{c:'var(--warn)',t:'Normal',sub:'kontrolliert',tier:'std'},red:{c:'var(--crit)',t:'Minimum',sub:'schonen',tier:'min'}};
 const TIERN={min:'Minimum',std:'Normal',full:'Voll'};
-/* Mini-Vorschläge für zwischendurch (Büro): passen zum Tagesmodus, „erledigt“ zählt Wiederholungen mit */
-const TC_NUDGES={
-  red:[{t:'2 Minuten Box-Atmung',s:'4 s ein · 4 halten · 4 aus · 4 halten',act:'breath'},{t:'5 Minuten gehen',s:'einmal ums Gebäude oder den Flur entlang'},{t:'Ein großes Glas Wasser',s:'hilft auch gegen den Nachmittags-Hunger',water:1}],
-  yellow:[{t:'10 Kniebeugen am Schreibtisch',s:'langsam, Stuhl als Ziel',rep:['squat',10]},{t:'Treppe statt Aufzug',s:'2 Stockwerke, ruhig atmen'},{t:'Hüftbeuger-Dehnung',s:'45 s pro Seite gegen das Sitzen'}],
-  green:[{t:'20 Kniebeugen',s:'zügig, volle Tiefe',rep:['squat',20]},{t:'15 Liegestütze an der Schreibtischkante',s:'Körper gerade',rep:['push',15]},{t:'Treppe hoch, 2× hintereinander',s:'zügig, oben kurz durchatmen'}]
-};
+/* Mini-Vorschläge für zwischendurch (Büro): persönlich statt allgemein – Wochenziele, Sprunggelenk, Sitzen, Kopf, Essen.
+   Gleiche Liste wie mac/nudges.py (tests/test_nudges.py prüft das). {n} = Wiederholungen je nach Tagesmodus. */
+const TC_NUDGE_POOL={
+  push:{t:'{n} Liegestütze an der Schreibtischkante',s:'Körper gerade, Brust zur Kante',rep:'push'},
+  squat:{t:'{n} Kniebeugen zum Stuhl',s:'Po tippt kurz an, Knie nach außen',rep:'squat'},
+  calf:{t:'Wadenheben einbeinig, 2 × 12 pro Seite',s:'3 s runter – macht das Sprunggelenk stabil',habit:'ankle'},
+  kneewall:{t:'Knie zur Wand, 10 pro Seite',s:'Ferse bleibt unten – mehr Beweglichkeit im Sprunggelenk',habit:'ankle'},
+  hipflex:{t:'Hüftbeuger dehnen, 45 s pro Seite',s:'gegen das lange Sitzen und den steifen Rücken'},
+  tspine:{t:'Oberkörper drehen am Stuhl, 8 pro Seite',s:'Hände vor der Brust, aus dem oberen Rücken drehen'},
+  sigh:{t:'3 tiefe Doppel-Einatmer',s:'zweimal kurz durch die Nase ein, lang durch den Mund aus – runter vom Stress'},
+  box:{t:'2 Minuten Box-Atmung',s:'4 s ein · 4 halten · 4 aus · 4 halten',act:'breath'},
+  arrive:{t:'1 Minute ankommen',s:'Füße spüren, 5 Dinge sehen, 3 hören – dann erst weiter'},
+  protein:{t:'Eiweiß-Snack um halb vier',s:'Skyr, Quark oder Nüsse – dann kippt der Abend seltener'},
+  walk:{t:'5 Minuten raus, ohne Handy',s:'nach einer kurzen Nacht besser als jede Übung'}};
+const TC_NUDGE_N={green:{push:20,squat:25},yellow:{push:12,squat:15}};
+function tcNudgeList(m){
+  const x=tcDay(), c=x.checkin||{}, band=m.band||'yellow', h=new Date().getHours(), k=Math.floor(dt(TD()).getTime()/864e5);
+  const pick=id=>Object.assign({id},TC_NUDGE_POOL[id]);
+  let body;
+  if(band==='red'||c.sick||c.night) body=pick('walk');
+  else if(c.pain>=4) body=pick('kneewall');
+  else { const gp=1-tcWeekSum('push')/TC_GOALS.weekPush, gs=1-tcWeekSum('squat')/TC_GOALS.weekSquat;
+    body=pick(gp>=gs?'push':'squat'); body.n=TC_NUDGE_N[band][body.rep];
+    body.why=`Wochenziel ${body.rep==='push'?'Liegestütze':'Kniebeugen'}: noch ${nf(Math.max(0,body.rep==='push'?TC_GOALS.weekPush-tcWeekSum('push'):TC_GOALS.weekSquat-tcWeekSum('squat')))}`; }
+  const mob=pick(!(x.habits||{}).ankle&&!(c.pain>=4)?(k%2?'calf':'kneewall'):(k%2?'hipflex':'tspine'));
+  const head=pick(c.stress>=4?'box':h>=13&&!(x.habits||{}).plate?'protein':(k%2?'sigh':'arrive'));
+  // Abgehaktes bleibt stehen, auch wenn sich die Auswahl danach ändern würde
+  const nd=x.nudges||{}, keep=(cur,ids)=>{ const d=ids.find(i=>nd[i]); if(!d||d===cur.id) return cur; const o=pick(d); if(nd[d]&&nd[d].n) o.n=nd[d].n; return o; };
+  body=keep(body,['walk','push','squat']);
+  return [body,keep(mob,['calf','kneewall','hipflex','tspine']),keep(head,['box','protein','sigh','arrive'])].map(n=>Object.assign(n,{t:n.t.replace('{n}',n.n||'')}));
+}
+
 
 store.days={}; store.tcplan={}; store.tcset=null;
 const tcDirty=new Set();
@@ -753,9 +779,9 @@ function tcRecRow(){
     <span class="minis"><span><b>${nf(x.parts.hrv&&x.parts.hrv.raw)}</b> ms HFV</span><span><b>${nf(x.parts.rhr&&x.parts.rhr.raw)}</b> Ruhepuls</span><span><b>${x.sleep?hc(x.sleep.asleep/3600):'–'}</b> h Schlaf</span></span></span><span class="chev">›</span></button>`;
 }
 function tcNudgeCard(m){
-  const list=TC_NUDGES[m.band||'yellow'], done=tcDay().nudges||{};
+  const list=tcNudgeList(m), done=tcDay().nudges||{};
   return `<section class="card s12"><h2>Für zwischendurch <span class="chip">Büro · 2 Minuten</span></h2>
-    <div class="nudges">${list.map((n,i)=>`<button type="button" class="nudge" data-tc="nudge" data-v="${i}" aria-pressed="${!!done[i]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}</small></span></button>`).join('')}</div></section>`;
+    <div class="nudges">${list.map(n=>`<button type="button" class="nudge" data-tc="nudge" data-v="${n.id}" aria-pressed="${!!done[n.id]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}${n.why?' · '+esc(n.why):''}</small></span></button>`).join('')}</div></section>`;
 }
 function tcMindCard(){
   const c=tcDay().checkin||{}, hi=c.stress>=4;
@@ -829,11 +855,12 @@ document.addEventListener('click',e=>{
   else if(a==='rep'){ tcPatch(x=>{ x.reps=x.reps||{}; x.reps[k]=Math.max(0,(x.reps[k]||0)+(+v)); }); }
   else if(a==='hb'){ tcPatch(x=>{ x.habits=x.habits||{}; x.habits[k]=!x.habits[k]; }); }
   else if(a==='water'){ tcPatch(x=>{ x.water=x.water===+v?+v-1:+v; }); }
-  else if(a==='nudge'){ const n=TC_NUDGES[tcMode().band||'yellow'][+v];
+  else if(a==='nudge'){ const n=tcNudgeList(tcMode()).find(y=>y.id===v)||Object.assign({id:v},TC_NUDGE_POOL[v]);
     if(n.act==='breath'&&!tcBreath.on&&!(tcDay().nudges||{})[v]){ tcPatch(x=>{ x.nudges=Object.assign({},x.nudges,{[v]:true}); }); tcToggleBreath(); return; }
-    tcPatch(x=>{ x.nudges=x.nudges||{}; const on=!x.nudges[v]; x.nudges[v]=on; const s=on?1:-1;
-      if(n.rep){ x.reps=x.reps||{}; x.reps[n.rep[0]]=Math.max(0,(x.reps[n.rep[0]]||0)+s*n.rep[1]); }
-      if(n.water) x.water=Math.max(0,(x.water||0)+s); x.habits=x.habits||{}; if(on) x.habits.breaks=true; }); }
+    tcPatch(x=>{ x.nudges=x.nudges||{}; const prev=x.nudges[v], on=!prev; x.nudges[v]=on?(n.n?{n:n.n}:true):false;
+      const cnt=on?(n.n||0):-((prev&&prev.n)||0);   // abhaken zählt mit, zurücknehmen zieht genau das wieder ab
+      if(n.rep&&cnt){ x.reps=x.reps||{}; x.reps[n.rep]=Math.max(0,(x.reps[n.rep]||0)+cnt); }
+      x.habits=x.habits||{}; if(on){ x.habits.breaks=true; if(n.habit) x.habits[n.habit]=true; } }); }
   else if(a==='ev'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; if(k==='screen') x.evening.screen=!x.evening.screen; else x.evening[k]=x.evening[k]===+v?null:+v; }); }
   else if(a==='evt'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; let l=(x.evening[k]||[]).slice(); const only=v==='nichts'||v==='ok';
       if(l.includes(v)) l=l.filter(t=>t!==v); else l=only?[v]:l.filter(t=>t!=='nichts'&&t!=='ok').concat(v);
