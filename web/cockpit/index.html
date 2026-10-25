@@ -299,6 +299,7 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .morning .num{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 14px var(--f-display);background:var(--accent-soft);color:var(--ink-2)}
 .tc .morning [aria-pressed="true"] .num{background:var(--good);color:#fff}
 .tc .morning [aria-pressed="true"] .ht{color:var(--ink-3)}
+.tc button{touch-action:manipulation}
 .tc-flash{outline:3px solid var(--accent);outline-offset:2px;transition:outline-color .3s}
 .tc-phase{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-4px 0 2px}
 .tc .water{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
@@ -560,14 +561,18 @@ const tcMonday=d=>addDays(d,-((dt(d).getDay()+6)%7));
 const tcDay=(d=TD())=>store.days[d]||(store.days[d]={date:d});
 let tcSaveT=null, tcTier=null, tcUi={}, tcBreath={on:false,t:null,phase:0,left:0};
 function tcPatch(fn,d=TD()){ const x=tcDay(d); fn(x); x.updatedAt=new Date().toISOString(); tcDirty.add(d); tcSaveLocal(); render(); clearTimeout(tcSaveT); tcSaveT=setTimeout(tcFlush,600); }
+let tcSaveErr=null, tcFlushing=false;
 async function tcFlush(){
-  if (!db) return;
-  for (const d of [...tcDirty]){ tcDirty.delete(d);
-    try{ await db.doc('days/'+d).set(JSON.parse(JSON.stringify(store.days[d]))); }
-    catch(e){ tcDirty.add(d); const f=$('#foot'); if(f) f.textContent='Speichern fehlgeschlagen – wird beim nächsten Eintrag erneut versucht.'; } }
+  if (!db || tcFlushing) return; tcFlushing=true;
+  // erst nach erfolgreichem Speichern als sauber markieren, sonst überschreibt eine Datenbank-Meldung den Tipp wieder
+  for (const d of [...tcDirty]){ const stamp=store.days[d]&&store.days[d].updatedAt;
+    try{ await db.doc('days/'+d).set(JSON.parse(JSON.stringify(store.days[d]))); if((store.days[d]&&store.days[d].updatedAt)===stamp) tcDirty.delete(d); tcSaveErr=null; }
+    catch(e){ tcSaveErr=(e&&(e.code||e.message))||'Fehler'; } }
+  tcFlushing=false; render();
+  if (tcDirty.size) { clearTimeout(tcSaveT); tcSaveT=setTimeout(tcFlush, tcSaveErr?5000:300); }
 }
 function tcInitDb(){
-  db.collection('days').onSnapshot(s=>{ s.docs.forEach(d=>{ if(!tcDirty.has(d.id)) store.days[d.id]=d.data(); }); tcSaveLocal(); emit(); }, ()=>{});
+  db.collection('days').onSnapshot(s=>{ s.docs.forEach(d=>{ const v=d.data(), l=store.days[d.id]; if(tcDirty.has(d.id)) return; if(l&&l.updatedAt&&v.updatedAt&&v.updatedAt<l.updatedAt) return; store.days[d.id]=v; }); tcSaveLocal(); emit(); }, ()=>{});
   db.collection('plan').onSnapshot(s=>{ store.tcplan={}; s.docs.forEach(d=>store.tcplan[d.id]=d.data()); emit(); }, ()=>{});
   db.doc('settings/main').onSnapshot(s=>{ store.tcset=s.exists?s.data():null; emit(); }, ()=>{});
 }
@@ -700,7 +705,7 @@ function renderHeute(){
   const m=tcMode(), x=tcDay(), t=dt(TD());
   const week=tcWeek().map(d=>`<span class="${tcMoved(d)?'on':''} ${d===TD()?'today':''}" title="${dshort(d)}">${WD[dt(d).getDay()]}</span>`).join('');
   const movedN=tcWeek().filter(tcMoved).length;
-  const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?'':dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
+  const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?(tcSaveErr?` · <b style="color:var(--crit)">nicht gespeichert (${esc(tcSaveErr)})</b>`:tcDirty.size?' · wird gespeichert …':' · gespeichert'):dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
   const restart=m.gap>=7?`<div class="tc-banner s12"><b>Wiedereinstieg nach ${m.gap} Tagen.</b> Diese Woche zählt nur eins: jeden Tag etwas machen. Minimum oder Normal mit 2–3 Wiederholungen Reserve, dann steigern.</div>`:'';
   // Alles zur richtigen Zeit: morgens der Start in den Tag, tagsüber die Mini-Vorschläge, abends Reflexion und Kopf.
   const ph=tcPhase(), all=tcUi.showAll, c=x.checkin||{}, checked=!!(c.sleep&&c.energy&&c.mood&&c.stress), trained=!!(x.training&&x.training.tier);
@@ -873,8 +878,9 @@ function renderUebersicht(){
 }
 
 /* ---------- Bedienung ---------- */
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-tc]'); if(!b||!document.getElementById('view').contains(b)) return;
+// direkt an jedem Knopf statt über document: in der eingebetteten Ansicht der iPhone-App kommen Tipps sonst nicht immer an
+function tcClick(e){
+  const b=e.currentTarget;
   const k=b.dataset.k, v=b.dataset.v, a=b.dataset.tc;
   if(a==='sc'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=x.checkin[k]===+v&&k==='pain'?null:+v; }); }
   else if(a==='tg'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=!x.checkin[k]; }); }
@@ -908,13 +914,13 @@ document.addEventListener('click',e=>{
     else if(w==='closeCheck'){ tcUi.editCheck=false; render(); }
     else if(w==='undoTrain'){ tcPatch(x=>{ delete x.training; }); }
     else if(w==='breath'){ tcToggleBreath(); } }
-});
+}
 let tcEvT=null;
-document.addEventListener('input',e=>{
-  const t=e.target; if(!t.dataset||!t.dataset.tcev) return;
+function tcInput(e){
+  const t=e.target;
   const x=tcDay(); x.evening=x.evening||{}; x.evening[t.dataset.tcev]=t.value; tcDirty.add(TD()); tcSaveLocal();
   clearTimeout(tcEvT); tcEvT=setTimeout(()=>{ x.updatedAt=new Date().toISOString(); tcFlush(); },900);
-});
+}
 function tcToggleBreath(){
   if(tcBreath.on){ clearInterval(tcBreath.t); tcBreath.on=false; render(); return; }
   tcBreath={on:true,phase:0,left:120,t:null}; render();
@@ -2134,6 +2140,7 @@ function render(){
     if(!slot.time && !slot.min){ st.textContent='Bitte Uhrzeit oder Dauer angeben.'; return; }
     try{ const j=Object.assign({date:DATA.today},store.journal[DATA.today]||{},{slot,updatedAt:new Date().toISOString()}); await db.doc('journal/'+DATA.today).set(j); }catch(e){}
     slotDraft=null; await coachNow(sg, st, slot); };
+  v.querySelectorAll('[data-tc]').forEach(b=>b.addEventListener('click',tcClick)); v.querySelectorAll('[data-tcev]').forEach(t=>t.addEventListener('input',tcInput));
   bindJournal(v); if(view==='coach') bindCoach(v); if(view==='workout') bindWorkout(v); if(view==='food') bindFood(v); if(view==='trd') bindTrd(v); tipBind(v);
   if (active){ const el=document.getElementById(active); if(el && el.focus) el.focus(); }
 }
