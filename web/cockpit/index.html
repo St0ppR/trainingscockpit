@@ -458,6 +458,8 @@ function ring(v, band, size=170){
 
 /* ---------- Speicher (Tagebuch, Profil, Trainer) ---------- */
 let db = null, dbState = 'lade';
+// Daten aus der Datenbank sind auf dem iPhone eingefroren (nicht änderbar): immer eine eigene Kopie nehmen, sonst scheitert jedes Antippen
+const own = v => v==null ? v : JSON.parse(JSON.stringify(v));
 const store = { journal:{}, coach:{}, profile:null, meals:{}, mealplan:{} };
 const listeners = new Set();
 function onStore(fn){ listeners.add(fn); }
@@ -468,12 +470,12 @@ async function initDb(){
   if (!db){ dbState='aus'; render(); return; }
   dbState='an';
   tcInitDb(); tcFlush(); diagStart();
-  db.collection('journal').onSnapshot(s=>{ store.journal={}; s.docs.forEach(d=>store.journal[d.id]=d.data()); emit(); }, ()=>{});
-  db.collection('coach').onSnapshot(s=>{ store.coach={}; s.docs.forEach(d=>store.coach[d.id]=d.data()); emit(); }, ()=>{});
-  db.collection('meals').onSnapshot(s=>{ store.meals={}; s.docs.forEach(d=>store.meals[d.id]=d.data()); emit(); }, ()=>{});
-  db.collection('mealplan').onSnapshot(s=>{ store.mealplan={}; s.docs.forEach(d=>store.mealplan[d.id]=d.data()); emit(); }, ()=>{});
-  db.doc('insights/verlauf').onSnapshot(s=>{ store.verlauf = s.exists ? s.data() : null; emit(); }, ()=>{});
-  db.doc('profile/main').onSnapshot(s=>{ store.profile = s.exists ? s.data() : null; emit(); }, ()=>{});
+  db.collection('journal').onSnapshot(s=>{ store.journal={}; s.docs.forEach(d=>store.journal[d.id]=own(d.data())); emit(); }, ()=>{});
+  db.collection('coach').onSnapshot(s=>{ store.coach={}; s.docs.forEach(d=>store.coach[d.id]=own(d.data())); emit(); }, ()=>{});
+  db.collection('meals').onSnapshot(s=>{ store.meals={}; s.docs.forEach(d=>store.meals[d.id]=own(d.data())); emit(); }, ()=>{});
+  db.collection('mealplan').onSnapshot(s=>{ store.mealplan={}; s.docs.forEach(d=>store.mealplan[d.id]=own(d.data())); emit(); }, ()=>{});
+  db.doc('insights/verlauf').onSnapshot(s=>{ store.verlauf = s.exists ? own(s.data()) : null; emit(); }, ()=>{});
+  db.doc('profile/main').onSnapshot(s=>{ store.profile = s.exists ? own(s.data()) : null; emit(); }, ()=>{});
 }
 const latestCoach = () => { const ks=Object.keys(store.coach).sort(); return ks.length? store.coach[ks[ks.length-1]] : null; };
 const latestWeekPlan = () => { const ks=Object.keys(store.coach).sort().reverse(); for(const k of ks){ if(store.coach[k].weekPlan) return store.coach[k]; } return null; };
@@ -572,9 +574,9 @@ async function tcFlush(){
   if (tcDirty.size) { clearTimeout(tcSaveT); tcSaveT=setTimeout(tcFlush, tcSaveErr?5000:300); }
 }
 function tcInitDb(){
-  db.collection('days').onSnapshot(s=>{ s.docs.forEach(d=>{ const v=d.data(), l=store.days[d.id]; if(tcDirty.has(d.id)) return; if(l&&l.updatedAt&&v.updatedAt&&v.updatedAt<l.updatedAt) return; store.days[d.id]=v; }); tcSaveLocal(); emit(); }, ()=>{});
-  db.collection('plan').onSnapshot(s=>{ store.tcplan={}; s.docs.forEach(d=>store.tcplan[d.id]=d.data()); emit(); }, ()=>{});
-  db.doc('settings/main').onSnapshot(s=>{ store.tcset=s.exists?s.data():null; emit(); }, ()=>{});
+  db.collection('days').onSnapshot(s=>{ s.docs.forEach(d=>{ const v=own(d.data()), l=store.days[d.id]; if(tcDirty.has(d.id)) return; if(l&&l.updatedAt&&v.updatedAt&&v.updatedAt<l.updatedAt) return; store.days[d.id]=v; }); tcSaveLocal(); emit(); }, ()=>{});
+  db.collection('plan').onSnapshot(s=>{ store.tcplan={}; s.docs.forEach(d=>store.tcplan[d.id]=own(d.data())); emit(); }, ()=>{});
+  db.doc('settings/main').onSnapshot(s=>{ store.tcset=s.exists?own(s.data()):null; emit(); }, ()=>{});
 }
 
 /* ---------- Ableitungen ---------- */
