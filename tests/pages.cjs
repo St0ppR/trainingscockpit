@@ -8,7 +8,9 @@ const wrap = html => '<!doctype html><html lang="de"><head><meta charset="utf-8"
 
 async function open(browser, app, data, width = 390, time = null) {
   const page = await browser.newPage({ viewport: { width, height: 844 } });
-  if (time) await page.clock.setFixedTime(time);   // nur Date; Timer laufen normal
+  // Uhrzeit fest auf 08:00, damit „Heute“ immer dieselbe Tagesphase zeigt (nur Date; Timer laufen normal)
+  if (!time) { time = new Date(); time.setHours(8, 0, 0, 0); }
+  await page.clock.setFixedTime(time);
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -71,7 +73,7 @@ const tests = {
     assert.doesNotMatch(await page.locator('.nudges').innerText(), /Treppe|\{n\}|undefined/);
     await page.click('[data-tc="rep"][data-k="push"][data-v="25"]');
     await page.reload();
-    await page.waitForSelector('.tc .badge');
+    await page.waitForSelector('.nudges');   // Start erledigt → Tagesphase mit Mini-Vorschlägen
     assert.match(await page.locator('#view').innerText(), /Erledigt/);
     assert.match(await page.locator('.counters').innerText(), /25/);
     assert.match(await page.locator('.counters').innerText(), /\/ 100\b[\s\S]*\/ 150\b/);   // Stufenplan-Start, nicht 500/750
@@ -112,6 +114,26 @@ const tests = {
     await page.click('[data-a="showEve"]');
     assert.strictEqual(await page.inputValue('#ev-good'), 'Minimum trotz Stress');
     assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="drain"][data-v="familie"]', 'aria-pressed'), 'true');
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: zur richtigen Zeit nur das, was dran ist'(b) {
+    const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d; };
+    let { page, errors } = await open(b, 'cockpit', DATA, 390, at(7));
+    await page.waitForSelector('#tcMorning');
+    assert.strictEqual(await page.locator('.nudges').count(), 0, 'morgens keine Mini-Vorschläge');
+    assert.strictEqual(await page.locator('#tcEve').count(), 0, 'morgens keine Abend-Reflexion');
+    await page.click('[data-a="showAll"]');
+    assert.ok(await page.locator('.nudges').count() === 1 && await page.locator('#tcMind').count() === 1, 'Alles anzeigen zeigt den Rest');
+    assert.deepStrictEqual(errors, []); await page.close();
+    ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(13)));
+    await page.waitForSelector('.nudges');
+    assert.strictEqual(await page.locator('#tcEve').count(), 0);
+    assert.deepStrictEqual(errors, []); await page.close();
+    ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(20)));
+    await page.waitForSelector('#tcEve');
+    assert.strictEqual(await page.locator('.nudges').count(), 0, 'abends keine Büro-Vorschläge');
+    assert.ok(await page.locator('#tcMind').count() === 1);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
