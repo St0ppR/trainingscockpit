@@ -299,6 +299,7 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .morning .num{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 14px var(--f-display);background:var(--accent-soft);color:var(--ink-2)}
 .tc .morning [aria-pressed="true"] .num{background:var(--good);color:#fff}
 .tc .morning [aria-pressed="true"] .ht{color:var(--ink-3)}
+.tc-flash{outline:3px solid var(--accent);outline-offset:2px;transition:outline-color .3s}
 .tc-phase{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-4px 0 2px}
 .tc .water{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .tc .water button{width:30px;height:36px;border-radius:7px 7px 10px 10px;border:2px solid var(--accent);background:transparent;cursor:pointer;padding:0}
@@ -707,7 +708,7 @@ function renderHeute(){
     nudge:()=>tcNudgeCard(m), mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard};
   const order={
     morgen:['morning','check','tip','train','rec'],
-    tag:['tip','nudge',...(checked?[]:['check']),'train','food','morning'],
+    tag:['tip','nudge','morning',...(checked?[]:['check']),'train','food'],   // Offenes vom Morgen direkt untereinander: Ablauf, Check-in, Training
     abend:['eve','habit','mind',...(trained?[]:['train']),'food']}[ph];
   const rest=['eve','morning','check','tip','train','rec','nudge','mind','habit','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
   const lab={morgen:'Guten Morgen',tag:'Für zwischendurch',abend:'Guten Abend'}[ph];
@@ -893,7 +894,7 @@ document.addEventListener('click',e=>{
   else if(a==='evt'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; let l=(x.evening[k]||[]).slice(); const only=v==='nichts'||v==='ok';
       if(l.includes(v)) l=l.filter(t=>t!==v); else l=only?[v]:l.filter(t=>t!=='nichts'&&t!=='ok').concat(v);
       x.evening[k]=l; if(k==='food'){ x.habits=x.habits||{}; x.habits.plate=l.length>0&&!l.includes('viel')&&!l.includes('packung'); } }); }
-  else if(a==='morning'){ const go=id=>setTimeout(()=>{ const el=document.getElementById(id); el&&el.scrollIntoView({behavior:'smooth',block:'start'}); },30);
+  else if(a==='morning'){ const go=id=>setTimeout(()=>{ const el=document.getElementById(id); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'start'}); el.classList.add('tc-flash'); setTimeout(()=>el.classList.remove('tc-flash'),1600); },30);   // Rahmen leuchtet kurz auf, falls die App nicht scrollt
     if(v==='water') tcPatch(x=>{ x.water=(x.water||0)>=1?(x.water||0)-1:1; });
     else if(v==='protein') tcPatch(x=>{ x.habits=x.habits||{}; x.habits.protein=!x.habits.protein; });
     else if(v==='check'){ tcUi.editCheck=true; render(); go('tcCheck'); }
