@@ -2103,6 +2103,7 @@ Antworte NUR mit JSON: {"days":[{"date":"${ws}","title":"Gericht","thermomix":tr
 
 /* ================= Rahmen ================= */
 const last7 = d => { const i=days.indexOf(d); return days.slice(Math.max(0,i-6),i+1); };
+window.addEventListener('error',e=>{ const f=$('#foot'); if(f) f.textContent='Fehler: '+(e.message||e)+' – bitte Screenshot an Claude.'; });
 const DAYVIEWS = ['rec','str','slp'];
 function render(){
   if (!DATA) return;
@@ -2118,7 +2119,10 @@ function render(){
     ? `<div class="banner"><b>Noch keine Daten von heute.</b> Angezeigt wird ${dshort(DATA.lastWithData)} Garmin-App öffnen, damit die Uhr abgleicht.</div>`
     : (DAYVIEWS.includes(view) && x && x.recovery==null ? `<div class="banner"><b>Für ${dlong(cur)} liegen noch keine Daten vor.</b></div>` : '');
   const v = $('#view');
-  v.innerHTML = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='uebersicht'?renderUebersicht():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
+  const html = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='uebersicht'?renderUebersicht():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
+  // Unverändertes nicht neu zeichnen: sonst geht auf dem iPhone ein Tipp verloren, wenn zwischen Berühren und Loslassen neu gezeichnet wird
+  if (html===v._html) return;
+  v.innerHTML = html; v._html = html;
   v.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>{cur=el.dataset.go;render();}));
   v.querySelectorAll('[data-goview]').forEach(el=>el.addEventListener('click',()=>{ if (el.dataset.wsel) wSel=el.dataset.wsel; view=el.dataset.goview; cur=DATA.lastWithData; saveView(); render(); scrollTo(0,0); }));
   v.querySelectorAll('[data-jopen]').forEach(el=>el.addEventListener('click',()=>{ jDate=el.dataset.jopen; render(); }));
