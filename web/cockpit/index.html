@@ -299,6 +299,7 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .morning .num{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 14px var(--f-display);background:var(--accent-soft);color:var(--ink-2)}
 .tc .morning [aria-pressed="true"] .num{background:var(--good);color:#fff}
 .tc .morning [aria-pressed="true"] .ht{color:var(--ink-3)}
+.tc-phase{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-4px 0 2px}
 .tc .water{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .tc .water button{width:30px;height:36px;border-radius:7px 7px 10px 10px;border:2px solid var(--accent);background:transparent;cursor:pointer;padding:0}
 .tc .water button.f{background:var(--accent)}
@@ -700,9 +701,28 @@ function renderHeute(){
   const movedN=tcWeek().filter(tcMoved).length;
   const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?'':dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
   const restart=m.gap>=7?`<div class="tc-banner s12"><b>Wiedereinstieg nach ${m.gap} Tagen.</b> Diese Woche zählt nur eins: jeden Tag etwas machen. Minimum oder Normal mit 2–3 Wiederholungen Reserve, dann steigern.</div>`:'';
-  const eve=new Date().getHours()>=17;
-  return `<div class="grid tc">${head}${restart}${eve?tcEveningCard():''}${tcMorningCard()}${tcCheckCard(m)}${tcTipCard(m)}${tcTrainCard(m)}${tcRecRow()}${tcNudgeCard(m)}${tcMindCard()}${tcHabitCard()}${foodTile()}
+  // Alles zur richtigen Zeit: morgens der Start in den Tag, tagsüber die Mini-Vorschläge, abends Reflexion und Kopf.
+  const ph=tcPhase(), all=tcUi.showAll, c=x.checkin||{}, checked=!!(c.sleep&&c.energy&&c.mood&&c.stress), trained=!!(x.training&&x.training.tier);
+  const card={morning:tcMorningCard, check:()=>tcCheckCard(m), tip:()=>tcTipCard(m), train:()=>tcTrainCard(m), rec:tcRecRow,
+    nudge:()=>tcNudgeCard(m), mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard};
+  const order={
+    morgen:['morning','check','tip','train','rec'],
+    tag:['tip','nudge',...(checked?[]:['check']),'train','food','morning'],
+    abend:['eve','habit','mind',...(trained?[]:['train']),'food']}[ph];
+  const rest=['eve','morning','check','tip','train','rec','nudge','mind','habit','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
+  const lab={morgen:'Guten Morgen',tag:'Für zwischendurch',abend:'Guten Abend'}[ph];
+  return `<div class="grid tc">${head}${restart}<div class="s12 tc-phase"><span class="chip">${lab}</span><span class="small muted">${{morgen:'Jetzt nur: dein Start in den Tag.',tag:checked&&trained?'Morgen erledigt. Jetzt nur das Kleine für zwischendurch.':'Jetzt das Kleine für zwischendurch. Check-in und Training gehen auch noch.',abend:'Jetzt nur: kurz zurückschauen und runterkommen.'}[ph]}</span></div>
+    ${order.map(k=>card[k]()).join('')}
+    ${all?rest.map(k=>card[k]()).join(''):''}
+    <button class="card s12 rowlink" data-tc="act" data-a="showAll"><span style="flex:1"><b>${all?'Weniger anzeigen':'Alles anzeigen'}</b><br><span class="small muted">${all?'Zurück zu dem, was jetzt dran ist':'Alle Bereiche von heute auf einmal'}</span></span><span class="chev">${all?'‹':'›'}</span></button>
     <button class="card s12 rowlink" data-goview="uebersicht"><span style="flex:1"><b>Übersicht</b><br><span class="small muted">Deine Woche, Trends und was deine Daten über dich sagen</span></span><span class="chev">›</span></button></div>`;
+}
+/* Tagesphase: morgen bis der Start erledigt ist (Check-in + Training) oder spätestens 11 Uhr, dann tag, ab 17 Uhr abend */
+function tcPhase(){
+  const h=new Date().getHours(), x=tcDay(), c=x.checkin||{};
+  if(h>=17) return 'abend';
+  const started=!!(c.sleep&&c.energy&&c.mood&&c.stress)&&!!(x.training&&x.training.tier);
+  return started||h>=11?'tag':'morgen';
 }
 /* Abend-Reflexion: vier Fragen zum Antippen, eine Zeile optional. Ab 17 Uhr oben in „Heute“ */
 const TC_EVE={
@@ -880,6 +900,7 @@ document.addEventListener('click',e=>{
     else if(v==='train') go('tcTrain'); }
   else if(a==='act'){ const w=b.dataset.a;
     if(w==='showMorning'){ tcUi.showMorning=true; render(); return; }
+    if(w==='showAll'){ tcUi.showAll=!tcUi.showAll; render(); scrollTo(0,0); return; }
     if(w==='showEve'){ tcUi.showEve=true; render(); return; }
     if(w==='closeEve'){ tcUi.showEve=false; render(); return; }
     if(w==='editCheck'){ tcUi.editCheck=true; render(); }
