@@ -142,6 +142,25 @@ const tests = {
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
+  async 'Cockpit Heute: Training mit Belastungsnormativen und allgemeinem Teil (Aufbau, Prinzip, Pausen, Begriffe)'(b) {
+    const d = new Date(); d.setHours(13, 0, 0, 0);
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, d);
+    await page.waitForSelector('#tcTrain');
+    const fmts = await page.locator('#tcTrain .block .fmt').allTextContents();
+    assert.ok(fmts.length > 0 && fmts.every(f => f.trim()), 'jeder Block nennt sein Format');
+    assert.ok(fmts.some(f => /Runden|EMOM|Dauermethode|Durchgang|Sätze|Leiter/.test(f)), 'Format mit Runden/Sätzen/Methode');
+    assert.ok(/Trainingsreiz:.*Progression:/s.test(await page.textContent('#tcTrain')), 'Trainingsreiz und Progression stehen dabei');
+    await page.click('#tcTrain [data-a="method"]');
+    await page.waitForSelector('#tcMethod');
+    const txt = await page.textContent('#tcMethod');
+    for (const w of ['Mikrozyklus', 'Autoregulation', 'RIR', 'Doppelprogression', 'Deload', 'Rundenpause', 'EMOM', 'Session-RPE', 'Tempo 3-1-1'])
+      assert.ok(txt.includes(w), 'allgemeiner Teil erklärt ' + w);
+    assert.strictEqual(await page.locator('#tcMethod .tc-week li').count(), 7, 'Wochenaufbau mit 7 Tagen');
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    await page.click('#tcTrain [data-a="method"]');
+    assert.strictEqual(await page.locator('#tcMethod').count(), 0, 'lässt sich wieder ausblenden');
+    assert.deepStrictEqual(errors, []);
+  },
   async 'Cockpit Heute: Antippen klappt auch mit eingefrorenen Datenbank-Daten (wie auf dem iPhone)'(b) {
     // Die echte Laufzeit liefert Dokumente eingefroren; vorher scheiterte daran jedes Antippen
     const init = () => { const freeze = o => { if (o && typeof o === 'object') { Object.values(o).forEach(freeze); Object.freeze(o); } return o; };
