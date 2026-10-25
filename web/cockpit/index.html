@@ -10,6 +10,7 @@
   --accent:#1f6fd1; --accent-soft:rgba(31,111,209,.12);
   --band:rgba(71,82,94,.11); --band-line:#8d97a2;
   --good:#0ca30c; --warn:#e8a100; --crit:#d03b3b;
+  --accent-ink:#ffffff; --good-soft:rgba(12,163,12,.13); --warn-soft:rgba(232,161,0,.15); --mind:#6b5fb5; --mind-soft:rgba(107,95,181,.12);
   --s-deep:#2a78d6; --s-light:#eb6834; --s-rem:#1baf7a; --s-awake:#eda100;
   --c-kraft:#2a78d6; --c-intervall:#eb6834; --c-ausdauer:#1baf7a; --c-erholung:#eda100; --c-sonstige:#a3a9b0;
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
@@ -21,6 +22,7 @@
   --bg:#0d1115; --surface:#161b21; --surface-2:#1e242b; --line:#2a323b;
   --ink:#edf0f3; --ink-2:#b8c0c8; --ink-3:#86909a;
   --accent:#3987e5; --accent-soft:rgba(57,135,229,.18);
+  --accent-ink:#0b1320; --good-soft:rgba(60,194,119,.15); --warn-soft:rgba(232,169,42,.15); --mind:#a59af0; --mind-soft:rgba(165,154,240,.15);
   --band:rgba(237,240,243,.09); --band-line:#6c7680;
   --s-deep:#3987e5; --s-light:#d95926; --s-rem:#199e70; --s-awake:#c98500;
   --c-kraft:#3987e5; --c-intervall:#d95926; --c-ausdauer:#199e70; --c-erholung:#c98500; --c-sonstige:#6c747c;
@@ -30,6 +32,7 @@
   --bg:#0d1115; --surface:#161b21; --surface-2:#1e242b; --line:#2a323b;
   --ink:#edf0f3; --ink-2:#b8c0c8; --ink-3:#86909a;
   --accent:#3987e5; --accent-soft:rgba(57,135,229,.18);
+  --accent-ink:#0b1320; --good-soft:rgba(60,194,119,.15); --warn-soft:rgba(232,169,42,.15); --mind:#a59af0; --mind-soft:rgba(165,154,240,.15);
   --band:rgba(237,240,243,.09); --band-line:#6c7680;
   --s-deep:#3987e5; --s-light:#d95926; --s-rem:#199e70; --s-awake:#c98500;
   --c-kraft:#3987e5; --c-intervall:#d95926; --c-ausdauer:#199e70; --c-erholung:#c98500; --c-sonstige:#6c747c;
@@ -221,6 +224,108 @@ details[open]>summary.h2s::after{content:'−'}
 details>summary{cursor:pointer}
 footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---------- Tagescoach (Heute) und Übersicht ---------- */
+.s3{grid-column:span 3}
+@media (max-width:820px){.s3{grid-column:span 6}}
+.tc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.tc-date{font:700 22px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.tc .week{display:flex;gap:5px}
+.tc .week span{width:26px;height:34px;border-radius:7px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font:600 13px var(--f-display);color:var(--ink-3)}
+.tc .week span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tc .week span.today{outline:2px solid var(--ink-3);outline-offset:1px}
+.tc-banner{border-radius:12px;padding:11px 14px;font-size:14px;background:var(--warn-soft);color:var(--ink)}
+.tc .chip{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--f-body);padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);text-transform:none;letter-spacing:0}
+.tc .card h2{justify-content:space-between}
+.tc .card h3{font-size:21px}
+.tc-mini{padding:4px 10px!important;font-size:12.5px!important}
+.tc .mode{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.tc .badge{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;text-align:center;font:700 17px/1 var(--f-display);text-transform:uppercase;letter-spacing:.05em;color:#fff}
+.tc .badge small{display:block;font:600 11px var(--f-body);letter-spacing:.02em;text-transform:none;opacity:.9;margin-top:3px}
+.tc .why{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--ink-2)}
+.tc .q{display:grid;gap:6px;margin-bottom:12px}
+.tc .q label,.tc .flab{font-size:13px;font-weight:600;color:var(--ink-2);display:flex;justify-content:space-between;gap:8px}
+.tc .q label span{font-weight:500;color:var(--ink-3)}
+.tc .scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.tc .scale.s6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tc .scale button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:9px;padding:8px 0;font:600 17px var(--f-display);cursor:pointer;min-width:0}
+.tc .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tc .toggles{display:flex;flex-wrap:wrap;gap:6px}
+.tc .tg{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:500 13.5px var(--f-body);cursor:pointer}
+.tc .tg[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.tc-tip{border-left:4px solid var(--accent)}
+.tc-tip p{margin:0;color:var(--ink-2)}
+.tc .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+.tc .tier{border:2px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 8px;text-align:left;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.tc .tier b{display:block;font:700 18px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.tc .tier span{font-size:12.5px;color:var(--ink-3)}
+.tc .tier[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.tc .tier.rec::after{content:"empfohlen";display:block;margin-top:4px;font:600 11px var(--f-body);color:var(--accent)}
+.tc .block{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.tc .block .bh{font:600 14px var(--f-display);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3)}
+.tc .ex{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.tc .ex:last-child{border-bottom:0}
+.tc .ex .n{font-weight:600}
+.tc .ex .d{font:700 17px var(--f-display);color:var(--accent);text-align:right;font-variant-numeric:tabular-nums}
+.tc .ex .t{grid-column:1/-1;font-size:12.5px;color:var(--ink-3)}
+.tc .done{display:flex;gap:12px;align-items:center;background:var(--good-soft);border-radius:12px;padding:12px 14px}
+.tc .done .ck{width:34px;height:34px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font:700 18px var(--f-display);flex:none}
+.tc .counters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tc .ctr{background:var(--surface-2);border-radius:12px;padding:11px 12px;min-width:0}
+.tc .ctr .k{font-size:12.5px;color:var(--ink-3)}
+.tc .ctr .v{font:700 26px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.tc .ctr .v small{font-size:15px;color:var(--ink-3);font-weight:600}
+.tc .bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 8px}
+.tc .bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.tc .ctr .row button{flex:1;padding:6px 0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 15px var(--f-display);cursor:pointer;min-width:0}
+.tc .mindcard{border-color:var(--mind-soft)}
+.tc .mindcard h2{color:var(--mind)}
+.tc .mindchip{background:var(--mind-soft)!important;color:var(--mind)!important}
+.tc .breath{display:grid;place-items:center;gap:10px;padding:8px 0}
+.tc .orb{width:120px;height:120px;border-radius:50%;background:var(--mind-soft);border:2px solid var(--mind);display:grid;place-items:center;font:700 18px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--mind);transition:transform 4s ease-in-out}
+.tc .orb.in,.tc .orb.hold{transform:scale(1.35)} .tc .orb.out{transform:scale(1)}
+.tc .ifthen{display:grid;gap:8px}
+.tc .ifthen>div{background:var(--mind-soft);border-radius:10px;padding:9px 12px;font-size:14px}
+.tc .ifthen b{color:var(--mind)}
+.tc textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 11px;width:100%;min-width:0;resize:vertical;min-height:58px}
+.tc .form{display:grid;gap:10px}
+.tc details summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:13.5px}
+.tc .habits,.tc .nudges{display:grid;gap:6px}
+.tc .habit,.tc .nudge{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;color:inherit;background:var(--surface-2);border:0;border-radius:11px;padding:10px 12px;cursor:pointer}
+.tc .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--ink-3);flex:none;display:grid;place-items:center;font:700 15px var(--f-display);color:transparent}
+.tc [aria-pressed="true"] .box{background:var(--good);border-color:var(--good);color:#fff}
+.tc .ht{flex:1;min-width:0}
+.tc .ht small{display:block;color:var(--ink-3);font-size:12px}
+.tc .habit .st{font:600 13px var(--f-display);color:var(--ink-3);white-space:nowrap}
+.tc .morning .num{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 14px var(--f-display);background:var(--accent-soft);color:var(--ink-2)}
+.tc .morning [aria-pressed="true"] .num{background:var(--good);color:#fff}
+.tc .morning [aria-pressed="true"] .ht{color:var(--ink-3)}
+.tc .water{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tc .water button{width:30px;height:36px;border-radius:7px 7px 10px 10px;border:2px solid var(--accent);background:transparent;cursor:pointer;padding:0}
+.tc .water button.f{background:var(--accent)}
+.tc-tile{display:flex;flex-direction:column;gap:2px;text-align:left;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.tc-tile .lab{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.tc-tile .big{font:700 34px/1.05 var(--f-display);font-variant-numeric:tabular-nums}
+.tc-tile .big small{font-size:16px;color:var(--ink-3);font-weight:600}
+.tc-tile svg{margin-top:6px}
+.trend{font-weight:700}.trend.up{color:var(--good)}.trend.down{color:var(--crit)}
+.dots7{display:flex;gap:4px;margin-top:10px}
+.dots7 i{flex:1;height:10px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line)}
+.dots7 i.on{background:var(--accent);border-color:var(--accent)}
+.tc .insights{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.tc-ins{background:var(--surface-2);border-radius:12px;padding:12px 14px;display:grid;gap:4px;align-content:start}
+.tc-ins .chip{justify-self:start;background:var(--surface)!important}
+.tc-ins h3{font-size:18px!important;margin:4px 0 0}
+.tc-ins p{margin:0}
+.tc-do{font-size:14px;border-top:1px solid var(--line);padding-top:6px;margin-top:4px!important}
+.tc .heat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.tc .heat div{aspect-ratio:1/1;border-radius:6px;background:var(--surface-2);display:grid;place-items:center;font:600 11px var(--f-display);color:var(--ink-3)}
+.tc .heat div.l1{background:var(--accent-soft);color:var(--ink-2)}
+.tc .heat div.l2{background:color-mix(in srgb,var(--accent) 55%,transparent);color:var(--accent-ink)}
+.tc .heat div.l3{background:var(--accent);color:var(--accent-ink)}
+.tc .heat div.t{outline:2px solid var(--ink-3);outline-offset:1px}
+.tc-trio{display:grid;gap:4px}
+@media (max-width:420px){.tc .badge{width:70px;height:70px;font-size:15px}.tc .tier b{font-size:16px}.tc .week span{width:22px}.tc-tile .big{font-size:28px}}
+@media (prefers-reduced-motion:reduce){.tc .orb{transition:none}}
 </style>
 
 <div class="wrap">
@@ -239,12 +344,13 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 <div id="tip" role="tooltip"></div>
 <nav class="bnav" aria-label="Bereiche"><div id="bnav">
   <button data-t="heute"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>Heute</button>
+  <button data-t="uebersicht"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Übersicht</button>
   <button data-t="workout"><svg viewBox="0 0 24 24"><path d="M8.6 8.2a3.4 3.4 0 1 1 6.8 0"/><path d="M7.2 9h9.6l1.7 5.6a5.6 5.6 0 0 1-5.4 6.9h-2.2a5.6 5.6 0 0 1-5.4-6.9z"/></svg>Training</button>
   <button data-t="food"><svg viewBox="0 0 24 24"><path d="M6.5 3v7.5M4.5 3v5a2 2 0 0 0 4 0V3M6.5 10.5V21M17.5 21V3c-2.4 1.6-3.2 5-3.2 9h3.2"/></svg>Essen</button>
-  <button data-t="coach"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v10.5H9.5L5 20v-4H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Trainer</button>
   <button data-t="more"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>Mehr</button>
 </div></nav>
 <div id="sheet" class="hidden"><div class="sheet-bg" data-close></div><div class="sheet" role="dialog" aria-label="Weitere Bereiche"><div class="grab"></div>
+  <button class="mi" data-mv="coach"><span class="ico">T</span><span>Trainer<small>Fragen, Profil, Tagesempfehlung</small></span></button>
   <button class="mi" data-mv="rec"><span class="ico">E</span><span>Erholung<small>HFV, Ruhepuls, Schlaf</small></span></button>
   <button class="mi" data-mv="str"><span class="ico">B</span><span>Belastung<small>Tagesbelastung aus dem Puls</small></span></button>
   <button class="mi" data-mv="slp"><span class="ico">S</span><span>Schlaf<small>Bedarf, Phasen, Schlafenszeit</small></span></button>
@@ -352,12 +458,13 @@ let db = null, dbState = 'lade';
 const store = { journal:{}, coach:{}, profile:null, meals:{}, mealplan:{} };
 const listeners = new Set();
 function onStore(fn){ listeners.add(fn); }
-function emit(){ listeners.forEach(f=>{ try{f()}catch(e){} }); if (['heute','jrn','coach','workout','food','trd'].includes(view)) render(); }
+function emit(){ listeners.forEach(f=>{ try{f()}catch(e){} }); const ae=document.activeElement; if (view==='heute' && ae && ae.tagName==='TEXTAREA' && $('#view').contains(ae)) return; if (['heute','uebersicht','jrn','coach','workout','food','trd'].includes(view)) render(); }
 async function initDb(){
   if (!window.claude || !window.claude.use){ dbState='lokal'; return; }
   try { db = await window.claude.use('db'); } catch(e){ db = null; }
   if (!db){ dbState='aus'; render(); return; }
   dbState='an';
+  tcInitDb(); tcFlush();
   db.collection('journal').onSnapshot(s=>{ store.journal={}; s.docs.forEach(d=>store.journal[d.id]=d.data()); emit(); }, ()=>{});
   db.collection('coach').onSnapshot(s=>{ store.coach={}; s.docs.forEach(d=>store.coach[d.id]=d.data()); emit(); }, ()=>{});
   db.collection('meals').onSnapshot(s=>{ store.meals={}; s.docs.forEach(d=>store.meals[d.id]=d.data()); emit(); }, ()=>{});
@@ -368,7 +475,399 @@ async function initDb(){
 const latestCoach = () => { const ks=Object.keys(store.coach).sort(); return ks.length? store.coach[ks[ks.length-1]] : null; };
 const latestWeekPlan = () => { const ks=Object.keys(store.coach).sort().reverse(); for(const k of ks){ if(store.coach[k].weekPlan) return store.coach[k]; } return null; };
 
-/* ================= HEUTE ================= */
+/* ================= TAGESCOACH: Heute als Tagesablauf ================= */
+/* Check-in → Tagesmodus → ein Vorschlag → Training in 3 Stufen → Kopf → Gewohnheiten. Speicher: db `days/<JJJJ-MM-TT>`, sonst Browser. */
+const TC_GOALS={startWeight:128,startDate:'2026-10-12',targetWeight:105,weekPush:500,weekSquat:750,weekDays:5,water:8,bedtime:'22:30'};
+const TC_LAST_TRAINING_BEFORE='2026-09-27'; /* letzte Garmin-Einheit vor dem Tagescoach */
+const TC_HABITS=[
+  {id:'meds',t:'Tablette nüchtern',s:'gleich nach dem Aufstehen, wie gewohnt'},
+  {id:'move',t:'Bewegt – egal wie wenig',s:'Minimum zählt voll'},
+  {id:'ankle',t:'5 min Sprunggelenk',s:'Knie zur Wand, Wadenheben langsam, tiefe Hocke'},
+  {id:'protein',t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier'},
+  {id:'breaks',t:'3 Bewegungspausen im Büro',s:'aufstehen, 2 min gehen oder dehnen – gegen den steifen Rücken'},
+  {id:'plate',t:'Abends bewusst portioniert',s:'auf den Teller, nicht aus der Packung'},
+  {id:'screen',t:'Bildschirm aus 30 min vor dem Bett',s:''},
+  {id:'bed',t:'Im Bett bis '+TC_GOALS.bedtime,s:'die Kinder wecken früh genug'}
+];
+const TC_WARM={name:'Aufwärmen · Sprunggelenk',items:[['Knie zur Wand','8/Seite','barfuß, Ferse bleibt unten'],['Wadenheben langsam','10','3 s ablassen'],['Katze-Kuh','6',''],['Band Pull-aparts','15','leichtes Band']]};
+const TC_LIB={
+  kraftA:{title:'Ganzkörper Kraft',focus:'Knie, Drücken, Ziehen',
+    min:{min:10,blocks:[{name:'2 Runden, ohne Pause',items:[['Goblet Squat','8','18 kg, Band über den Knien'],['Liegestütze','10','auf Griffen'],['Rudern an den Dip-Bars','8',''],['Knie zur Wand','8/Seite','']]}]},
+    std:{min:30,blocks:[TC_WARM,{name:'3 Runden · 60 s Pause',items:[['Goblet Squat','8–10','24 kg, Knie über die Zehen schieben'],['Liegestütze','12','2 s ablassen'],['Rudern an den Dip-Bars','10','Brust zur Stange'],['Glute Bridge','12','oben 2 s halten']]},{name:'Abschluss',items:[['Farmer Carry','30 s/Seite','24 kg, aufrecht'],['Plank','40 s','']]}]},
+    full:{min:45,blocks:[TC_WARM,{name:'4 Runden · 75 s Pause',items:[['Goblet Squat','10','24 kg oder 32 kg'],['Liegestütze mit Weste','10','10 kg'],['Dips','5–6','sauber, voller Bewegungsumfang'],['Rudern an den Dip-Bars','10','']]},{name:'Finisher',items:[['KB Swing','10 × 10 EMOM','24 kg'],['Suitcase Carry','40 s/Seite','24 kg']]}]}},
+  swing:{title:'Kettlebell & Rumpf',focus:'Hüfte, Kondition, Rumpf',
+    min:{min:10,blocks:[{name:'EMOM 8 min',items:[['KB Swing','10 pro Minute','18 oder 24 kg'],['dazwischen','tiefe Hocke halten','']]}]},
+    std:{min:30,blocks:[TC_WARM,{name:'EMOM 12 min',items:[['KB Swing','12 pro Minute','24 kg, explosiv aus der Hüfte']]},{name:'2 Runden',items:[['Get-up','2/Seite','18 kg, langsam'],['Dead Bug','8/Seite',''],['Seitstütz','30 s/Seite','']]}]},
+    full:{min:45,blocks:[TC_WARM,{name:'Leiter 1–2–3–4–5 · 3 Durchgänge',items:[['Clean & Press','1–5/Seite','24 kg'],['Front Squat','1–5','gleiche Glocke']]},{name:'EMOM 10 min',items:[['KB Swing','15 pro Minute','24 oder 32 kg']]},{name:'Rumpf',items:[['L-Sit an den Dip-Bars','5 × 10 s','Knie angewinkelt erlaubt']]}]}},
+  zone2:{title:'Zone 2 Ergometer',focus:'Ausdauer fürs Rad',
+    min:{min:12,blocks:[{name:'Locker',items:[['Ergometer','10 min','Puls 110–130, Nasenatmung'],['Wadenheben langsam','10','']]}]},
+    std:{min:30,blocks:[{name:'Grundlage',items:[['Ergometer','25 min','Puls 110–130, du kannst ganze Sätze sprechen']]},{name:'Danach',items:[['Knie zur Wand','8/Seite',''],['Hüftbeuger-Dehnung','45 s/Seite','gegen das viele Sitzen']]}]},
+    full:{min:50,blocks:[{name:'Grundlage lang',items:[['Ergometer','45 min','Puls 110–130, letzte 5 min gleichmäßig']]},{name:'Danach',items:[['Mobility','5 min','Sprunggelenk, Hüfte, Brustwirbelsäule']]}]}},
+  kraftB:{title:'Hüfte, Ziehen & Tragen',focus:'Rücken stabil, Gesäß, Griff',
+    min:{min:10,blocks:[{name:'2 Runden',items:[['Einbeiniges Kreuzheben','6/Seite','ohne Gewicht, für die Sprunggelenke'],['KB Rudern','10/Seite','24 kg'],['Face Pulls Band','15','']]}]},
+    std:{min:30,blocks:[TC_WARM,{name:'3 Runden · 60 s Pause',items:[['KB Kreuzheben','10','32 kg, Rücken neutral'],['KB Rudern','10/Seite','24 kg'],['Einbeiniges Kreuzheben','6/Seite','18 kg'],['Face Pulls Band','15','']]},{name:'Tragen',items:[['Farmer Carry','2 × 40 s','2 × 24 kg']]}]},
+    full:{min:45,blocks:[TC_WARM,{name:'4 Runden',items:[['KB Swing','15','32 kg'],['Doppel-KB Rudern','8','2 × 24 kg'],['Bulgarian Split Squat','8/Seite','Hinterfuß auf Bank'],['Pike Push-up','8','']]},{name:'Tragen',items:[['Farmer Carry','3 × 40 s','2 × 24 kg'],['Rack Carry','2 × 30 s','2 × 24 kg']]}]}},
+  mob:{title:'Beweglichkeit & Atmung',focus:'Erholung aktiv',
+    min:{min:10,blocks:[{name:'Ruhig',items:[['Knie zur Wand','10/Seite',''],['Tiefe Hocke','2 × 45 s','an den Dip-Bars festhalten'],['Box-Atmung','2 min','4 s ein, 4 halten, 4 aus, 4 halten']]}]},
+    std:{min:25,blocks:[{name:'Mobility-Fluss · 2 Runden',items:[['Katze-Kuh','8',''],['Weltbeste Dehnung','5/Seite',''],['90/90 Hüfte','6/Seite',''],['Knie zur Wand','10/Seite',''],['Brustwirbel-Rotation','8/Seite','']]},{name:'Gehen',items:[['Spaziergang','10–15 min','draußen, mit den Kindern zählt']]}]},
+    full:{min:40,blocks:[{name:'Draußen',items:[['Spaziergang oder Radtour locker','30 min','Puls unter 120']]},{name:'Danach',items:[['Yoga-Fluss','10 min','Hüfte und Rücken']]}]}}
+};
+const TC_ROT={1:'kraftA',2:'zone2',3:'swing',4:'kraftB',5:'zone2',6:'kraftA',0:'mob'};
+const TC_MODE={green:{c:'var(--good)',t:'Voll',sub:'gut erholt',tier:'full'},yellow:{c:'var(--warn)',t:'Normal',sub:'kontrolliert',tier:'std'},red:{c:'var(--crit)',t:'Minimum',sub:'schonen',tier:'min'}};
+const TIERN={min:'Minimum',std:'Normal',full:'Voll'};
+/* Mini-Vorschläge für zwischendurch (Büro): passen zum Tagesmodus, „erledigt“ zählt Wiederholungen mit */
+const TC_NUDGES={
+  red:[{t:'2 Minuten Box-Atmung',s:'4 s ein · 4 halten · 4 aus · 4 halten',act:'breath'},{t:'5 Minuten gehen',s:'einmal ums Gebäude oder den Flur entlang'},{t:'Ein großes Glas Wasser',s:'hilft auch gegen den Nachmittags-Hunger',water:1}],
+  yellow:[{t:'10 Kniebeugen am Schreibtisch',s:'langsam, Stuhl als Ziel',rep:['squat',10]},{t:'Treppe statt Aufzug',s:'2 Stockwerke, ruhig atmen'},{t:'Hüftbeuger-Dehnung',s:'45 s pro Seite gegen das Sitzen'}],
+  green:[{t:'20 Kniebeugen',s:'zügig, volle Tiefe',rep:['squat',20]},{t:'15 Liegestütze an der Schreibtischkante',s:'Körper gerade',rep:['push',15]},{t:'Treppe hoch, 2× hintereinander',s:'zügig, oben kurz durchatmen'}]
+};
+
+store.days={}; store.tcplan={}; store.tcset=null;
+const tcDirty=new Set();
+try{ Object.assign(store.days, JSON.parse(localStorage.getItem('cockpit.days')||'{}')); }catch(e){}
+const tcSaveLocal=()=>{ try{ localStorage.setItem('cockpit.days', JSON.stringify(store.days)); }catch(e){} };
+const TD=()=>todayISO();
+const tcBetween=(a,b)=>Math.round((dt(b)-dt(a))/864e5);
+const tcMonday=d=>addDays(d,-((dt(d).getDay()+6)%7));
+const tcDay=(d=TD())=>store.days[d]||(store.days[d]={date:d});
+let tcSaveT=null, tcTier=null, tcUi={}, tcBreath={on:false,t:null,phase:0,left:0};
+function tcPatch(fn,d=TD()){ const x=tcDay(d); fn(x); x.updatedAt=new Date().toISOString(); tcDirty.add(d); tcSaveLocal(); render(); clearTimeout(tcSaveT); tcSaveT=setTimeout(tcFlush,600); }
+async function tcFlush(){
+  if (!db) return;
+  for (const d of [...tcDirty]){ tcDirty.delete(d);
+    try{ await db.doc('days/'+d).set(JSON.parse(JSON.stringify(store.days[d]))); }
+    catch(e){ tcDirty.add(d); const f=$('#foot'); if(f) f.textContent='Speichern fehlgeschlagen – wird beim nächsten Eintrag erneut versucht.'; } }
+}
+function tcInitDb(){
+  db.collection('days').onSnapshot(s=>{ s.docs.forEach(d=>{ if(!tcDirty.has(d.id)) store.days[d.id]=d.data(); }); tcSaveLocal(); emit(); }, ()=>{});
+  db.collection('plan').onSnapshot(s=>{ store.tcplan={}; s.docs.forEach(d=>store.tcplan[d.id]=d.data()); emit(); }, ()=>{});
+  db.doc('settings/main').onSnapshot(s=>{ store.tcset=s.exists?s.data():null; emit(); }, ()=>{});
+}
+
+/* ---------- Ableitungen ---------- */
+const tcHabits=()=>(store.tcset&&store.tcset.habits)||TC_HABITS;
+const tcGarmin=()=>{ const L=DATA.lastWithData; if(!L||tcBetween(L,TD())>1) return null; const x=DATA.days[L]; return x&&x.band?x:null; };
+const tcTrained=d=>{ const x=store.days[d], j=store.journal[d], g=DATA.days[d];
+  return !!((x&&x.training&&x.training.tier)||(j&&j.workout)||(g&&g.acts&&g.acts.some(a=>(a.min||0)>=10))); };
+const tcMoved=d=>{ const x=store.days[d]; return tcTrained(d)||!!(x&&x.habits&&x.habits.move); };
+function tcLastTraining(){
+  const ks=new Set([...Object.keys(store.days),...Object.keys(store.journal),...Object.keys(DATA.days)]);
+  const own=[...ks].filter(d=>d<TD()&&tcTrained(d)).sort().pop();
+  const s=DATA.training&&DATA.training.since||{};
+  const g=['kraft','ausdauer','intervall'].map(k=>s[k]&&s[k].date).filter(Boolean).sort().pop();
+  return [own,g,TC_LAST_TRAINING_BEFORE].filter(Boolean).sort().pop();
+}
+function tcMode(){
+  const c=tcDay().checkin||{}, why=[], parts=[];
+  if(c.sleep) parts.push(c.sleep); if(c.energy) parts.push(c.energy); if(c.mood) parts.push(c.mood); if(c.stress) parts.push(6-c.stress);
+  const score=parts.length?parts.reduce((a,b)=>a+b,0)/parts.length:null;
+  let band=null;
+  if(score!=null){ band=score>=3.7?'green':score>=2.6?'yellow':'red'; why.push(`Dein Check-in ergibt ${nf(score,1)} von 5.`); }
+  if(c.night&&band==='green'){ band='yellow'; why.push('Die Nacht war unterbrochen – heute lieber kontrolliert.'); }
+  const g=tcGarmin();
+  if(g){ why.push(`Uhr: Erholung ${nf(g.recovery)} % (${BAND[g.band].t}).`); const rank={red:0,yellow:1,green:2}; if(band==null||rank[g.band]<rank[band]) band=g.band; }
+  if(c.pain!=null&&c.pain>=6){ band='red'; why.push(`Schmerz ${c.pain}/10: heute nur sanfte Mobility. Hält er an oder wird stärker, lass es ärztlich oder physiotherapeutisch anschauen.`); }
+  else if(c.pain!=null&&c.pain>=4&&band==='green'){ band='yellow'; why.push(`Schmerz ${c.pain}/10: kontrolliert, ohne Maximalversuche.`); }
+  if(c.sick){ band='red'; why.push('Krank: Training pausieren, erst nach ein paar symptomfreien Tagen locker einsteigen.'); }
+  return {band, why, gap:tcBetween(tcLastTraining(),TD()), checked:score!=null, garmin:!!g};
+}
+function tcSession(m){
+  const p=store.tcplan[TD()];
+  if(p&&p.title&&p.tiers) return {key:'plan',title:p.title,focus:p.focus||'vom Coach',min:p.tiers.min,std:p.tiers.std,full:p.tiers.full,note:p.note};
+  let key=TC_ROT[dt(TD()).getDay()];
+  if(m.band==='red'||(tcDay().checkin||{}).sick) key='mob';
+  return Object.assign({key},TC_LIB[key]);
+}
+const tcWeek=(ref=TD())=>{ const m=tcMonday(ref); return [...Array(7)].map((_,i)=>addDays(m,i)); };
+const tcWeekSum=(f,ref)=>tcWeek(ref).reduce((a,d)=>a+((store.days[d]&&store.days[d].reps&&store.days[d].reps[f])||0),0);
+function tcWeights(){
+  const w={};
+  Object.values(store.journal).forEach(e=>{ if(e.weight) w[e.date]=e.weight; });
+  Object.values(store.days).forEach(e=>{ if(e.weight) w[e.date]=e.weight; });
+  return Object.keys(w).sort().map(d=>({x:d,y:w[d]}));
+}
+const tcBed=()=>(DATA.plan&&DATA.plan.tiers&&DATA.plan.tiers[1]&&DATA.plan.tiers[1].bedtime)||TC_GOALS.bedtime;
+const tcIns=n=>(DATA.insights||[]).find(i=>i.name===n&&i.strength!=='schwach');
+
+/* ---------- Erkenntnisse → Alltagstipps ---------- */
+/* Jede Erkenntnis: was die Daten zeigen (mit Fallzahl), und was das konkret im Alltag heißt. */
+function tcInsights(){
+  const out=[], ms=v=>nf(Math.abs(v),1)+' ms';
+  const add=(key,tag,title,evidence,tip)=>out.push({key,tag,title,evidence,tip});
+  let i;
+  if((i=tcIns('Einschlafzeit'))) add('bed','Schlaf',`Früh einschlafen bringt dir messbar mehr Erholung`,
+    `${i.hi}: Herzfrequenzvariabilität im Schnitt ${ms(i.diff)} höher als ${i.lo} (${i.nHi+i.nLo} Nächte, ${i.strength}).`,
+    `Stell dir einen Wecker „Ab ins Bett“ für ${tcBed()}. Bildschirm 30 Minuten vorher weg.`);
+  if((i=tcIns('Schlafdauer'))) add('dur','Schlaf',`Ab 7 Stunden Schlaf erholst du dich deutlich besser`,
+    `${i.hi}: Herzfrequenzvariabilität ${ms(i.diff)} höher als bei kürzeren Nächten (${i.nHi+i.nLo} Nächte, ${i.strength}).`,
+    `Wenn die Kinder dich nachts wecken, hol es nicht mit Kaffee nach, sondern am nächsten Abend mit 30 Minuten früher ins Bett.`);
+  if((i=tcIns('Stress am Vortag'))) add('stress','Kopf',`Stress von heute spürt dein Körper morgen`,
+    `Nach Tagen mit Stress-Ø ab 29 ist deine Herzfrequenzvariabilität am nächsten Morgen ${ms(i.diff)} niedriger (${i.nHi+i.nLo} Tage, ${i.strength}).`,
+    `An stressigen Tagen abends 2 Minuten Box-Atmung und der Wenn-Dann-Plan gegen Frustessen. Am Morgen danach eher Normal statt Voll.`);
+  if((i=tcIns('Wochenende'))) add('wknd','Schlaf',`Die Nächte am Wochenende sind deine schwächsten`,
+    `${i.hi}: Herzfrequenzvariabilität ${ms(i.diff)} niedriger als unter der Woche (${i.nHi+i.nLo} Nächte, ${i.strength}).`,
+    `Freitag und Samstag gleiche Bettzeit wie unter der Woche, höchstens 30 Minuten später. Alkohol und spätes Essen wirken hier am stärksten.`);
+  if((i=tcIns('Training am Vortag'))) add('load','Training',`Harte Einheiten brauchen einen ruhigeren Tag danach`,
+    `Nach einem harten Vortag liegt deine Herzfrequenzvariabilität ${ms(i.diff)} niedriger (${i.nHi} harte Tage, ${i.strength}).`,
+    `Plane nie zwei harte Tage hintereinander. Auf Voll folgt Normal oder Minimum.`);
+  /* eigene Check-ins: Energie nach kurzen vs. langen Nächten, Stimmung nach Trainingstagen */
+  const ci=Object.values(store.days).filter(x=>x.checkin&&x.checkin.energy);
+  const cmp=(metric,cond)=>{ const a=[],b=[]; ci.forEach(x=>{ const c=cond(x.date); if(c==null) return; (c?a:b).push(x.checkin[metric]); });
+    const m=v=>v.reduce((s,y)=>s+y,0)/v.length; return a.length>=4&&b.length>=4?{d:m(a)-m(b),na:a.length,nb:b.length}:null; };
+  const sleptH=d=>{ const g=DATA.days[d]; return g&&g.sleep&&g.sleep.asleep?g.sleep.asleep/3600:null; };
+  let r=cmp('energy',d=>{ const h=sleptH(d); return h==null?null:h>=7; });
+  if(r&&Math.abs(r.d)>=0.3) add('own-sleep','Du selbst',`Nach 7 Stunden Schlaf hast du ${r.d>0?'mehr':'weniger'} Energie`,
+    `Dein Check-in: Energie im Schnitt ${sign(r.d,1)} Punkte (${r.na} lange, ${r.nb} kurze Nächte).`, r.d>0?`Dein eigener Beweis: Schlaf ist dein stärkster Hebel für den Tag.`:`Interessant – bei dir hängt Energie weniger am Schlaf. Schau auf Stress und Essen.`);
+  r=cmp('mood',d=>tcTrained(addDays(d,-1)));
+  if(r&&Math.abs(r.d)>=0.3) add('own-move','Du selbst',`Nach Trainingstagen ist deine Stimmung ${r.d>0?'besser':'schlechter'}`,
+    `Dein Check-in: Stimmung im Schnitt ${sign(r.d,1)} Punkte am Morgen nach einem Trainingstag (${r.na} gegen ${r.nb} Tage).`, r.d>0?`Wenn du keine Lust hast: Das Minimum heute ist die bessere Laune morgen.`:`Dosis prüfen: Vielleicht waren die Einheiten zu hart. Öfter Normal statt Voll.`);
+  const ev=Object.values(store.days).filter(x=>x.evening&&(x.evening.food||[]).length&&(x.evening.drain||[]).length);
+  if(ev.length>=8){ const bad=x=>x.evening.food.some(t=>t!=='ok'), hard=x=>!x.evening.drain.includes('nichts');
+    const a=ev.filter(hard), b=ev.filter(x=>!hard(x)), pa=a.length?a.filter(bad).length/a.length:null, pb=b.length?b.filter(bad).length/b.length:null;
+    if(a.length>=4&&b.length>=3&&pa-pb>=0.2) add('own-food','Du selbst',`An anstrengenden Tagen kippt das Essen`,
+      `Deine Abende: an Tagen, die Kraft gekostet haben, lief das Essen in ${nf(pa*100)} % nicht nach Plan, an ruhigen Tagen in ${nf(pb*100)} % (${ev.length} Abende).`,
+      `Plane für harte Tage vor: Eiweiß-Snack um 16 Uhr, abends feste Portion auf den Teller, 2 Minuten atmen vor dem Kühlschrank.`); }
+  if(ci.length<10) add('own-wait','Du selbst',`Deine persönlichen Muster kommen mit jedem Check-in`,
+    `${ci.length} von 10 Check-ins. Danach zeigt dir das Cockpit, wie Schlaf, Training und Stress bei dir persönlich zusammenhängen.`,
+    `Jeden Morgen 30 Sekunden einchecken, auch an schlechten Tagen. Gerade die zählen.`);
+  return out;
+}
+/* der eine Tipp für heute: was jetzt am meisten bringt */
+function tcTodayTip(m){
+  const c=tcDay().checkin||{}, g=tcGarmin(), h=new Date().getHours(), wd=dt(TD()).getDay(), x=tcDay();
+  const slept=g&&g.sleep&&g.sleep.asleep?g.sleep.asleep/3600:null;
+  if(c.sick) return {t:'Heute gesund werden',s:'Viel trinken, früh schlafen, Training pausieren. Ein Spaziergang ist erlaubt, wenn es sich gut anfühlt.'};
+  if(c.stress>=4) return {t:'Erst atmen, dann der Rest',s:'Dein Stress ist hoch. 2 Minuten Box-Atmung unten im Kopf-Bereich. Danach fällt dir auch das Essen heute leichter.'};
+  if(m.gap>=2&&!tcTrained(TD())) return {t:'Nie zweimal auslassen',s:`Dein letztes Training war vor ${m.gap} Tagen. Heute zählt schon das 10-Minuten-Minimum als voller Erfolg.`};
+  if((slept!=null&&slept<6.5)||c.sleep<=2||c.night) return {t:`Heute früher ins Bett: ${tcBed()}`,s:'Die Nacht war kurz. Nach Nächten ab 7 Stunden ist deine Erholung messbar besser. Training heute mit Reserve.'};
+  if(wd===5||wd===6) return {t:'Wochenende ohne Schlaf-Kater',s:`Deine Wochenend-Nächte sind deine schwächsten. Heute höchstens 30 Minuten später ins Bett als sonst (${tcBed()}).`};
+  if(h>=17&&!(x.habits||{}).plate) return {t:'Abends: erst Teller, dann Sofa',s:'Portion auf den Teller, Packung zurück in den Schrank. Wenn der Heißhunger kommt: Glas Wasser, 10 Minuten warten.'};
+  if(h<11&&!(x.habits||{}).protein) return {t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier halten bis mittags satt und schützen die Muskeln beim Abnehmen.'};
+  return {t:'Bewegung in den Arbeitstag streuen',s:'3 kurze Pausen bringen mehr als eine lange: aufstehen, 10 Kniebeugen, kurz gehen. Die Vorschläge stehen unten.'};
+}
+
+/* ---------- Bausteine ---------- */
+function tcScale(id,val,n=5,from=1){ let s=''; for(let i=from;i<from+n;i++) s+=`<button type="button" data-tc="sc" data-k="${id}" data-v="${i}" aria-pressed="${val===i}">${i}</button>`; return s; }
+function tcExList(blocks){ return blocks.map(b=>`<div class="block"><div class="bh">${esc(b.name)}</div>${b.items.map(([n,d,t])=>`<div class="ex"><span class="n">${esc(n)}</span><span class="d">${esc(d)}</span>${t?`<span class="t">${esc(t)}</span>`:''}</div>`).join('')}</div>`).join(''); }
+function tcSpark(pts,{w=300,h=64,color='var(--accent)',lo=null,hi=null}={}){
+  const v=pts.filter(p=>p.y!=null).map(p=>p.y); if(v.length<2) return '';
+  lo=lo??Math.min(...v); hi=hi??Math.max(...v); if(hi===lo){hi+=1;lo-=1;}
+  const n=pts.length, X=i=>4+i/(n-1)*(w-8), Y=y=>4+(h-8)-(y-lo)/(hi-lo)*(h-8);
+  let d=''; pts.forEach((p,i)=>{ if(p.y==null) return; d+=(d?'L':'M')+X(i).toFixed(1)+','+Y(p.y).toFixed(1); });
+  const li=pts.map(p=>p.y!=null).lastIndexOf(true);
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${X(li)}" cy="${Y(pts[li].y)}" r="3.5" fill="${color}"/></svg>`;
+}
+const tcLastN=(n,ref=TD())=>[...Array(n)].map((_,i)=>addDays(ref,i-n+1));
+
+/* ---------- HEUTE ---------- */
+function renderHeute(){
+  const m=tcMode(), x=tcDay(), t=dt(TD());
+  const week=tcWeek().map(d=>`<span class="${tcMoved(d)?'on':''} ${d===TD()?'today':''}" title="${dshort(d)}">${WD[dt(d).getDay()]}</span>`).join('');
+  const movedN=tcWeek().filter(tcMoved).length;
+  const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?'':dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
+  const restart=m.gap>=7?`<div class="tc-banner s12"><b>Wiedereinstieg nach ${m.gap} Tagen.</b> Diese Woche zählt nur eins: jeden Tag etwas machen. Minimum oder Normal mit 2–3 Wiederholungen Reserve, dann steigern.</div>`:'';
+  const eve=new Date().getHours()>=17;
+  return `<div class="grid tc">${head}${restart}${eve?tcEveningCard():''}${tcMorningCard()}${tcCheckCard(m)}${tcTipCard(m)}${tcTrainCard(m)}${tcRecRow()}${tcNudgeCard(m)}${tcMindCard()}${tcHabitCard()}${foodTile()}
+    <button class="card s12 rowlink" data-goview="uebersicht"><span style="flex:1"><b>Übersicht</b><br><span class="small muted">Deine Woche, Trends und was deine Daten über dich sagen</span></span><span class="chev">›</span></button></div>`;
+}
+/* Abend-Reflexion: vier Fragen zum Antippen, eine Zeile optional. Ab 17 Uhr oben in „Heute“ */
+const TC_EVE={
+  drain:[['arbeit','Arbeit'],['familie','Kinder / Familie'],['privat','Privates'],['schlaf','Müde / schlecht geschlafen'],['schmerz','Schmerzen'],['nichts','Nichts Besonderes']],
+  food:[['ok','Im Rahmen'],['viel','Zu viel'],['suess','Süßes / Snacks'],['spaet','Spät gegessen'],['packung','Aus der Packung']]};
+const tcEveDone=e=>!!(e&&e.day&&(e.drain||[]).length&&(e.food||[]).length);
+function tcEveningCard(){
+  const e=tcDay().evening||{}, tags=(k)=>TC_EVE[k].map(([id,t])=>`<button type="button" class="tg" data-tc="evt" data-k="${k}" data-v="${id}" aria-pressed="${(e[k]||[]).includes(id)}">${t}</button>`).join('');
+  if(tcEveDone(e)&&!tcUi.showEve) return `<button class="card s12 rowlink" data-tc="act" data-a="showEve"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Abend reflektiert</b><br><span class="small muted">${e.screen?'Bildschirm aus um 22 Uhr – gute Nacht.':'Danke. Jetzt Bildschirm weg und ab Richtung Bett.'}</span></span><span class="chev">›</span></button>`;
+  return `<section class="card s12 evening" id="tcEve"><h2>Dein Abend <span class="chip">1 Minute</span></h2>
+    <p class="small muted" style="margin-top:-4px">Kurz zurückschauen, nur antippen. Daraus lernt das Cockpit, was dir Kraft kostet und wann das Essen kippt.</p>
+    <div class="q"><label>Wie war dein Tag? <span>1 schwer · 5 richtig gut</span></label><div class="scale">${[1,2,3,4,5].map(i=>`<button type="button" data-tc="ev" data-k="day" data-v="${i}" aria-pressed="${e.day===i}">${i}</button>`).join('')}</div></div>
+    <div class="q"><label>Was hat Kraft gekostet?</label><div class="toggles">${tags('drain')}</div></div>
+    <div class="q"><label>Wie lief das Essen?</label><div class="toggles">${tags('food')}</div></div>
+    <div class="q"><label>Vorsatz für jetzt</label><div class="toggles"><button type="button" class="tg" data-tc="ev" data-k="screen" data-v="1" aria-pressed="${!!e.screen}">Bildschirm aus um 22 Uhr</button></div></div>
+    <div class="q"><label for="ev-good">Ein Satz, was gut lief <span>optional</span></label><textarea id="ev-good" rows="1" placeholder="z. B. Minimum trotz Stress gemacht" data-tcev="good">${esc(e.good||'')}</textarea></div>
+    ${tcEveDone(e)?`<div class="row" style="margin-top:12px"><button class="btn" data-tc="act" data-a="closeEve">Fertig</button></div>`:''}</section>`;
+}
+/* Morgen-Ablauf: vier feste Schritte nach dem Aufstehen, jeder zum Abhaken oder Hinspringen */
+function tcMorningSteps(){
+  const x=tcDay(), c=x.checkin||{};
+  return [
+    {id:'water',t:'Ein großes Glas Wasser',s:'direkt nach dem Aufstehen, noch im Bad oder in der Küche',on:(x.water||0)>=1},
+    {id:'check',t:'Check-in im Cockpit',s:'6 kurze Fragen, 30 Sekunden – danach steht dein Tagesmodus',on:!!(c.sleep&&c.energy&&c.mood&&c.stress)},
+    {id:'train',t:'Training im Keller',s:'die vorgeschlagene Stufe, danach „erledigt“ tippen',on:!!(x.training&&x.training.tier)},
+    {id:'protein',t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier',on:!!(x.habits&&x.habits.protein)}];
+}
+function tcMorningCard(){
+  const st=tcMorningSteps(), n=st.filter(s=>s.on).length;
+  if(n===st.length&&!tcUi.showMorning) return `<button class="card s12 rowlink" data-tc="act" data-a="showMorning"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Morgen erledigt</b><br><span class="small muted">Alle 4 Schritte geschafft.</span></span><span class="chev">›</span></button>`;
+  return `<section class="card s12 morning" id="tcMorning"><h2>Dein Morgen <span class="chip">${n} von ${st.length}</span></h2>
+    <p class="small muted" style="margin-top:-4px">Nach dem endgültigen Aufstehen, in dieser Reihenfolge. Tippen hakt ab oder springt zum Schritt.</p>
+    <div class="habits">${st.map((s,i)=>`<button type="button" class="habit" data-tc="morning" data-v="${s.id}" aria-pressed="${s.on}"><span class="num">${s.on?'✓':i+1}</span><span class="ht">${esc(s.t)}<small>${esc(s.s)}</small></span></button>`).join('')}</div></section>`;
+}
+function tcCheckCard(m){
+  const c=tcDay().checkin||{}, done=c.sleep&&c.energy&&c.mood&&c.stress;
+  if(done&&!tcUi.editCheck){
+    if(!m.band) return '';
+    const b=TC_MODE[m.band];
+    const msg={green:'Gute Voraussetzungen. Heute darfst du fordern.',yellow:'Trainieren ja, aber mit Reserve. Das Ziel ist, morgen wieder Lust zu haben.',red:'Heute schonen. Das Minimum hält die Gewohnheit am Leben, mehr braucht es nicht.'}[m.band];
+    return `<section class="card s12"><h2>Tagesmodus <button class="btn ghost tc-mini" data-tc="act" data-a="editCheck">Check-in ändern</button></h2>
+      <div class="mode"><div class="badge" style="background:${b.c}">${b.t}<small>${b.sub}</small></div>
+      <div><h3>${msg}</h3><ul class="why">${m.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div></div></section>`;
+  }
+  const g=tcGarmin();
+  return `<section class="card s12" id="tcCheck"><h2>Morgen-Check-in <span class="chip">6 Fragen · 30 Sekunden</span></h2>
+    ${g?`<p class="small muted" style="margin-top:-4px">Die Uhr sagt: Erholung ${nf(g.recovery)} % (${BAND[g.band].t}). Wie fühlst du dich selbst?</p>`:''}
+    <div class="q"><label>Wie erholt fühlst du dich? <span>1 kaputt · 5 frisch</span></label><div class="scale">${tcScale('sleep',c.sleep)}</div></div>
+    <div class="q"><label>Energie <span>1 leer · 5 voll</span></label><div class="scale">${tcScale('energy',c.energy)}</div></div>
+    <div class="q"><label>Stimmung <span>1 mies · 5 richtig gut</span></label><div class="scale">${tcScale('mood',c.mood)}</div></div>
+    <div class="q"><label>Stress <span>1 ruhig · 5 am Limit</span></label><div class="scale">${tcScale('stress',c.stress)}</div></div>
+    <div class="q"><label>Schmerz Sprunggelenk oder Rücken <span>0 keiner · 10 stark</span></label><div class="scale s6">${[0,2,4,6,8,10].map(i=>`<button type="button" data-tc="sc" data-k="pain" data-v="${i}" aria-pressed="${c.pain===i}">${i}</button>`).join('')}</div></div>
+    <div class="toggles"><button type="button" class="tg" data-tc="tg" data-k="night" aria-pressed="${!!c.night}">Nacht unterbrochen</button><button type="button" class="tg" data-tc="tg" data-k="sick" aria-pressed="${!!c.sick}">Krank / erkältet</button></div>
+    ${done?`<div class="row" style="margin-top:12px"><button class="btn" data-tc="act" data-a="closeCheck">Fertig</button></div>`:''}</section>`;
+}
+function tcTipCard(m){ const tip=tcTodayTip(m);
+  return `<section class="card s12 tc-tip"><h2>Dein Tipp für heute</h2><h3>${esc(tip.t)}</h3><p>${esc(tip.s)}</p></section>`; }
+function tcTrainCard(m){
+  const s=tcSession(m), tr=tcDay().training;
+  const recTier=m.band?TC_MODE[m.band].tier:(m.gap>=7?'min':'std'), sel=tcTier||recTier, v=s[sel];
+  const c=store.coach[TD()];
+  const coachLine=c&&c.headline?`<p class="small" style="margin:4px 0 0"><span class="muted">Trainer:</span> ${esc(c.headline)}</p>`:'';
+  const head=`<h2>Training <span class="chip">${esc(s.focus)}</span></h2><h3>${esc(s.title)}</h3>${s.note?`<p class="small muted">${esc(s.note)}</p>`:''}${coachLine}`;
+  if(tr&&tr.tier) return `<section class="card s12" id="tcTrain">${head}<div class="done"><span class="ck">✓</span><div><b>Erledigt: ${TIERN[tr.tier]}</b>${tr.rpe?` · Anstrengung ${tr.rpe}/10`:''}<div class="small muted">${tr.rpe&&tr.rpe<=5?'Fiel leicht – nächstes Mal eine Stufe mehr.':tr.rpe>=8?'War hart – nächstes Mal etwas zurücknehmen.':'Gut gemacht. Morgen geht es weiter.'}</div></div></div>
+    ${tr.rpe?'':`<div class="q" style="margin-top:12px"><label>Wie anstrengend war es? <span>1 locker · 10 maximal</span></label><div class="scale s6">${[3,5,6,7,8,9].map(i=>`<button type="button" data-tc="rpe" data-v="${i}">${i}</button>`).join('')}</div></div>`}
+    <div class="row" style="margin-top:10px"><button class="btn ghost" data-tc="act" data-a="undoTrain">Rückgängig</button></div>${tcCounters()}</section>`;
+  return `<section class="card s12" id="tcTrain">${head}<div class="tiers" role="group" aria-label="Umfang wählen">
+    ${['min','std','full'].map(k=>s[k]?`<button type="button" class="tier ${k===recTier?'rec':''}" data-tc="tier" data-v="${k}" aria-pressed="${k===sel}"><b>${TIERN[k]}</b><span>${s[k].min} min</span></button>`:'').join('')}</div>
+    ${v?tcExList(v.blocks):''}
+    <button class="btn go bigbtn" style="margin-top:14px" data-tc="done" data-v="${sel}">✓ ${TIERN[sel]} erledigt</button>
+    <div class="row" style="margin-top:8px;justify-content:space-between"><span class="small muted">Wenn die Zeit knapp wird, ist das Minimum ein voller Erfolg.</span><button class="btn ghost tc-mini" data-goview="workout">Geführt mit Timer ›</button></div>${tcCounters()}</section>`;
+}
+function tcCounters(){
+  const pr=tcWeekSum('push'), sq=tcWeekSum('squat'), r=tcDay().reps||{};
+  return `<div class="counters" style="margin-top:14px">${[['push','Liegestütze diese Woche',pr,TC_GOALS.weekPush],['squat','Kniebeugen diese Woche',sq,TC_GOALS.weekSquat]].map(([k,l,val,goal])=>`<div class="ctr"><div class="k">${l}</div><div class="v">${nf(val)} <small>/ ${goal}</small></div><div class="bar"><i style="width:${Math.min(100,val/goal*100)}%"></i></div><div class="row">${[10,25].map(n=>`<button type="button" data-tc="rep" data-k="${k}" data-v="${n}">+${n}</button>`).join('')}<button type="button" data-tc="rep" data-k="${k}" data-v="-10" aria-label="10 abziehen">−10</button></div></div>`).join('')}</div>
+    <p class="small muted" style="margin-top:6px">Zählt alles: Einheit, Büro, abends vorm Fernseher. Heute: ${nf(r.push||0)} Liegestütze, ${nf(r.squat||0)} Kniebeugen.</p>`;
+}
+function tcRecRow(){
+  const L=DATA.lastWithData, x=DATA.days[L]; if(!x) return '';
+  return `<button class="card s12 rowlink" data-goview="rec">${ring(x.recovery,x.band,78)}
+    <span style="flex:1;min-width:0"><span class="lab">Uhr · ${L===DATA.today?'heute':dshort(L)}</span><br><b style="font-size:16px">${x.band?BAND[x.band].name:'–'}</b>
+    <span class="minis"><span><b>${nf(x.parts.hrv&&x.parts.hrv.raw)}</b> ms HFV</span><span><b>${nf(x.parts.rhr&&x.parts.rhr.raw)}</b> Ruhepuls</span><span><b>${x.sleep?hc(x.sleep.asleep/3600):'–'}</b> h Schlaf</span></span></span><span class="chev">›</span></button>`;
+}
+function tcNudgeCard(m){
+  const list=TC_NUDGES[m.band||'yellow'], done=tcDay().nudges||{};
+  return `<section class="card s12"><h2>Für zwischendurch <span class="chip">Büro · 2 Minuten</span></h2>
+    <div class="nudges">${list.map((n,i)=>`<button type="button" class="nudge" data-tc="nudge" data-v="${i}" aria-pressed="${!!done[i]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}</small></span></button>`).join('')}</div></section>`;
+}
+function tcMindCard(){
+  const c=tcDay().checkin||{}, hi=c.stress>=4;
+  return `<section class="card s12 mindcard" id="tcMind"><h2>Kopf ${hi?'<span class="chip mindchip">Stress hoch – erst atmen</span>':''}</h2>
+    <div class="breath"><div class="orb" id="orb">${tcBreath.on?'':'Start'}</div>
+      <div class="row" style="justify-content:center"><button class="btn ghost" data-tc="act" data-a="breath">${tcBreath.on?'Stopp':'2 Minuten Box-Atmung'}</button><span class="status" id="bleft">${tcBreath.on?'':'4 s ein · 4 halten · 4 aus · 4 halten'}</span></div></div>
+    <details style="margin-top:6px" ${hi?'open':''}><summary>Deine Wenn-Dann-Pläne</summary><div class="ifthen" style="margin-top:8px">
+      <div><b>Wenn</b> ich abends nach der Packung greifen will, <b>dann</b> trinke ich ein Glas Wasser, warte 10 Minuten und nehme mir danach eine Portion auf einen Teller.</div>
+      <div><b>Wenn</b> die Nacht schlecht war, <b>dann</b> mache ich das Minimum und gehe heute 30 Minuten früher ins Bett.</div>
+      <div><b>Wenn</b> mich etwas mit den Kindern oder bei der Arbeit hochbringt, <b>dann</b> erst 2 Minuten atmen, dann reagieren.</div>
+      <div><b>Wenn</b> ich einen Tag ausgelassen habe, <b>dann</b> ist morgen Pflicht – nie zweimal hintereinander.</div></div></details>
+    </section>`;
+}
+function tcHabitCard(){
+  const h=tcDay().habits||{}, hs=tcHabits(), n=hs.filter(x=>h[x.id]).length, w=tcDay().water||0;
+  const streak=id=>{ let k=0,d=TD(); const on=d=>store.days[d]&&store.days[d].habits&&store.days[d].habits[id]; if(!on(d)) d=addDays(d,-1); while(on(d)){k++;d=addDays(d,-1);} return k; };
+  return `<section class="card s12"><h2>Gewohnheiten <span class="chip">${n} von ${hs.length}</span></h2>
+    <div class="habits">${hs.map(x=>{ const st=streak(x.id); return `<button type="button" class="habit" data-tc="hb" data-k="${esc(x.id)}" aria-pressed="${!!h[x.id]}"><span class="box">✓</span><span class="ht">${esc(x.t)}${x.s?`<small>${esc(x.s)}</small>`:''}</span><span class="st">${st>1?st+' Tage':''}</span></button>`; }).join('')}</div>
+    <div style="margin-top:14px"><div class="flab">Wasser <span class="muted" style="font-weight:500">${w} von ${TC_GOALS.water} Gläsern</span></div>
+    <div class="water">${[...Array(TC_GOALS.water)].map((_,i)=>`<button type="button" data-tc="water" data-v="${i+1}" class="${i<w?'f':''}" aria-label="${i+1} Gläser"></button>`).join('')}</div></div></section>`;
+}
+
+/* ---------- ÜBERSICHT ---------- */
+function renderUebersicht(){
+  const d14=tcLastN(14), d7=d14.slice(7), p7=d14.slice(0,7);
+  const avg=a=>{ const v=a.filter(y=>y!=null); return v.length?v.reduce((s,y)=>s+y,0)/v.length:null; };
+  const rec=d=>{ const x=DATA.days[d]; return x&&x.recovery!=null?x.recovery:null; };
+  const slp=d=>{ const x=DATA.days[d]; return x&&x.sleep&&x.sleep.asleep?x.sleep.asleep/3600:null; };
+  const need=d=>{ const x=DATA.days[d]; return x&&x.need&&x.need.need?x.need.need:null; };
+  const r7=avg(d7.map(rec)), r0=avg(p7.map(rec)), s7=avg(d7.map(slp)), n7=avg(d7.map(need));
+  const movedN=tcWeek().filter(tcMoved).length, ws=tcWeights(), lastW=ws.length?ws[ws.length-1].y:TC_GOALS.startWeight;
+  const trend=(a,b)=>a==null||b==null?'':`<span class="trend ${a>=b?'up':'down'}">${a>=b?'▲':'▼'} ${nf(Math.abs(a-b))}</span>`;
+  const tile=(lab,val,unit,sub,spark,go)=>`<button class="card s3 tc-tile" ${go?`data-goview="${go}"`:''}><span class="lab">${lab}</span><span class="big">${val}<small>${unit}</small></span><span class="small muted">${sub}</span>${spark}</button>`;
+  const tiles=[
+    tile('Bewegungstage',`${movedN}`,`/${TC_GOALS.weekDays}`,'diese Woche',`<div class="dots7">${tcWeek().map(d=>`<i class="${tcMoved(d)?'on':''}"></i>`).join('')}</div>`,'heute'),
+    tile('Erholung Ø 7 Tage',r7==null?'–':nf(r7),' %',`${trend(r7,r0)} gegenüber der Woche davor`,tcSpark(d14.map(d=>({x:d,y:rec(d)})),{lo:0,hi:100}),'rec'),
+    tile('Schlaf Ø 7 Nächte',s7==null?'–':hc(s7),' h',n7?`Bedarf ${hc(n7)} h · ${s7>=n7?'gedeckt':'fehlt '+hm(n7-s7)}`:'',tcSpark(d14.map(d=>({x:d,y:slp(d)})),{color:'var(--s-rem)'}),'slp'),
+    tile('Gewicht',nf(lastW,1),' kg',`${lastW<TC_GOALS.startWeight?nf(TC_GOALS.startWeight-lastW,1)+' kg seit 12.10.':'Start 128 kg'} · Ziel ${TC_GOALS.targetWeight}`,tcSpark(ws.slice(-20),{color:'var(--good)'}),'jrn')
+  ].join('');
+  const ins=tcInsights();
+  const insHTML=`<section class="card s12"><h2>Was deine Daten sagen</h2><div class="insights">${ins.map(i=>`<div class="tc-ins"><span class="chip">${esc(i.tag)}</span><h3>${esc(i.title)}</h3><p class="small muted">${esc(i.evidence)}</p><p class="tc-do"><b>Für deinen Alltag:</b> ${esc(i.tip)}</p></div>`).join('')}</div>
+    <p class="tiny muted" style="margin-top:10px">Zusammenhänge, keine Beweise für Ursachen. Herzfrequenzvariabilität (HFV) in Millisekunden gegenüber deinem eigenen Schnitt.</p></section>`;
+  const d28=[...Array(28)].map((_,i)=>addDays(tcMonday(TD()),i-21));
+  const lvl=d=>{ const x=store.days[d]||{}, t=x.training&&x.training.tier; return t==='full'||t==='std'||(!t&&tcTrained(d))?3:t==='min'?2:x.habits&&x.habits.move?1:0; };
+  const heat=`<section class="card s6"><h2>Letzte 4 Wochen</h2><div class="heat">${d28.map(d=>`<div class="l${d>TD()?0:lvl(d)} ${d===TD()?'t':''}" title="${dshort(d)}">${dt(d).getDate()}</div>`).join('')}</div>
+    <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Training</span><span><i class="sw" style="background:color-mix(in srgb,var(--accent) 55%,transparent)"></i>Minimum</span><span><i class="sw" style="background:var(--accent-soft)"></i>bewegt</span></div></section>`;
+  const mp=k=>d14.map(d=>({x:d,y:(store.days[d]&&store.days[d].checkin&&store.days[d].checkin[k])||null}));
+  const nCi=d14.filter(d=>store.days[d]&&store.days[d].checkin).length;
+  const notes=tcWeek().filter(d=>{ const e=(store.days[d]||{}).evening||{}; return e.good||e.stress||e.tomorrow; }).length;
+  const breaths=tcWeek().reduce((a,d)=>a+((store.days[d]||{}).breathing||0),0);
+  const head=`<section class="card s6 mindcard"><h2>Kopf · 14 Tage</h2>
+    ${nCi>=2?`<div class="tc-trio">${[['energy','Energie','var(--accent)'],['mood','Stimmung','var(--good)'],['stress','Stress','var(--mind)']].map(([k,l,c])=>`<div><span class="small muted">${l}</span>${tcSpark(mp(k),{lo:1,hi:5,color:c,h:44})}</div>`).join('')}</div>`:'<p class="small muted">Erscheint nach den ersten zwei Check-ins.</p>'}
+    <div class="minis" style="margin-top:8px"><span><b>${breaths}</b> Atemübungen</span><span><b>${notes}</b> Abendnotizen</span><span><b>${nCi}</b> Check-ins</span><span class="muted">diese Woche bzw. 14 Tage</span></div></section>`;
+  const weeks=[3,2,1,0].map(k=>addDays(tcMonday(TD()),-7*k));
+  const reps=`<section class="card s6"><h2>Liegestütze & Kniebeugen</h2>${barChart({pts:weeks.map(w=>({x:w,stack:[[tcWeekSum('push',w),'var(--accent)'],[tcWeekSum('squat',w),'var(--good)']],tip:`Woche ab ${dshort(w)}: ${tcWeekSum('push',w)} Liegestütze, ${tcWeekSum('squat',w)} Kniebeugen`})),label:'Wiederholungen pro Woche',h:170,xfmt:d=>'KW ab '+dt(d).getDate()+'.'+(dt(d).getMonth()+1)+'.',ymax:Math.max(TC_GOALS.weekPush+TC_GOALS.weekSquat, ...weeks.map(w=>tcWeekSum('push',w)+tcWeekSum('squat',w)))*1.1})}
+    <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Liegestütze (Ziel ${TC_GOALS.weekPush})</span><span><i class="sw" style="background:var(--good)"></i>Kniebeugen (Ziel ${TC_GOALS.weekSquat})</span></div></section>`;
+  const sl=`<section class="card s6"><h2>Schlaf · 14 Nächte</h2>${lineChart({pts:d14.map(d=>({x:d,y:slp(d)})),label:'Schlaf',yfmt:v=>hc(v),avg:false,h:170,color:'var(--s-rem)',refLine:n7||8,ymin:Math.min(4,...d14.map(slp).filter(v=>v!=null)),ymax:Math.max((n7||8)+0.5,...d14.map(slp).filter(v=>v!=null))})}
+    <p class="small muted">Gestrichelt: dein Schlafbedarf. ${DATA.plan&&DATA.plan.bedSD!=null?`Einschlafzeit schwankt um ± ${nf(DATA.plan.bedSD)} min${DATA.plan.bedSD>45?' – gleichmäßiger wäre besser.':'.'}`:''}</p></section>`;
+  return `<div class="grid tc">${tiles}${insHTML}${heat}${head}${sl}${reps}</div>`;
+}
+
+/* ---------- Bedienung ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-tc]'); if(!b||!document.getElementById('view').contains(b)) return;
+  const k=b.dataset.k, v=b.dataset.v, a=b.dataset.tc;
+  if(a==='sc'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=x.checkin[k]===+v&&k==='pain'?null:+v; }); }
+  else if(a==='tg'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=!x.checkin[k]; }); }
+  else if(a==='tier'){ tcTier=v; render(); }
+  else if(a==='done'){ tcPatch(x=>{ x.training={tier:v,session:tcSession(tcMode()).title,at:new Date().toISOString()}; x.habits=x.habits||{}; x.habits.move=true; }); }
+  else if(a==='rpe'){ tcPatch(x=>{ x.training.rpe=+v; }); }
+  else if(a==='rep'){ tcPatch(x=>{ x.reps=x.reps||{}; x.reps[k]=Math.max(0,(x.reps[k]||0)+(+v)); }); }
+  else if(a==='hb'){ tcPatch(x=>{ x.habits=x.habits||{}; x.habits[k]=!x.habits[k]; }); }
+  else if(a==='water'){ tcPatch(x=>{ x.water=x.water===+v?+v-1:+v; }); }
+  else if(a==='nudge'){ const n=TC_NUDGES[tcMode().band||'yellow'][+v];
+    if(n.act==='breath'&&!tcBreath.on&&!(tcDay().nudges||{})[v]){ tcPatch(x=>{ x.nudges=Object.assign({},x.nudges,{[v]:true}); }); tcToggleBreath(); return; }
+    tcPatch(x=>{ x.nudges=x.nudges||{}; const on=!x.nudges[v]; x.nudges[v]=on; const s=on?1:-1;
+      if(n.rep){ x.reps=x.reps||{}; x.reps[n.rep[0]]=Math.max(0,(x.reps[n.rep[0]]||0)+s*n.rep[1]); }
+      if(n.water) x.water=Math.max(0,(x.water||0)+s); x.habits=x.habits||{}; if(on) x.habits.breaks=true; }); }
+  else if(a==='ev'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; if(k==='screen') x.evening.screen=!x.evening.screen; else x.evening[k]=x.evening[k]===+v?null:+v; }); }
+  else if(a==='evt'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; let l=(x.evening[k]||[]).slice(); const only=v==='nichts'||v==='ok';
+      if(l.includes(v)) l=l.filter(t=>t!==v); else l=only?[v]:l.filter(t=>t!=='nichts'&&t!=='ok').concat(v);
+      x.evening[k]=l; if(k==='food'){ x.habits=x.habits||{}; x.habits.plate=l.length>0&&!l.includes('viel')&&!l.includes('packung'); } }); }
+  else if(a==='morning'){ const go=id=>setTimeout(()=>{ const el=document.getElementById(id); el&&el.scrollIntoView({behavior:'smooth',block:'start'}); },30);
+    if(v==='water') tcPatch(x=>{ x.water=(x.water||0)>=1?(x.water||0)-1:1; });
+    else if(v==='protein') tcPatch(x=>{ x.habits=x.habits||{}; x.habits.protein=!x.habits.protein; });
+    else if(v==='check'){ tcUi.editCheck=true; render(); go('tcCheck'); }
+    else if(v==='train') go('tcTrain'); }
+  else if(a==='act'){ const w=b.dataset.a;
+    if(w==='showMorning'){ tcUi.showMorning=true; render(); return; }
+    if(w==='showEve'){ tcUi.showEve=true; render(); return; }
+    if(w==='closeEve'){ tcUi.showEve=false; render(); return; }
+    if(w==='editCheck'){ tcUi.editCheck=true; render(); }
+    else if(w==='closeCheck'){ tcUi.editCheck=false; render(); }
+    else if(w==='undoTrain'){ tcPatch(x=>{ delete x.training; }); }
+    else if(w==='breath'){ tcToggleBreath(); } }
+});
+let tcEvT=null;
+document.addEventListener('input',e=>{
+  const t=e.target; if(!t.dataset||!t.dataset.tcev) return;
+  const x=tcDay(); x.evening=x.evening||{}; x.evening[t.dataset.tcev]=t.value; tcDirty.add(TD()); tcSaveLocal();
+  clearTimeout(tcEvT); tcEvT=setTimeout(()=>{ x.updatedAt=new Date().toISOString(); tcFlush(); },900);
+});
+function tcToggleBreath(){
+  if(tcBreath.on){ clearInterval(tcBreath.t); tcBreath.on=false; render(); return; }
+  tcBreath={on:true,phase:0,left:120,t:null}; render();
+  const names=['Ein','Halten','Aus','Halten'], cls=['in','hold','out','out'];
+  const step=()=>{ const o=$('#orb'); if(!o) return; o.className='orb '+cls[tcBreath.phase]; o.textContent=names[tcBreath.phase]; const bl=$('#bleft'); if(bl) bl.textContent='noch '+Math.ceil(tcBreath.left/60*10)/10+' min'; };
+  step();
+  tcBreath.t=setInterval(()=>{ tcBreath.left-=4; tcBreath.phase=(tcBreath.phase+1)%4; if(tcBreath.left<=0){ clearInterval(tcBreath.t); tcBreath.on=false; tcPatch(x=>{ x.breathing=(x.breathing||0)+1; }); return; } step(); },4000);
+}
+
+/* ================= HINWEISE (Uhr) ================= */
 function signals(){
   const x = DATA.days[DATA.lastWithData], b = DATA.brief, out=[];
   const add=(lvl,t)=>out.push([lvl,t]);
@@ -438,40 +937,6 @@ function foodTile(){
     <span class="mid" style="color:var(--s-rem);min-width:64px">${nf(t.protein)}<span class="unit"> g</span></span>
     <span style="flex:1;min-width:0"><b>Essen</b><br><span class="small muted">${t.n?`${nf(t.protein)} von ${N.protein} g Eiweiß · ${nf(t.kcal)} von ${nf(N.kcalTarget)} kcal`:'Noch nichts eingetragen'}</span>
     <span class="meter" style="display:block;margin-top:6px"><span style="position:absolute;inset:0;width:${Math.min(100,t.protein/N.protein*100)}%;background:var(--s-rem);border-radius:4px"></span></span></span><span class="chev">›</span></button>`;
-}
-function renderHeute(){
-  const L=DATA.lastWithData, x=DATA.days[L], p=DATA.plan;
-  const c = store.coach[DATA.today] || (()=>{ const ks=Object.keys(store.coach).filter(k=>k<=DATA.today).sort(); return ks.length?store.coach[ks[ks.length-1]]:null; })();
-  const stale = c && c.date!==DATA.today;
-  const ORD={crit:0,warn:1,info:2}; const sig = signals().filter(([l])=>l!=='good').sort((a,b)=>ORD[a[0]]-ORD[b[0]]).slice(0,3);
-  const icon = {crit:['!','var(--crit)'],warn:['!','var(--warn)'],info:['i','var(--accent)']};
-  const done = (store.journal[DATA.today]||{}).workout;
-  const j = store.journal[DATA.today]||{};
-  const bed = (c&&!stale&&c.sleep&&c.sleep.bedtime) || (p?p.tiers[1].bedtime:null);
-  const target = (c&&!stale&&c.strainTarget) || (x.target?nf(x.target[0],1)+'–'+nf(x.target[1],1):null);
-  const tr = (c&&c.training)||{};
-  const v = c&&!stale&&c.variants&&x.band&&L===DATA.today ? c.variants[x.band] : null;
-  const variant = v&&v.title ? v : null;
-  const recId = c&&!stale&&c.options ? (c.options.find(o=>o.id===c.recommended)||c.options.find(o=>o.role==='empfohlen')||{}).id : null;
-  const rec = `<div class="card s12">
-      ${c?`<h2>Empfehlung${c.focus&&!stale?' · '+esc(c.focus):''} ${stale?`<span class="est">von ${dshort(c.date)}</span>`:''}</h2>
-      <p class="coach-h">${esc(c.headline||'')}</p>
-      ${variant?`<p><b>${esc(variant.title)}</b>${variant.detail?' – '+esc(variant.detail):''}</p>`:tr.detail?`<p>${esc(tr.detail)}</p>`:''}`
-      :`<h2>Empfehlung</h2><p class="muted">Für heute gibt es noch keine Empfehlung.</p>${sampleOK()?`<div class="row" style="margin:8px 0"><button class="btn ghost" id="askNow">Jetzt einschätzen lassen</button><span class="status" id="askNowSt"></span></div>`:''}`}
-      <div class="facts">${target?`<span>Belastungsziel <b>${esc(target)}</b></span>`:''}${bed?`<span>Ins Bett <b>${esc(bed)}</b></span>`:''}</div>
-      ${c&&!stale&&c.nutrition?`<p class="small"><span class="muted">Essen:</span> ${esc(c.nutrition)}</p>`:''}
-      ${c&&c.why&&c.why.length?`<details style="margin-top:4px"><summary class="small muted">Warum?</summary><ul class="why small">${c.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></details>`:''}
-      <button class="btn bigbtn ${done?'ghost':'go'}" data-goview="workout" ${recId&&!done?`data-wsel="${esc(recId)}"`:''} style="margin-top:12px">${done?'✓ Training erledigt':'▶ Zum Training'}</button>
-    </div>`;
-  return `<div class="grid">
-    <button class="card s12 rowlink" data-goview="rec">${ring(x.recovery,x.band,92)}
-      <span style="flex:1;min-width:0"><span class="lab">Erholung ${L===DATA.today?'heute':dshort(L)}</span><br><b style="font-size:17px">${x.band?BAND[x.band].name:'–'}</b>
-      <span class="minis"><span><b>${nf(x.parts.hrv&&x.parts.hrv.raw)}</b> ms HFV</span><span><b>${nf(x.parts.rhr&&x.parts.rhr.raw)}</b> Ruhepuls</span><span><b>${x.sleep?hc(x.sleep.asleep/3600):'–'}</b> h Schlaf</span></span></span><span class="chev">›</span></button>
-    ${rec}
-    ${foodTile()}
-    ${sig.length?`<div class="card s12"><h2>Hinweise</h2><div class="sig">${sig.map(([l,t])=>`<div><span class="ic" style="background:${icon[l][1]}">${icon[l][0]}</span><span>${t}</span></div>`).join('')}</div></div>`:''}
-    <button class="card s12 rowlink" data-goview="jrn"><span style="flex:1"><b>Tagebuch</b><br><span class="small muted">${(j.tags&&j.tags.length)||j.energy?'Heute: '+esc([...(j.tags||[]), j.energy?'Energie '+j.energy+'/5':''].filter(Boolean).join(', ')):'Wie geht es dir heute? Kurz eintragen'}</span></span><span class="chev">›</span></button>
-  </div>`;
 }
 function weekPlanTable(wp){
   return `<div class="tw"><table><thead><tr><th>Tag</th><th class="tl">Plan</th><th>Belastung</th></tr></thead><tbody>${wp.map(r=>`<tr${r.date===DATA.today?' style="background:var(--accent-soft)"':''}><td>${r.date?dshort(r.date):esc(r.day||'')}</td><td class="tl">${esc(r.plan||'')}${r.note?`<div class="muted small">${esc(r.note)}</div>`:''}</td><td class="num">${esc(r.strain||'')}</td></tr>`).join('')}</tbody></table></div>`;
@@ -1588,15 +2053,15 @@ function render(){
   $('#daynav').classList.toggle('hidden', !DAYVIEWS.includes(view));
   $('#date').textContent = dlong(cur);
   $('#prev').disabled = days.indexOf(cur)===0; $('#next').disabled = days.indexOf(cur)===days.length-1;
-  const tab = ['heute','workout','food','coach'].includes(view) ? view : 'more';
-  $('#ttl').textContent = {heute:'Heute', workout:'Training', food:'Essen', coach:'Trainer', rec:'Erholung', str:'Belastung', slp:'Schlaf', trn:'Trainingsanalyse', trd:'Verlauf', jrn:'Tagebuch'}[view] || 'Trainingscockpit';
+  const tab = ['heute','uebersicht','workout','food'].includes(view) ? view : 'more';
+  $('#ttl').textContent = {heute:'Heute', uebersicht:'Übersicht', workout:'Training', food:'Essen', coach:'Trainer', rec:'Erholung', str:'Belastung', slp:'Schlaf', trn:'Trainingsanalyse', trd:'Verlauf', jrn:'Tagebuch'}[view] || 'Trainingscockpit';
   document.querySelectorAll('#bnav button').forEach(b=>{ if (b.dataset.t===tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   const x = DATA.days[cur];
-  $('#banner').innerHTML = ['food','coach','workout','trn','trd','jrn'].includes(view) ? '' : DATA.today!==DATA.lastWithData && (view==='heute' || cur===DATA.lastWithData)
-    ? `<div class="banner"><b>Noch keine Daten von heute.</b> Angezeigt wird ${dshort(DATA.lastWithData)}. Garmin-App öffnen, damit die Uhr abgleicht.</div>`
+  $('#banner').innerHTML = ['food','coach','workout','trn','trd','jrn','uebersicht'].includes(view) ? '' : DATA.today!==DATA.lastWithData && (view==='heute' || cur===DATA.lastWithData)
+    ? `<div class="banner"><b>Noch keine Daten von heute.</b> Angezeigt wird ${dshort(DATA.lastWithData)} Garmin-App öffnen, damit die Uhr abgleicht.</div>`
     : (DAYVIEWS.includes(view) && x && x.recovery==null ? `<div class="banner"><b>Für ${dlong(cur)} liegen noch keine Daten vor.</b></div>` : '');
   const v = $('#view');
-  v.innerHTML = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
+  v.innerHTML = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='uebersicht'?renderUebersicht():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
   v.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>{cur=el.dataset.go;render();}));
   v.querySelectorAll('[data-goview]').forEach(el=>el.addEventListener('click',()=>{ if (el.dataset.wsel) wSel=el.dataset.wsel; view=el.dataset.goview; cur=DATA.lastWithData; saveView(); render(); scrollTo(0,0); }));
   v.querySelectorAll('[data-jopen]').forEach(el=>el.addEventListener('click',()=>{ jDate=el.dataset.jopen; render(); }));
@@ -1618,7 +2083,7 @@ async function boot(){
   days = Object.keys(DATA.days).sort();
   cur = DATA.lastWithData || days[days.length-1];
   parseHash();
-  if (!['heute','workout','food','rec','str','slp','trn','trd','jrn','coach'].includes(view)) view='heute';
+  if (!['heute','uebersicht','workout','food','rec','str','slp','trn','trd','jrn','coach'].includes(view)) view='heute';
   gLoad(); if (G) gRun();
   $('#meta').textContent = `Trainingscockpit · Stand ${DATA.lastSync?dmini(DATA.lastSync.slice(0,10))+', '+DATA.lastSync.slice(11,16)+' Uhr':'–'}`;
   $('#prev').onclick=()=>{ const i=days.indexOf(cur); if(i>0){cur=days[i-1];render();} };

@@ -6,8 +6,9 @@ const ROOT = path.resolve(__dirname, '..');
 const DATA = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const wrap = html => '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>' + html + '</body></html>';
 
-async function open(browser, app, data, width = 390) {
+async function open(browser, app, data, width = 390, time = null) {
   const page = await browser.newPage({ viewport: { width, height: 844 } });
+  if (time) await page.clock.setFixedTime(time);   // nur Date; Timer laufen normal
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -37,11 +38,11 @@ const tests = {
   async 'Cockpit: alle Bereiche lassen sich öffnen'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForFunction(() => document.querySelector('#view').innerText.length > 50);
-    for (const t of ['workout', 'food', 'coach', 'heute']) {
+    for (const t of ['uebersicht', 'workout', 'food', 'heute']) {
       await page.click(`#bnav button[data-t="${t}"]`);
       assert.ok((await page.locator('#view').innerText()).length > 20, t);
     }
-    for (const t of ['rec', 'str', 'slp', 'trn']) {
+    for (const t of ['coach', 'rec', 'str', 'slp', 'trn', 'trd', 'jrn']) {
       await page.click('#bnav button[data-t="more"]');
       await page.click(`[data-mv="${t}"]`);
       assert.ok((await page.locator('#view').innerText()).length > 20, t);
@@ -53,6 +54,73 @@ const tests = {
     const { page, errors } = await open(b, 'cockpit', stale);
     await page.waitForSelector('#banner .banner');
     assert.match(await page.locator('#banner').innerText(), /Noch keine Daten von heute/);
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Check-in, Training, Mini-Vorschlag und Speichern im Browser'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#tcCheck');
+    for (const k of ['sleep', 'energy', 'mood', 'stress']) await page.click(`[data-tc="sc"][data-k="${k}"][data-v="4"]`);
+    await page.click('[data-tc="act"][data-a="closeCheck"]');
+    await page.waitForSelector('.tc .badge');
+    assert.match(await page.locator('.tc .badge').innerText(), /Voll|Normal|Minimum/i);
+    await page.click('[data-tc="done"]');
+    assert.match(await page.locator('#view').innerText(), /Erledigt/);
+    await page.click('[data-tc="nudge"][data-v="1"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="nudge"][data-v="1"]', 'aria-pressed'), 'true');
+    await page.click('[data-tc="rep"][data-k="push"][data-v="25"]');
+    await page.reload();
+    await page.waitForSelector('.tc .badge');
+    assert.match(await page.locator('#view').innerText(), /Erledigt/);
+    assert.match(await page.locator('.counters').innerText(), /25/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Morgen-Ablauf in 4 Schritten'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#tcMorning');
+    assert.match(await page.locator('#tcMorning h2').innerText(), /0 von 4/);
+    await page.click('[data-tc="morning"][data-v="water"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="morning"][data-v="water"]', 'aria-pressed'), 'true');
+    await page.click('[data-tc="morning"][data-v="check"]');
+    for (const k of ['sleep', 'energy', 'mood', 'stress']) await page.click(`[data-tc="sc"][data-k="${k}"][data-v="3"]`);
+    await page.click('[data-tc="act"][data-a="closeCheck"]');
+    await page.click('[data-tc="done"]');
+    await page.click('[data-tc="morning"][data-v="protein"]');
+    assert.match(await page.locator('#view').innerText(), /Morgen erledigt/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Abend-Reflexion ab 17 Uhr, nur antippen'(b) {
+    const evening = new Date(); evening.setHours(19, 30, 0, 0);
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, evening);
+    await page.waitForSelector('#tcEve');
+    await page.click('[data-tc="ev"][data-k="day"][data-v="4"]');
+    await page.click('[data-tc="evt"][data-k="drain"][data-v="arbeit"]');
+    await page.click('[data-tc="evt"][data-k="drain"][data-v="familie"]');
+    await page.click('[data-tc="evt"][data-k="food"][data-v="ok"]');
+    await page.click('[data-tc="evt"][data-k="food"][data-v="suess"]');   // "Im Rahmen" fällt dann weg
+    assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="food"][data-v="ok"]', 'aria-pressed'), 'false');
+    await page.click('[data-tc="ev"][data-k="screen"]');
+    await page.fill('#ev-good', 'Minimum trotz Stress');
+    await page.click('[data-tc="act"][data-a="closeEve"]');
+    assert.match(await page.locator('#view').innerText(), /Abend reflektiert/);
+    await page.reload();
+    await page.waitForSelector('[data-a="showEve"]');
+    await page.click('[data-a="showEve"]');
+    assert.strictEqual(await page.inputValue('#ev-good'), 'Minimum trotz Stress');
+    assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="drain"][data-v="familie"]', 'aria-pressed'), 'true');
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Übersicht: Kacheln, Erkenntnisse mit Alltagstipp'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#bnav button[data-t="uebersicht"]');
+    await page.click('#bnav button[data-t="uebersicht"]');
+    await page.waitForSelector('.tc-tile');
+    assert.strictEqual(await page.locator('.tc-tile').count(), 4);
+    assert.ok(await page.locator('.tc-ins').count() >= 1);
+    assert.match(await page.locator('.insights').innerText(), /Für deinen Alltag/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
   async 'Tagescoach: Check-in ausfüllen ohne Fehler'(b) {
