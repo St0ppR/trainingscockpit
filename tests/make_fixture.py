@@ -7,6 +7,7 @@ erfunden. So laesst sich analyze.py in CI komplett durchlaufen, ohne persoenlich
 Aufruf:  python tests/make_fixture.py ZIELORDNER [--days 60] [--end JJJJ-MM-TT]
 """
 import argparse, json, random, datetime as dt
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 
@@ -16,7 +17,7 @@ def ms(d):   return int(d.replace(tzinfo=dt.timezone.utc).timestamp() * 1000)
 
 def make(days=60, end=None, seed=7):
     rnd = random.Random(seed)
-    end = end or dt.date.today()
+    end = end or dt.datetime.now(ZoneInfo("Europe/Berlin")).date()   # wie analyze.py
     out = {"days": {}, "activities": {}, "meta": {"last_sync": f"{end.isoformat()}T07:30:00",
                                                   "range": [(end - dt.timedelta(days=days - 1)).isoformat(), end.isoformat()]}}
     for i in range(days):

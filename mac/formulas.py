@@ -54,13 +54,13 @@ def sleep_score(perf): return min(100.0, perf)
 def parse_said(said):
     """Morgen-Diktat -> (Minuten oder None, Flag 'red' | 'none' | None)."""
     low = said.lower(); mins, flag = None, None
-    m = re.search(r"(\d{1,3})\s*(min|minuten|m\b)?", low)
-    if m: mins = int(m.group(1))
+    m = re.search(r"(\d{1,3}(?:[.,]\d)?)\s*(min|minuten|m\b|std|stunden?)?", low)
+    if m: mins = round(float(m.group(1).replace(",", ".")) * (60 if (m.group(2) or "").startswith(("std", "stunde")) else 1))
     elif "dreiviertel" in low: mins = 45
+    elif "viertelstunde" in low: mins = 15
     elif "halbe stunde" in low: mins = 30
     elif "eineinhalb" in low or "anderthalb" in low: mins = 90
     elif "stunde" in low: mins = 60
-    elif "viertelstunde" in low: mins = 15
     if re.search(r"krank|erk(ä|ae)lt|fieber|schmerz|verletz|grippe|\bweh\b|tut weh|zerrung|hexenschuss|migräne|kopfweh|übel|durchfall", low): flag = "red"
     if re.search(r"kein(e)? (zeit|training)|ausfallen|pause", low): flag = "none"
     return mins, flag

@@ -150,10 +150,10 @@ def recovery(day):
     hm, hs, hn = base_hrv(day); rm, rs, rn = base_rhr(day); sn = sleep_need(day)
     slept = slp.get(day); perf = slept / 3600 / sn["need"] * 100 if slept else None
     parts = {}
-    if day in hrv and hm:
+    if day in hrv and hm and hs:          # hs == 0: Baseline ohne Streuung, kein z-Wert
         z = (hrv[day] - hm) / hs
         parts["hrv"] = {"raw": hrv[day], "mean": hm, "sd": hs, "n": hn, "z": z, "score": hrv_score(z), "w": W["hrv"]}
-    if day in rhr and rm:
+    if day in rhr and rm and rs:
         z = (rhr[day] - rm) / rs
         parts["rhr"] = {"raw": rhr[day], "mean": rm, "sd": rs, "n": rn, "z": z, "score": rhr_score(z), "w": W["rhr"]}
     if perf is not None:

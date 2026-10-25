@@ -11,6 +11,7 @@ run() {
   echo "\n=== $(date '+%Y-%m-%d %H:%M:%S') ($MODE) ==="
   .venv/bin/python sync.py || echo "Sync fehlgeschlagen - analysiere mit dem letzten Stand."
   .venv/bin/python analyze.py ${MINUTES:+--minutes $MINUTES}
+  .venv/bin/python check_fresh.py || true
 }
 if [[ "$MODE" == "--auto" ]]; then
   run >> logs/morgenlauf.log 2>&1
