@@ -37,11 +37,11 @@ const tests = {
   async 'Cockpit: alle Bereiche lassen sich öffnen'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForFunction(() => document.querySelector('#view').innerText.length > 50);
-    for (const t of ['workout', 'food', 'coach', 'heute']) {
+    for (const t of ['uebersicht', 'workout', 'food', 'heute']) {
       await page.click(`#bnav button[data-t="${t}"]`);
       assert.ok((await page.locator('#view').innerText()).length > 20, t);
     }
-    for (const t of ['rec', 'str', 'slp', 'trn']) {
+    for (const t of ['coach', 'rec', 'str', 'slp', 'trn', 'trd', 'jrn']) {
       await page.click('#bnav button[data-t="more"]');
       await page.click(`[data-mv="${t}"]`);
       assert.ok((await page.locator('#view').innerText()).length > 20, t);
@@ -53,6 +53,36 @@ const tests = {
     const { page, errors } = await open(b, 'cockpit', stale);
     await page.waitForSelector('#banner .banner');
     assert.match(await page.locator('#banner').innerText(), /Noch keine Daten von heute/);
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Check-in, Training, Mini-Vorschlag und Speichern im Browser'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#tcCheck');
+    for (const k of ['sleep', 'energy', 'mood', 'stress']) await page.click(`[data-tc="sc"][data-k="${k}"][data-v="4"]`);
+    await page.click('[data-tc="act"][data-a="closeCheck"]');
+    await page.waitForSelector('.tc .badge');
+    assert.match(await page.locator('.tc .badge').innerText(), /Voll|Normal|Minimum/i);
+    await page.click('[data-tc="done"]');
+    assert.match(await page.locator('#view').innerText(), /Erledigt/);
+    await page.click('[data-tc="nudge"][data-v="1"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="nudge"][data-v="1"]', 'aria-pressed'), 'true');
+    await page.click('[data-tc="rep"][data-k="push"][data-v="25"]');
+    await page.reload();
+    await page.waitForSelector('.tc .badge');
+    assert.match(await page.locator('#view').innerText(), /Erledigt/);
+    assert.match(await page.locator('.counters').innerText(), /25/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Übersicht: Kacheln, Erkenntnisse mit Alltagstipp'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#bnav button[data-t="uebersicht"]');
+    await page.click('#bnav button[data-t="uebersicht"]');
+    await page.waitForSelector('.tc-tile');
+    assert.strictEqual(await page.locator('.tc-tile').count(), 4);
+    assert.ok(await page.locator('.tc-ins').count() >= 1);
+    assert.match(await page.locator('.insights').innerText(), /Für deinen Alltag/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
   async 'Tagescoach: Check-in ausfüllen ohne Fehler'(b) {
