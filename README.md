@@ -5,7 +5,7 @@ Florians tägliches Trainings- und Gesundheits-Cockpit: Garmin-Daten vom Mac, au
 | Ordner | Inhalt |
 |---|---|
 | `mac/` | Läuft auf dem Mac in `~/garmin`: `sync.py` (Garmin Connect), `analyze.py` (Auswertung), `formulas.py` (reine Formeln), `check_fresh.py` (Warnung bei alten Daten), `garmin.sh`, launchd-Job |
-| `web/cockpit/` | Seite des Trainingscockpits (Claude-Artifact). Start ist **Heute** (Check-in, Tagesmodus, Tipp, Training in 3 Stufen, Mini-Vorschläge, Kopf, Gewohnheiten), daneben **Übersicht** (Woche, Trends, Erkenntnisse mit Alltagstipp) |
+| `web/cockpit/` | Seite des Trainingscockpits (Claude-Artifact). Start ist **Heute** (Morgen-Ablauf in 4 Schritten, ab 17 Uhr Abend-Reflexion zum Antippen, Check-in, Tagesmodus, Tipp, Training in 3 Stufen, Mini-Vorschläge, Kopf, Gewohnheiten), daneben **Übersicht** (Woche, Trends, Erkenntnisse mit Alltagstipp) |
 | `web/tagescoach/` | Alter, eigenständiger Tagescoach; steckt jetzt im Cockpit und kann nach dem Umzug der Daten weg |
 | `tests/` | Tests; `make_fixture.py` erzeugt ausgedachte Garmin-Daten |
 | `COACH.md` | Leitfaden für den Coach (Plan-Schema, Übungen) |

@@ -621,6 +621,12 @@ function tcInsights(){
   r=cmp('mood',d=>tcTrained(addDays(d,-1)));
   if(r&&Math.abs(r.d)>=0.3) add('own-move','Du selbst',`Nach Trainingstagen ist deine Stimmung ${r.d>0?'besser':'schlechter'}`,
     `Dein Check-in: Stimmung im Schnitt ${sign(r.d,1)} Punkte am Morgen nach einem Trainingstag (${r.na} gegen ${r.nb} Tage).`, r.d>0?`Wenn du keine Lust hast: Das Minimum heute ist die bessere Laune morgen.`:`Dosis prüfen: Vielleicht waren die Einheiten zu hart. Öfter Normal statt Voll.`);
+  const ev=Object.values(store.days).filter(x=>x.evening&&(x.evening.food||[]).length&&(x.evening.drain||[]).length);
+  if(ev.length>=8){ const bad=x=>x.evening.food.some(t=>t!=='ok'), hard=x=>!x.evening.drain.includes('nichts');
+    const a=ev.filter(hard), b=ev.filter(x=>!hard(x)), pa=a.length?a.filter(bad).length/a.length:null, pb=b.length?b.filter(bad).length/b.length:null;
+    if(a.length>=4&&b.length>=3&&pa-pb>=0.2) add('own-food','Du selbst',`An anstrengenden Tagen kippt das Essen`,
+      `Deine Abende: an Tagen, die Kraft gekostet haben, lief das Essen in ${nf(pa*100)} % nicht nach Plan, an ruhigen Tagen in ${nf(pb*100)} % (${ev.length} Abende).`,
+      `Plane für harte Tage vor: Eiweiß-Snack um 16 Uhr, abends feste Portion auf den Teller, 2 Minuten atmen vor dem Kühlschrank.`); }
   if(ci.length<10) add('own-wait','Du selbst',`Deine persönlichen Muster kommen mit jedem Check-in`,
     `${ci.length} von 10 Check-ins. Danach zeigt dir das Cockpit, wie Schlaf, Training und Stress bei dir persönlich zusammenhängen.`,
     `Jeden Morgen 30 Sekunden einchecken, auch an schlechten Tagen. Gerade die zählen.`);
@@ -660,8 +666,26 @@ function renderHeute(){
   const movedN=tcWeek().filter(tcMoved).length;
   const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?'':dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
   const restart=m.gap>=7?`<div class="tc-banner s12"><b>Wiedereinstieg nach ${m.gap} Tagen.</b> Diese Woche zählt nur eins: jeden Tag etwas machen. Minimum oder Normal mit 2–3 Wiederholungen Reserve, dann steigern.</div>`:'';
-  return `<div class="grid tc">${head}${restart}${tcMorningCard()}${tcCheckCard(m)}${tcTipCard(m)}${tcTrainCard(m)}${tcRecRow()}${tcNudgeCard(m)}${tcMindCard()}${tcHabitCard()}${foodTile()}
+  const eve=new Date().getHours()>=17;
+  return `<div class="grid tc">${head}${restart}${eve?tcEveningCard():''}${tcMorningCard()}${tcCheckCard(m)}${tcTipCard(m)}${tcTrainCard(m)}${tcRecRow()}${tcNudgeCard(m)}${tcMindCard()}${tcHabitCard()}${foodTile()}
     <button class="card s12 rowlink" data-goview="uebersicht"><span style="flex:1"><b>Übersicht</b><br><span class="small muted">Deine Woche, Trends und was deine Daten über dich sagen</span></span><span class="chev">›</span></button></div>`;
+}
+/* Abend-Reflexion: vier Fragen zum Antippen, eine Zeile optional. Ab 17 Uhr oben in „Heute“ */
+const TC_EVE={
+  drain:[['arbeit','Arbeit'],['familie','Kinder / Familie'],['privat','Privates'],['schlaf','Müde / schlecht geschlafen'],['schmerz','Schmerzen'],['nichts','Nichts Besonderes']],
+  food:[['ok','Im Rahmen'],['viel','Zu viel'],['suess','Süßes / Snacks'],['spaet','Spät gegessen'],['packung','Aus der Packung']]};
+const tcEveDone=e=>!!(e&&e.day&&(e.drain||[]).length&&(e.food||[]).length);
+function tcEveningCard(){
+  const e=tcDay().evening||{}, tags=(k)=>TC_EVE[k].map(([id,t])=>`<button type="button" class="tg" data-tc="evt" data-k="${k}" data-v="${id}" aria-pressed="${(e[k]||[]).includes(id)}">${t}</button>`).join('');
+  if(tcEveDone(e)&&!tcUi.showEve) return `<button class="card s12 rowlink" data-tc="act" data-a="showEve"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Abend reflektiert</b><br><span class="small muted">${e.screen?'Bildschirm aus um 22 Uhr – gute Nacht.':'Danke. Jetzt Bildschirm weg und ab Richtung Bett.'}</span></span><span class="chev">›</span></button>`;
+  return `<section class="card s12 evening" id="tcEve"><h2>Dein Abend <span class="chip">1 Minute</span></h2>
+    <p class="small muted" style="margin-top:-4px">Kurz zurückschauen, nur antippen. Daraus lernt das Cockpit, was dir Kraft kostet und wann das Essen kippt.</p>
+    <div class="q"><label>Wie war dein Tag? <span>1 schwer · 5 richtig gut</span></label><div class="scale">${[1,2,3,4,5].map(i=>`<button type="button" data-tc="ev" data-k="day" data-v="${i}" aria-pressed="${e.day===i}">${i}</button>`).join('')}</div></div>
+    <div class="q"><label>Was hat Kraft gekostet?</label><div class="toggles">${tags('drain')}</div></div>
+    <div class="q"><label>Wie lief das Essen?</label><div class="toggles">${tags('food')}</div></div>
+    <div class="q"><label>Vorsatz für jetzt</label><div class="toggles"><button type="button" class="tg" data-tc="ev" data-k="screen" data-v="1" aria-pressed="${!!e.screen}">Bildschirm aus um 22 Uhr</button></div></div>
+    <div class="q"><label for="ev-good">Ein Satz, was gut lief <span>optional</span></label><textarea id="ev-good" rows="1" placeholder="z. B. Minimum trotz Stress gemacht" data-tcev="good">${esc(e.good||'')}</textarea></div>
+    ${tcEveDone(e)?`<div class="row" style="margin-top:12px"><button class="btn" data-tc="act" data-a="closeEve">Fertig</button></div>`:''}</section>`;
 }
 /* Morgen-Ablauf: vier feste Schritte nach dem Aufstehen, jeder zum Abhaken oder Hinspringen */
 function tcMorningSteps(){
@@ -734,7 +758,7 @@ function tcNudgeCard(m){
     <div class="nudges">${list.map((n,i)=>`<button type="button" class="nudge" data-tc="nudge" data-v="${i}" aria-pressed="${!!done[i]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}</small></span></button>`).join('')}</div></section>`;
 }
 function tcMindCard(){
-  const e=tcDay().evening||{}, c=tcDay().checkin||{}, hi=c.stress>=4, late=new Date().getHours()>=18;
+  const c=tcDay().checkin||{}, hi=c.stress>=4;
   return `<section class="card s12 mindcard" id="tcMind"><h2>Kopf ${hi?'<span class="chip mindchip">Stress hoch – erst atmen</span>':''}</h2>
     <div class="breath"><div class="orb" id="orb">${tcBreath.on?'':'Start'}</div>
       <div class="row" style="justify-content:center"><button class="btn ghost" data-tc="act" data-a="breath">${tcBreath.on?'Stopp':'2 Minuten Box-Atmung'}</button><span class="status" id="bleft">${tcBreath.on?'':'4 s ein · 4 halten · 4 aus · 4 halten'}</span></div></div>
@@ -743,10 +767,7 @@ function tcMindCard(){
       <div><b>Wenn</b> die Nacht schlecht war, <b>dann</b> mache ich das Minimum und gehe heute 30 Minuten früher ins Bett.</div>
       <div><b>Wenn</b> mich etwas mit den Kindern oder bei der Arbeit hochbringt, <b>dann</b> erst 2 Minuten atmen, dann reagieren.</div>
       <div><b>Wenn</b> ich einen Tag ausgelassen habe, <b>dann</b> ist morgen Pflicht – nie zweimal hintereinander.</div></div></details>
-    <details style="margin-top:10px" ${late||e.good||e.stress||e.tomorrow?'open':''}><summary>Abend: drei Zeilen, eine Minute</summary><div class="form" style="margin-top:8px">
-      <textarea id="ev-good" placeholder="Was lief heute gut?" data-tcev="good">${esc(e.good||'')}</textarea>
-      <textarea id="ev-stress" placeholder="Was hat dich gestresst oder Kraft gekostet?" data-tcev="stress">${esc(e.stress||'')}</textarea>
-      <textarea id="ev-tomorrow" placeholder="Eine Sache, die du morgen anders oder genauso machst" data-tcev="tomorrow">${esc(e.tomorrow||'')}</textarea></div></details></section>`;
+    </section>`;
 }
 function tcHabitCard(){
   const h=tcDay().habits||{}, hs=tcHabits(), n=hs.filter(x=>h[x.id]).length, w=tcDay().water||0;
@@ -813,6 +834,10 @@ document.addEventListener('click',e=>{
     tcPatch(x=>{ x.nudges=x.nudges||{}; const on=!x.nudges[v]; x.nudges[v]=on; const s=on?1:-1;
       if(n.rep){ x.reps=x.reps||{}; x.reps[n.rep[0]]=Math.max(0,(x.reps[n.rep[0]]||0)+s*n.rep[1]); }
       if(n.water) x.water=Math.max(0,(x.water||0)+s); x.habits=x.habits||{}; if(on) x.habits.breaks=true; }); }
+  else if(a==='ev'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; if(k==='screen') x.evening.screen=!x.evening.screen; else x.evening[k]=x.evening[k]===+v?null:+v; }); }
+  else if(a==='evt'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; let l=(x.evening[k]||[]).slice(); const only=v==='nichts'||v==='ok';
+      if(l.includes(v)) l=l.filter(t=>t!==v); else l=only?[v]:l.filter(t=>t!=='nichts'&&t!=='ok').concat(v);
+      x.evening[k]=l; if(k==='food'){ x.habits=x.habits||{}; x.habits.plate=l.length>0&&!l.includes('viel')&&!l.includes('packung'); } }); }
   else if(a==='morning'){ const go=id=>setTimeout(()=>{ const el=document.getElementById(id); el&&el.scrollIntoView({behavior:'smooth',block:'start'}); },30);
     if(v==='water') tcPatch(x=>{ x.water=(x.water||0)>=1?(x.water||0)-1:1; });
     else if(v==='protein') tcPatch(x=>{ x.habits=x.habits||{}; x.habits.protein=!x.habits.protein; });
@@ -820,6 +845,8 @@ document.addEventListener('click',e=>{
     else if(v==='train') go('tcTrain'); }
   else if(a==='act'){ const w=b.dataset.a;
     if(w==='showMorning'){ tcUi.showMorning=true; render(); return; }
+    if(w==='showEve'){ tcUi.showEve=true; render(); return; }
+    if(w==='closeEve'){ tcUi.showEve=false; render(); return; }
     if(w==='editCheck'){ tcUi.editCheck=true; render(); }
     else if(w==='closeCheck'){ tcUi.editCheck=false; render(); }
     else if(w==='undoTrain'){ tcPatch(x=>{ delete x.training; }); }

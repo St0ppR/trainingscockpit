@@ -6,8 +6,9 @@ const ROOT = path.resolve(__dirname, '..');
 const DATA = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const wrap = html => '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>' + html + '</body></html>';
 
-async function open(browser, app, data, width = 390) {
+async function open(browser, app, data, width = 390, time = null) {
   const page = await browser.newPage({ viewport: { width, height: 844 } });
+  if (time) await page.clock.setFixedTime(time);   // nur Date; Timer laufen normal
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -86,6 +87,28 @@ const tests = {
     await page.click('[data-tc="done"]');
     await page.click('[data-tc="morning"][data-v="protein"]');
     assert.match(await page.locator('#view').innerText(), /Morgen erledigt/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Abend-Reflexion ab 17 Uhr, nur antippen'(b) {
+    const evening = new Date(); evening.setHours(19, 30, 0, 0);
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, evening);
+    await page.waitForSelector('#tcEve');
+    await page.click('[data-tc="ev"][data-k="day"][data-v="4"]');
+    await page.click('[data-tc="evt"][data-k="drain"][data-v="arbeit"]');
+    await page.click('[data-tc="evt"][data-k="drain"][data-v="familie"]');
+    await page.click('[data-tc="evt"][data-k="food"][data-v="ok"]');
+    await page.click('[data-tc="evt"][data-k="food"][data-v="suess"]');   // "Im Rahmen" fällt dann weg
+    assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="food"][data-v="ok"]', 'aria-pressed'), 'false');
+    await page.click('[data-tc="ev"][data-k="screen"]');
+    await page.fill('#ev-good', 'Minimum trotz Stress');
+    await page.click('[data-tc="act"][data-a="closeEve"]');
+    assert.match(await page.locator('#view').innerText(), /Abend reflektiert/);
+    await page.reload();
+    await page.waitForSelector('[data-a="showEve"]');
+    await page.click('[data-a="showEve"]');
+    assert.strictEqual(await page.inputValue('#ev-good'), 'Minimum trotz Stress');
+    assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="drain"][data-v="familie"]', 'aria-pressed'), 'true');
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
