@@ -267,6 +267,18 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .ex .n{font-weight:600}
 .tc .ex .d{font:700 17px var(--f-display);color:var(--accent);text-align:right;font-variant-numeric:tabular-nums}
 .tc .ex .t{grid-column:1/-1;font-size:12.5px;color:var(--ink-3)}
+.tc .block .fmt{font-size:13px;color:var(--ink-2);margin:3px 0 2px;font-variant-numeric:tabular-nums}
+.tc .tc-goal{margin:6px 0 0;line-height:1.45}
+.tc .tc-method{border-top:1px solid var(--line);margin-top:12px;padding-top:12px;font-size:14px;line-height:1.5}
+.tc .tc-method h3{margin:0 0 6px}
+.tc .tc-method h4{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin:14px 0 4px}
+.tc .tc-method ul{margin:4px 0;padding-left:18px}
+.tc .tc-method li{margin:3px 0}
+.tc .tc-method .tc-week{list-style:none;padding:0;display:grid;gap:2px}
+.tc .tc-gloss{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr);gap:4px 10px;margin:4px 0}
+.tc .tc-gloss dt{font-weight:600}
+.tc .tc-gloss dd{margin:0;color:var(--ink-2)}
+@media (max-width:420px){.tc .tc-gloss{grid-template-columns:1fr}.tc .tc-gloss dd{margin-bottom:6px}}
 .tc .done{display:flex;gap:12px;align-items:center;background:var(--good-soft);border-radius:12px;padding:12px 14px}
 .tc .done .ck{width:34px;height:34px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font:700 18px var(--f-display);flex:none}
 .tc .counters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -494,32 +506,93 @@ const TC_HABITS=[
   {id:'screen',t:'Bildschirm aus 30 min vor dem Bett',s:''},
   {id:'bed',t:'Im Bett bis '+TC_GOALS.bedtime,s:'die Kinder wecken früh genug'}
 ];
-const TC_WARM={name:'Aufwärmen · Sprunggelenk',items:[['Knie zur Wand','8/Seite','barfuß, Ferse bleibt unten'],['Wadenheben langsam','10','3 s ablassen'],['Katze-Kuh','6',''],['Band Pull-aparts','15','leichtes Band']]};
+/* Bibliothek der Einheiten. Jeder Block hat ein Format (fmt) mit den Belastungsnormativen:
+   Runden/Sätze, Satz- bzw. Rundenpause, Intensität (RIR/RPE). Dosis je Übung = pro Runde bzw. pro Satz.
+   Tempo 3-1-1 = 3 s exzentrisch (absenken) · 1 s Pause unten · 1 s konzentrisch (hochdrücken). */
+const TC_WARM={name:'Aufwärmen · 5 min',fmt:'1 Durchgang · ohne Pause · locker, keine Ermüdung',items:[['Knie zur Wand','8 Wdh./Seite','Sprunggelenk-Mobilität, Ferse bleibt am Boden'],['Wadenheben langsam','10 Wdh.','Tempo 1-1-3: 3 s ablassen'],['Katze-Kuh','6 Wdh.','Wirbelsäule Wirbel für Wirbel bewegen'],['Band Pull-aparts','15 Wdh.','leichtes Band, Schulterblätter zusammen']]};
 const TC_LIB={
-  kraftA:{title:'Ganzkörper Kraft',focus:'Knie, Drücken, Ziehen',
-    min:{min:10,blocks:[{name:'2 Runden, ohne Pause',items:[['Goblet Squat','8','18 kg, Band über den Knien'],['Liegestütze','10','auf Griffen'],['Rudern an den Dip-Bars','8',''],['Knie zur Wand','8/Seite','']]}]},
-    std:{min:30,blocks:[TC_WARM,{name:'3 Runden · 60 s Pause',items:[['Goblet Squat','8–10','24 kg, Knie über die Zehen schieben'],['Liegestütze','12','2 s ablassen'],['Rudern an den Dip-Bars','10','Brust zur Stange'],['Glute Bridge','12','oben 2 s halten']]},{name:'Abschluss',items:[['Farmer Carry','30 s/Seite','24 kg, aufrecht'],['Plank','40 s','']]}]},
-    full:{min:45,blocks:[TC_WARM,{name:'4 Runden · 75 s Pause',items:[['Goblet Squat','10','24 kg oder 32 kg'],['Liegestütze mit Weste','10','10 kg'],['Dips','5–6','sauber, voller Bewegungsumfang'],['Rudern an den Dip-Bars','10','']]},{name:'Finisher',items:[['KB Swing','10 × 10 EMOM','24 kg'],['Suitcase Carry','40 s/Seite','24 kg']]}]}},
-  swing:{title:'Kettlebell & Rumpf',focus:'Hüfte, Kondition, Rumpf',
-    min:{min:10,blocks:[{name:'EMOM 8 min',items:[['KB Swing','10 pro Minute','18 oder 24 kg'],['dazwischen','tiefe Hocke halten','']]}]},
-    std:{min:30,blocks:[TC_WARM,{name:'EMOM 12 min',items:[['KB Swing','12 pro Minute','24 kg, explosiv aus der Hüfte']]},{name:'2 Runden',items:[['Get-up','2/Seite','18 kg, langsam'],['Dead Bug','8/Seite',''],['Seitstütz','30 s/Seite','']]}]},
-    full:{min:45,blocks:[TC_WARM,{name:'Leiter 1–2–3–4–5 · 3 Durchgänge',items:[['Clean & Press','1–5/Seite','24 kg'],['Front Squat','1–5','gleiche Glocke']]},{name:'EMOM 10 min',items:[['KB Swing','15 pro Minute','24 oder 32 kg']]},{name:'Rumpf',items:[['L-Sit an den Dip-Bars','5 × 10 s','Knie angewinkelt erlaubt']]}]}},
-  zone2:{title:'Zone 2 Ergometer',focus:'Ausdauer fürs Rad',
-    min:{min:12,blocks:[{name:'Locker',items:[['Ergometer','10 min','Puls 110–130, Nasenatmung'],['Wadenheben langsam','10','']]}]},
-    std:{min:30,blocks:[{name:'Grundlage',items:[['Ergometer','25 min','Puls 110–130, du kannst ganze Sätze sprechen']]},{name:'Danach',items:[['Knie zur Wand','8/Seite',''],['Hüftbeuger-Dehnung','45 s/Seite','gegen das viele Sitzen']]}]},
-    full:{min:50,blocks:[{name:'Grundlage lang',items:[['Ergometer','45 min','Puls 110–130, letzte 5 min gleichmäßig']]},{name:'Danach',items:[['Mobility','5 min','Sprunggelenk, Hüfte, Brustwirbelsäule']]}]}},
-  kraftB:{title:'Hüfte, Ziehen & Tragen',focus:'Rücken stabil, Gesäß, Griff',
-    min:{min:10,blocks:[{name:'2 Runden',items:[['Einbeiniges Kreuzheben','6/Seite','ohne Gewicht, für die Sprunggelenke'],['KB Rudern','10/Seite','24 kg'],['Face Pulls Band','15','']]}]},
-    std:{min:30,blocks:[TC_WARM,{name:'3 Runden · 60 s Pause',items:[['KB Kreuzheben','10','32 kg, Rücken neutral'],['KB Rudern','10/Seite','24 kg'],['Einbeiniges Kreuzheben','6/Seite','18 kg'],['Face Pulls Band','15','']]},{name:'Tragen',items:[['Farmer Carry','2 × 40 s','2 × 24 kg']]}]},
-    full:{min:45,blocks:[TC_WARM,{name:'4 Runden',items:[['KB Swing','15','32 kg'],['Doppel-KB Rudern','8','2 × 24 kg'],['Bulgarian Split Squat','8/Seite','Hinterfuß auf Bank'],['Pike Push-up','8','']]},{name:'Tragen',items:[['Farmer Carry','3 × 40 s','2 × 24 kg'],['Rack Carry','2 × 30 s','2 × 24 kg']]}]}},
-  mob:{title:'Beweglichkeit & Atmung',focus:'Erholung aktiv',
-    min:{min:10,blocks:[{name:'Ruhig',items:[['Knie zur Wand','10/Seite',''],['Tiefe Hocke','2 × 45 s','an den Dip-Bars festhalten'],['Box-Atmung','2 min','4 s ein, 4 halten, 4 aus, 4 halten']]}]},
-    std:{min:25,blocks:[{name:'Mobility-Fluss · 2 Runden',items:[['Katze-Kuh','8',''],['Weltbeste Dehnung','5/Seite',''],['90/90 Hüfte','6/Seite',''],['Knie zur Wand','10/Seite',''],['Brustwirbel-Rotation','8/Seite','']]},{name:'Gehen',items:[['Spaziergang','10–15 min','draußen, mit den Kindern zählt']]}]},
-    full:{min:40,blocks:[{name:'Draußen',items:[['Spaziergang oder Radtour locker','30 min','Puls unter 120']]},{name:'Danach',items:[['Yoga-Fluss','10 min','Hüfte und Rücken']]}]}}
+  kraftA:{title:'Ganzkörper Kraft A',focus:'Kniebeuge · Drücken · Ziehen',
+    goal:'Kraftausdauer und Muskelaufbau (8–12 Wdh.), Ganzkörper',prog:'Doppelprogression: erst alle Runden am oberen Ende des Wdh.-Bereichs, dann mehr Last oder schwerere Variante',
+    min:{min:10,blocks:[{name:'Zirkel',fmt:'2 Runden · Übungswechsel ohne Pause · Rundenpause 30 s · RIR 3',items:[['Goblet Squat','8 Wdh.','18 kg, Band über den Knien'],['Liegestütze auf Griffen','10 Wdh.','Tempo 2-0-1'],['Rudern an den Dip-Bars','8 Wdh.','Körper gestreckt wie im Brett'],['Knie zur Wand','8 Wdh./Seite','']]}]},
+    std:{min:30,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'3 Runden · Übungswechsel ohne Pause · Rundenpause 60 s · RIR 2 (≈ RPE 8)',items:[['Goblet Squat','8–10 Wdh.','24 kg, Tempo 3-1-1, Knie folgen den Zehen'],['Liegestütze auf Griffen','12 Wdh.','Tempo 2-0-1'],['Rudern an den Dip-Bars','10 Wdh.','Brust zur Stange, oben 1 s halten'],['Glute Bridge','12 Wdh.','oben 2 s halten']]},{name:'Abschluss · Tragen & Rumpf',fmt:'1 Satz je Übung · 60 s Pause dazwischen',items:[['Farmer Carry einarmig','30 s/Seite','24 kg, aufrecht, Rumpf fest'],['Unterarmstütz (Plank)','40 s','Gesäß und Bauch angespannt']]}]},
+    full:{min:45,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'4 Runden · Übungswechsel ohne Pause · Rundenpause 90 s · RIR 1–2 (RPE 8–9)',items:[['Goblet Squat','10 Wdh.','24 oder 32 kg, Tempo 3-1-1'],['Liegestütze mit Weste','10 Wdh.','10 kg, Tempo 2-0-1'],['Dips','5–6 Wdh.','voller Bewegungsumfang, nicht bis zum Muskelversagen'],['Rudern an den Dip-Bars','10 Wdh.','']]},{name:'Finisher · EMOM 10 min',fmt:'jede Minute 10 Swings · Rest der Minute = Pause · danach 1 Satz Carry',items:[['KB Swing','10 Wdh./min','24 kg, explosive Hüftstreckung'],['Suitcase Carry','40 s/Seite','24 kg, nicht zur Seite kippen']]}]}},
+  swing:{title:'Kettlebell & Rumpf',focus:'Hüftstreckung · Kondition · Rumpf',
+    goal:'Schnellkraft und Kraftausdauer der hinteren Kette, Rumpfstabilität',prog:'Erst Wdh. pro Minute steigern (10 → 15), dann die schwerere Kettlebell',
+    min:{min:10,blocks:[{name:'EMOM 8 min',fmt:'jede Minute 10 Swings · Rest der Minute = Pause · RIR 3',items:[['KB Swing','10 Wdh./min','18 oder 24 kg'],['in der Pause','tiefe Hocke halten','aktive Pause']]}]},
+    std:{min:30,blocks:[TC_WARM,{name:'EMOM 12 min',fmt:'jede Minute 12 Swings · Rest der Minute = Pause · RPE 7',items:[['KB Swing','12 Wdh./min','24 kg, explosiv aus der Hüfte']]},{name:'Rumpf · Zirkel',fmt:'2 Runden · Rundenpause 60 s',items:[['Turkish Get-up','2 Wdh./Seite','18 kg, langsam und kontrolliert'],['Dead Bug','8 Wdh./Seite','unterer Rücken bleibt am Boden'],['Seitstütz','30 s/Seite','']]}]},
+    full:{min:45,blocks:[TC_WARM,{name:'Leiter 1–2–3–4–5',fmt:'3 Leitern · 90 s Pause zwischen den Leitern · RIR 2',items:[['Clean & Press','1–5 Wdh./Seite','24 kg, pro Sprosse 1 Wdh. mehr'],['Front Squat','1–5 Wdh.','gleiche Glocke, gleiche Sprosse']]},{name:'EMOM 10 min',fmt:'jede Minute 15 Swings · Rest der Minute = Pause · RPE 8',items:[['KB Swing','15 Wdh./min','24 oder 32 kg']]},{name:'Rumpf',fmt:'5 Sätze · 30 s Satzpause',items:[['L-Sit an den Dip-Bars','10 s halten','Knie angewinkelt erlaubt']]}]}},
+  zone2:{title:'Zone-2-Ausdauer',focus:'aerobe Grundlage · Ergometer',
+    goal:'Grundlagenausdauer (GA1): Herz-Kreislauf, Fettstoffwechsel, schnellere Erholung',prog:'Erst die Dauer verlängern (25 → 45 min), der Puls bleibt in Zone 2',
+    min:{min:12,blocks:[{name:'Grundlage kurz',fmt:'Dauermethode · Zone 2 · RPE 3–4',items:[['Ergometer','10 min','Puls 110–130, Nasenatmung'],['Wadenheben langsam','10 Wdh.','Tempo 1-1-3']]}]},
+    std:{min:30,blocks:[{name:'Grundlage',fmt:'Dauermethode · Zone 2 (Puls 110–130) · RPE 3–4 · Sprechtest: ganze Sätze möglich',items:[['Ergometer','25 min','gleichmäßig, Trittfrequenz 80–90/min']]},{name:'Cool-down · Mobility',fmt:'1 Durchgang',items:[['Knie zur Wand','8 Wdh./Seite',''],['Hüftbeuger-Dehnung','45 s/Seite','gegen das viele Sitzen']]}]},
+    full:{min:50,blocks:[{name:'Grundlage lang',fmt:'Dauermethode · Zone 2 (Puls 110–130) · RPE 3–4',items:[['Ergometer','45 min','Puls auch am Ende nicht über 130']]},{name:'Cool-down · Mobility',fmt:'1 Durchgang',items:[['Mobility','5 min','Sprunggelenk, Hüfte, Brustwirbelsäule']]}]}},
+  kraftB:{title:'Ganzkörper Kraft B',focus:'Hüftbeuge · Ziehen · Tragen',
+    goal:'Kraft der hinteren Kette (Gesäß, Rücken), Zug- und Griffkraft',prog:'Doppelprogression wie bei Kraft A',
+    min:{min:10,blocks:[{name:'Zirkel',fmt:'2 Runden · Übungswechsel ohne Pause · Rundenpause 30 s · RIR 3',items:[['Einbeiniges Kreuzheben','6 Wdh./Seite','ohne Gewicht, Gleichgewicht fürs Sprunggelenk'],['KB Rudern einarmig','10 Wdh./Seite','24 kg'],['Face Pulls mit Band','15 Wdh.','']]}]},
+    std:{min:30,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'3 Runden · Übungswechsel ohne Pause · Rundenpause 60 s · RIR 2 (≈ RPE 8)',items:[['KB Kreuzheben','10 Wdh.','32 kg, Hüftscharnier, Rücken neutral'],['KB Rudern einarmig','10 Wdh./Seite','24 kg, oben 1 s halten'],['Einbeiniges Kreuzheben','6 Wdh./Seite','18 kg, Tempo 3-0-1'],['Face Pulls mit Band','15 Wdh.','']]},{name:'Tragen',fmt:'2 Sätze · 60 s Satzpause',items:[['Farmer Carry','40 s','2 × 24 kg']]}]},
+    full:{min:45,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'4 Runden · Übungswechsel ohne Pause · Rundenpause 90 s · RIR 1–2 (RPE 8–9)',items:[['KB Swing','15 Wdh.','32 kg'],['Doppel-KB Rudern','8 Wdh.','2 × 24 kg'],['Bulgarian Split Squat','8 Wdh./Seite','Hinterfuß auf der Bank, Tempo 2-0-1'],['Pike Push-up','8 Wdh.','']]},{name:'Tragen',fmt:'je Übung die angegebenen Sätze · 60 s Satzpause',items:[['Farmer Carry','3 × 40 s','2 × 24 kg'],['Rack Carry','2 × 30 s','2 × 24 kg']]}]}},
+  mob:{title:'Mobility & Atmung',focus:'aktive Erholung',
+    goal:'Aktive Regeneration: Durchblutung, Beweglichkeit, Entspannung',prog:'keine, bewusst locker (RPE 2–3)',
+    min:{min:10,blocks:[{name:'Mobility',fmt:'1 Durchgang · ruhig · RPE 2',items:[['Knie zur Wand','10 Wdh./Seite',''],['Tiefe Hocke','2 × 45 s','an den Dip-Bars festhalten'],['Box-Atmung','2 min','4 s ein · 4 halten · 4 aus · 4 halten']]}]},
+    std:{min:25,blocks:[{name:'Mobility-Flow',fmt:'2 Runden · fließend, ohne Pausen · RPE 2–3',items:[['Katze-Kuh','8 Wdh.',''],["World's Greatest Stretch",'5 Wdh./Seite',''],['90/90 Hüftrotation','6 Wdh./Seite',''],['Knie zur Wand','10 Wdh./Seite',''],['Brustwirbelsäulen-Rotation','8 Wdh./Seite','']]},{name:'Gehen',fmt:'locker · Zone 1',items:[['Spaziergang','10–15 min','draußen, mit den Kindern zählt']]}]},
+    full:{min:40,blocks:[{name:'Draußen',fmt:'Dauermethode · Zone 1 (Puls unter 120)',items:[['Spaziergang oder lockere Radtour','30 min','']]},{name:'Danach',fmt:'1 Durchgang',items:[['Yoga-Flow','10 min','Hüfte und Rücken']]}]}}
 };
-const TC_ROT={1:'kraftA',2:'zone2',3:'swing',4:'kraftB',5:'zone2',6:'kraftA',0:'mob'};
+/* Mikrozyklus: zwischen zwei Krafteinheiten liegt immer ein Ausdauer- oder Erholungstag, gleiche Muster ≥ 48 h auseinander. */
+const TC_ROT={1:'kraftA',2:'zone2',3:'kraftB',4:'zone2',5:'swing',6:'kraftA',0:'mob'};
 const TC_MODE={green:{c:'var(--good)',t:'Voll',sub:'gut erholt',tier:'full'},yellow:{c:'var(--warn)',t:'Normal',sub:'kontrolliert',tier:'std'},red:{c:'var(--crit)',t:'Minimum',sub:'schonen',tier:'min'}};
 const TIERN={min:'Minimum',std:'Normal',full:'Voll'};
+const TIERI={min:'Erhaltungsdosis',std:'Arbeitsdosis',full:'Aufbaudosis'};
+/* Allgemeiner Teil: wie der Plan aufgebaut ist, nach welchen Prinzipien gesteuert wird, wie Pausen geregelt sind, Fachbegriffe. */
+const TC_GLOSSAR=[
+  ['Wdh. (Wiederholung)','eine vollständige Bewegung, z. B. einmal runter und hoch.'],
+  ['Satz','mehrere Wdh. einer Übung am Stück. „3 × 10“ = 3 Sätze à 10 Wdh.'],
+  ['Zirkel · Runde','mehrere Übungen direkt nacheinander; einmal alle Übungen = 1 Runde.'],
+  ['Satzpause · Rundenpause','Pause nach einem Satz bzw. nach einer ganzen Runde. Uhr läuft ab dem letzten Wdh.'],
+  ['RPE','Rate of Perceived Exertion: gefühlte Anstrengung 1–10. 10 = nichts geht mehr.'],
+  ['RIR','Reps in Reserve: wie viele saubere Wdh. noch möglich wären. RIR 2 ≈ RPE 8.'],
+  ['Session-RPE','Anstrengung der ganzen Einheit, 10–30 min danach eingeschätzt. Das fragt die Karte ab.'],
+  ['Volumen','Trainingsumfang: Sätze × Wdh. (× Last). Hier vor allem Runden und Minuten.'],
+  ['Intensität','wie schwer: Last bzw. Nähe zum Muskelversagen (RIR), beim Ausdauertraining der Puls.'],
+  ['Tempo 3-1-1','Sekunden pro Phase: 3 s absenken (exzentrisch) · 1 s Pause unten · 1 s hoch (konzentrisch).'],
+  ['EMOM','Every Minute On the Minute: Zu jeder vollen Minute die Wdh., der Rest der Minute ist Pause.'],
+  ['Leiter','Wdh. steigen von Sprosse zu Sprosse (1, 2, 3 …), dazwischen nur kurz durchatmen.'],
+  ['Zone 2','lockere Ausdauer, bei dir Puls 110–130. Sprechtest: ganze Sätze gehen noch.'],
+  ['Progressive Überlastung','der Reiz wird schrittweise größer, sonst passt sich der Körper nicht weiter an.'],
+  ['Doppelprogression','erst Wdh. bis zum oberen Ende des Bereichs steigern, dann Last erhöhen und wieder unten anfangen.'],
+  ['Autoregulation','die Tagesform bestimmt die Dosis, nicht der Kalender.'],
+  ['Deload','Entlastungswoche mit etwa halbem Volumen, damit sich Ermüdung abbaut.'],
+  ['Superkompensation','nach Belastung und Erholung ist die Leistungsfähigkeit höher als vorher. Deshalb sind Pausen Teil des Trainings.']];
+function tcMethodCard(){
+  const DAYN=['So','Mo','Di','Mi','Do','Fr','Sa'], week=[1,2,3,4,5,6,0].map(i=>`<li><b>${DAYN[i]}</b> ${esc(TC_LIB[TC_ROT[i]].title)} <span class="muted">· ${esc(TC_LIB[TC_ROT[i]].focus)}</span></li>`).join('');
+  return `<div class="tc-method" id="tcMethod">
+    <h3>So ist dein Training aufgebaut</h3>
+    <h4>1 · Wochenaufbau (Mikrozyklus)</h4>
+    <ul class="tc-week">${week}</ul>
+    <p>3 Krafteinheiten, 1 Kettlebell-Einheit, 2 Ausdauereinheiten, 1 Tag aktive Erholung. Jedes Grundmuster (Kniebeuge, Hüftbeuge, Drücken, Ziehen, Tragen, Rumpf) kommt mindestens 2-mal pro Woche dran (Trainingsfrequenz 2). Zwischen zwei Krafttagen liegt immer ein Ausdauer- oder Erholungstag, so liegen 48 h zwischen Belastungen derselben Muskeln. Fällt ein Tag aus, wird nicht nachgeholt: Es geht mit dem Plan des nächsten Tages weiter.</p>
+    <h4>2 · Trainingsprinzipien</h4>
+    <ul>
+      <li><b>Autoregulation:</b> Check-in und Garmin-Erholung ergeben die Tagesampel. Grün = <b>Voll</b> (${TIERI.full}), Gelb = <b>Normal</b> (${TIERI.std}), Rot = <b>Minimum</b> (${TIERI.min}) oder nur Mobility.</li>
+      <li><b>Intensität über RIR:</b> Minimum RIR 3, Normal RIR 2, Voll RIR 1–2. Nie bis zum Muskelversagen. Die Technik bleibt sauber, sonst ist der Satz zu Ende.</li>
+      <li><b>Progressive Überlastung per Doppelprogression:</b> Schaffst du alle Runden am oberen Ende des Wdh.-Bereichs mit dem vorgegebenen RIR, kommt beim nächsten Mal mehr Last (z. B. 24 → 32 kg) oder eine schwerere Variante (Liegestütze → mit Weste).</li>
+      <li><b>Steuerung über Session-RPE:</b> RPE ≤ 5 → nächste Einheit eine Stufe mehr. RPE 6–7 → so bleiben. RPE ≥ 8 → eine Stufe zurück.</li>
+      <li><b>Wiedereinstieg:</b> Nach ≥ 7 Tagen Pause beginnst du mit dem Minimum und steigerst über 2–3 Wochen. Sehnen und Gelenke passen sich langsamer an als Muskeln.</li>
+      <li><b>Deload:</b> Alle 4–5 Wochen kommt eine Woche mit etwa 50 % Volumen und gleichen Übungen. Früher, wenn die Session-RPE mehrmals ≥ 8 ist oder die Ampel mehrere Tage rot bleibt.</li>
+      <li><b>Wochenziel Liegestütze/Kniebeugen:</b> Es gibt einen Stufenplan ab ${TC_GOALS.stepPush}/${TC_GOALS.stepSquat} pro Woche. Erreichst du ≥ 80 %, steigt das Ziel nächste Woche um 20 %. Das Fernziel ist ${TC_GOALS.weekPush}/${TC_GOALS.weekSquat}.</li>
+    </ul>
+    <h4>3 · Pausen</h4>
+    <ul>
+      <li><b>Zirkel:</b> Zwischen den Übungen wechselst du ohne Pause (nur umgreifen). Die Rundenpause beträgt 30 s (Minimum), 60 s (Normal) oder 90 s (Voll). Das reicht bei 8–12 Wdh. und RIR 2 für Kraftausdauer und Muskelaufbau.</li>
+      <li><b>EMOM:</b> Pause ist der Rest der Minute. Bleiben weniger als 20 s, nimm 2 Wdh. weniger.</li>
+      <li><b>Leiter:</b> Zwischen den Sprossen kurz durchatmen, zwischen den Leitern 90 s.</li>
+      <li><b>Halten und Tragen (Plank, L-Sit, Carries):</b> 30–60 s Satzpause.</li>
+      <li><b>Zu kurze Pause?</b> Wenn du den RIR nicht halten kannst, verlängere die Pause um 30 s. Lieber länger Pause als unsaubere Wdh.</li>
+      <li><b>Ruhetage:</b> Sonntag ist aktive Erholung. Zone 2 und Spaziergänge zählen als leichte Belastung und fördern die Regeneration.</li>
+    </ul>
+    <h4>4 · Begriffe</h4>
+    <dl class="tc-gloss">${TC_GLOSSAR.map(([t,d])=>`<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl>
+    <p class="small muted">Wie du eine Zeile liest: <b>Goblet Squat · 8–10 Wdh. · 24 kg, Tempo 3-1-1</b> im Block „3 Runden · Rundenpause 60 s · RIR 2“ heißt: In jeder der 3 Runden machst du 8–10 Kniebeugen mit 24 kg. Du senkst jeweils 3 s ab und hörst auf, wenn noch 2 saubere Wdh. gingen.</p>
+  </div>`;
+}
 /* Mini-Vorschläge für zwischendurch (Büro): persönlich statt allgemein – Wochenziele, Sprunggelenk, Sitzen, Kopf, Essen.
    Gleiche Liste wie mac/nudges.py (tests/test_nudges.py prüft das). {n} = Wiederholungen je nach Tagesmodus. */
 const TC_NUDGE_POOL={
@@ -691,7 +764,7 @@ function tcTodayTip(m){
 
 /* ---------- Bausteine ---------- */
 function tcScale(id,val,n=5,from=1){ let s=''; for(let i=from;i<from+n;i++) s+=`<button type="button" data-tc="sc" data-k="${id}" data-v="${i}" aria-pressed="${val===i}">${i}</button>`; return s; }
-function tcExList(blocks){ return blocks.map(b=>`<div class="block"><div class="bh">${esc(b.name)}</div>${b.items.map(([n,d,t])=>`<div class="ex"><span class="n">${esc(n)}</span><span class="d">${esc(d)}</span>${t?`<span class="t">${esc(t)}</span>`:''}</div>`).join('')}</div>`).join(''); }
+function tcExList(blocks){ return blocks.map(b=>`<div class="block"><div class="bh">${esc(b.name)}</div>${b.fmt?`<div class="fmt">${esc(b.fmt)}</div>`:''}${b.items.map(([n,d,t])=>`<div class="ex"><span class="n">${esc(n)}</span><span class="d">${esc(d)}</span>${t?`<span class="t">${esc(t)}</span>`:''}</div>`).join('')}</div>`).join(''); }
 function tcSpark(pts,{w=300,h=64,color='var(--accent)',lo=null,hi=null}={}){
   const v=pts.filter(p=>p.y!=null).map(p=>p.y); if(v.length<2) return '';
   lo=lo??Math.min(...v); hi=hi??Math.max(...v); if(hi===lo){hi+=1;lo-=1;}
@@ -788,20 +861,23 @@ function tcCheckCard(m){
 }
 function tcTipCard(m){ const tip=tcTodayTip(m);
   return `<section class="card s12 tc-tip"><h2>Dein Tipp für heute</h2><h3>${esc(tip.t)}</h3><p>${esc(tip.s)}</p></section>`; }
+const k2why=(m,rec)=>m.band?` · empfohlen: ${TIERN[rec]}, weil deine Tagesampel ${m.band==='green'?'grün':m.band==='yellow'?'gelb':'rot'} ist`:m.gap>=7?` · empfohlen: ${TIERN[rec]}, weil du nach ${m.gap} Tagen Pause wieder einsteigst`:'';
 function tcTrainCard(m){
   const s=tcSession(m), tr=tcDay().training;
   const recTier=m.band?TC_MODE[m.band].tier:(m.gap>=7?'min':'std'), sel=tcTier||recTier, v=s[sel];
   const c=store.coach[TD()];
   const coachLine=c&&c.headline?`<p class="small" style="margin:4px 0 0"><span class="muted">Trainer:</span> ${esc(c.headline)}</p>`:'';
-  const head=`<h2>Training <span class="chip">${esc(s.focus)}</span></h2><h3>${esc(s.title)}</h3>${s.note?`<p class="small muted">${esc(s.note)}</p>`:''}${coachLine}`;
-  if(tr&&tr.tier) return `<section class="card s12" id="tcTrain">${head}<div class="done"><span class="ck">✓</span><div><b>Erledigt: ${TIERN[tr.tier]}</b>${tr.rpe?` · Anstrengung ${tr.rpe}/10`:''}<div class="small muted">${tr.rpe&&tr.rpe<=5?'Fiel leicht – nächstes Mal eine Stufe mehr.':tr.rpe>=8?'War hart – nächstes Mal etwas zurücknehmen.':'Gut gemacht. Morgen geht es weiter.'}</div></div></div>
-    ${tr.rpe?'':`<div class="q" style="margin-top:12px"><label>Wie anstrengend war es? <span>1 locker · 10 maximal</span></label><div class="scale s6">${[3,5,6,7,8,9].map(i=>`<button type="button" data-tc="rpe" data-v="${i}">${i}</button>`).join('')}</div></div>`}
-    <div class="row" style="margin-top:10px"><button class="btn ghost" data-tc="act" data-a="undoTrain">Rückgängig</button></div>${tcCounters()}</section>`;
+  const head=`<h2>Training <span class="chip">${esc(s.focus)}</span></h2><h3>${esc(s.title)}</h3>${s.note?`<p class="small muted">${esc(s.note)}</p>`:''}${s.goal?`<p class="small tc-goal"><b>Trainingsreiz:</b> ${esc(s.goal)}<br><b>Progression:</b> ${esc(s.prog)}</p>`:''}${coachLine}`;
+  const meth=`<div class="row" style="margin-top:10px"><button type="button" class="btn ghost tc-mini" data-tc="act" data-a="method" aria-expanded="${!!tcUi.method}">${tcUi.method?'Aufbau & Begriffe ausblenden':'So ist dein Training aufgebaut: Prinzip, Pausen, Begriffe ›'}</button></div>${tcUi.method?tcMethodCard():''}`;
+  if(tr&&tr.tier) return `<section class="card s12" id="tcTrain">${head}<div class="done"><span class="ck">✓</span><div><b>Erledigt: ${TIERN[tr.tier]}</b>${tr.rpe?` · Anstrengung ${tr.rpe}/10`:''}<div class="small muted">${tr.rpe&&tr.rpe<=5?'RPE ≤ 5: Reiz zu klein, nächstes Mal eine Stufe mehr (progressive Überlastung).':tr.rpe>=8?'RPE ≥ 8: hohe Belastung, nächstes Mal eine Stufe zurück.':tr.rpe?'RPE 6–7: passende Dosis, so bleibt es.':'Gut gemacht. Morgen geht es weiter.'}</div></div></div>
+    ${tr.rpe?'':`<div class="q" style="margin-top:12px"><label>Session-RPE: Wie anstrengend war die ganze Einheit? <span>1 sehr leicht · 10 maximal</span></label><div class="scale s6">${[3,5,6,7,8,9].map(i=>`<button type="button" data-tc="rpe" data-v="${i}">${i}</button>`).join('')}</div></div>`}
+    <div class="row" style="margin-top:10px"><button class="btn ghost" data-tc="act" data-a="undoTrain">Rückgängig</button></div>${meth}${tcCounters()}</section>`;
   return `<section class="card s12" id="tcTrain">${head}<div class="tiers" role="group" aria-label="Umfang wählen">
     ${['min','std','full'].map(k=>s[k]?`<button type="button" class="tier ${k===recTier?'rec':''}" data-tc="tier" data-v="${k}" aria-pressed="${k===sel}"><b>${TIERN[k]}</b><span>${s[k].min} min</span></button>`:'').join('')}</div>
+    <p class="small muted" style="margin:-4px 0 6px">${TIERN[sel]} = ${TIERI[sel]}${k2why(m,recTier)}. Die Dosis pro Übung gilt pro Runde bzw. pro Satz.</p>
     ${v?tcExList(v.blocks):''}
     <button class="btn go bigbtn" style="margin-top:14px" data-tc="done" data-v="${sel}">✓ ${TIERN[sel]} erledigt</button>
-    <div class="row" style="margin-top:8px;justify-content:space-between"><span class="small muted">Wenn die Zeit knapp wird, ist das Minimum ein voller Erfolg.</span><button class="btn ghost tc-mini" data-goview="workout">Geführt mit Timer ›</button></div>${tcCounters()}</section>`;
+    <div class="row" style="margin-top:8px;justify-content:space-between"><span class="small muted">Wenn die Zeit knapp wird, ist das Minimum ein voller Erfolg.</span><button class="btn ghost tc-mini" data-goview="workout">Geführt mit Timer ›</button></div>${meth}${tcCounters()}</section>`;
 }
 function tcCounters(){
   const pr=tcWeekSum('push'), sq=tcWeekSum('squat'), r=tcDay().reps||{};
@@ -912,6 +988,7 @@ function tcClick(e){
     if(w==='showAll'){ tcUi.showAll=!tcUi.showAll; render(); scrollTo(0,0); return; }
     if(w==='showEve'){ tcUi.showEve=true; render(); return; }
     if(w==='closeEve'){ tcUi.showEve=false; render(); return; }
+    if(w==='method'){ tcUi.method=!tcUi.method; render(); if(tcUi.method) setTimeout(()=>{ const el=document.getElementById('tcMethod'); el&&el.scrollIntoView({behavior:'smooth',block:'start'}); },30); return; }
     if(w==='editCheck'){ tcUi.editCheck=true; render(); }
     else if(w==='closeCheck'){ tcUi.editCheck=false; render(); }
     else if(w==='undoTrain'){ tcPatch(x=>{ delete x.training; }); }
