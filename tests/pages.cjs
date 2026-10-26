@@ -81,10 +81,11 @@ const tests = {
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
-  async 'Cockpit Heute: Morgen-Ablauf in 4 Schritten'(b) {
+  async 'Cockpit Heute: Morgen-Ablauf in 5 Schritten (mit Tagestyp)'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForSelector('#tcMorning');
-    assert.match(await page.locator('#tcMorning h2').innerText(), /0 von 4/);
+    assert.match(await page.locator('#tcMorning h2').innerText(), /[01] von 5/);   // Sa/So ist der Tagestyp vorbelegt
+    await page.click('[data-tc="dtype"][data-v="buero"]');
     await page.click('[data-tc="morning"][data-v="water"]');
     assert.strictEqual(await page.getAttribute('[data-tc="morning"][data-v="water"]', 'aria-pressed'), 'true');
     await page.click('[data-tc="morning"][data-v="check"]');
@@ -93,6 +94,27 @@ const tests = {
     await page.click('[data-tc="done"]');
     await page.click('[data-tc="morning"][data-v="protein"]');
     assert.match(await page.locator('#view').innerText(), /Morgen erledigt/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Cockpit Heute: Tagestyp ändert Vorschläge, Dehnen über den Tag zum Abhaken'(b) {
+    const d = new Date(); d.setHours(15, 10, 0, 0);
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, d);
+    await page.waitForSelector('#tcStretch');
+    await page.click('[data-tc="dtype"][data-v="buero"]');
+    assert.match(await page.locator('.nudges').first().innerText(), /Schreibtisch|Stuhl|Box|Doppel|ankommen|Eiweiß|raus|Knie zur Wand|Waden|Hüft|Oberkörper/);
+    assert.strictEqual(await page.locator('#tcStretch .nudge').count(), 4, '4 Dehnzeitpunkte');
+    assert.match(await page.locator('#tcStretch').innerText(), /JETZT DRAN|jetzt dran/i);
+    const office = await page.locator('#tcStretch').innerText();
+    assert.ok(!/kniend|90\/90|World|Tiefe Hocke/.test(office.split(/Abends/i)[0]), 'im Büro nur Übungen ohne Boden');
+    await page.click('[data-tc="dtype"][data-v="frei"]');
+    assert.strictEqual(await page.getAttribute('[data-tc="dtype"][data-v="frei"]', 'aria-pressed'), 'true');
+    assert.match(await page.locator('.nudges').first().innerText(), /zwischendurch|30 Minuten raus|Eiweiß|Box|Doppel|ankommen/);
+    assert.ok(!/Schreibtisch/.test(await page.locator('.nudges').first().innerText()), 'freier Tag: kein Büro-Text');
+    const first = page.locator('#tcStretch .nudge').first();
+    await first.click();
+    assert.strictEqual(await first.getAttribute('aria-pressed'), 'true');
+    assert.match(await page.locator('#tcStretch h2').innerText(), /1 von 4/);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },

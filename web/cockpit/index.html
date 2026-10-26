@@ -301,12 +301,17 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 11px;width:100%;min-width:0;resize:vertical;min-height:58px}
 .tc .form{display:grid;gap:10px}
 .tc details summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:13.5px}
-.tc .habits,.tc .nudges{display:grid;gap:6px}
+.tc .habits,.tc .nudges,.tc .nudges-s{display:grid;gap:6px}
 .tc .habit,.tc .nudge{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;color:inherit;background:var(--surface-2);border:0;border-radius:11px;padding:10px 12px;cursor:pointer}
 .tc .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--ink-3);flex:none;display:grid;place-items:center;font:700 15px var(--f-display);color:transparent}
 .tc [aria-pressed="true"] .box{background:var(--good);border-color:var(--good);color:#fff}
 .tc .ht{flex:1;min-width:0}
 .tc .ht small{display:block;color:var(--ink-3);font-size:12px}
+.tc .ht .slot{display:block;font:600 11.5px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.tc .nudge.now{box-shadow:inset 0 0 0 2px var(--accent)}
+.tc-dtype{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tc-dtype button{font:600 13.5px var(--f-body,inherit);color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer;touch-action:manipulation}
+.tc-dtype button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .tc .habit .st{font:600 13px var(--f-display);color:var(--ink-3);white-space:nowrap}
 .tc .morning .num{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 14px var(--f-display);background:var(--accent-soft);color:var(--ink-2)}
 .tc .morning [aria-pressed="true"] .num{background:var(--good);color:#fff}
@@ -607,6 +612,56 @@ const TC_NUDGE_POOL={
   arrive:{t:'1 Minute ankommen',s:'Füße spüren, 5 Dinge sehen, 3 hören – dann erst weiter'},
   protein:{t:'Eiweiß-Snack um halb vier',s:'Skyr, Quark oder Nüsse – dann kippt der Abend seltener'},
   walk:{t:'5 Minuten raus, ohne Handy',s:'nach einer kurzen Nacht besser als jede Übung'}};
+/* Tagestyp: morgens gewählt (Sa/So vorbelegt mit Wochenende). Ändert Texte der Mini-Vorschläge, Dehnübungen und die Trainingsempfehlung. */
+const TC_DTYPE={buero:{t:'Büro',chip:'Büro'},ho:{t:'Home Office',chip:'Home Office'},we:{t:'Wochenende',chip:'Wochenende'},frei:{t:'Frei',chip:'freier Tag'}};
+const tcDType=(d=TD())=>{ const x=store.days[d]; if(x&&x.daytype) return x.daytype; const w=dt(d).getDay(); return w===0||w===6?'we':null; };
+const tcAtDesk=t=>t==null||t==='buero'||t==='ho';
+/* Gleiche Mini-Vorschläge, aber passend zum Ort (Liste selbst bleibt gleich wie mac/nudges.py) */
+const TC_NUDGE_TXT={
+  ho:{push:{t:'{n} Liegestütze am Boden',s:'zwischen zwei Calls, Körper gerade wie ein Brett'},squat:{t:'{n} Kniebeugen in der Küche',s:'während der Kaffee durchläuft, Knie nach außen'},walk:{t:'10 Minuten um den Block',s:'statt Arbeitsweg: Tageslicht, ohne Handy'}},
+  we:{push:{t:'{n} Liegestütze zwischendurch',s:'gern als kleiner Wettkampf mit den Kindern'},squat:{t:'{n} Kniebeugen zwischendurch',s:'beim Warten oder Spielen, Knie nach außen'},walk:{t:'30 Minuten raus',s:'Spaziergang oder Rad mit der Familie, ganz locker'},protein:{t:'Eiweiß beim Mittag- oder Abendessen',s:'Quark, Eier, Fisch oder Hülsenfrüchte – dann kippt der Abend seltener'}}};
+TC_NUDGE_TXT.frei=TC_NUDGE_TXT.we;
+/* Dehnen über den Tag: 4 feste Zeitpunkte, Schwerpunkt Sprunggelenk, Hüfte (Sitzen), oberer Rücken/Brust, abends Entspannung.
+   desk: geht im Büro ohne Boden. Statisch 30–45 s bis leichtes Ziehen, weiteratmen. */
+const TC_STRETCH={
+  calfwall:{t:'Wadendehnung an der Wand',d:'30 s/Seite',s:'Ferse bleibt unten, erst Knie gestreckt, dann leicht gebeugt',zone:'Sprunggelenk',desk:1},
+  kneewall:{t:'Knie zur Wand',d:'10 Wdh./Seite',s:'Ferse bleibt unten, Knie schiebt über die Zehen',zone:'Sprunggelenk',desk:1},
+  hipstand:{t:'Hüftbeuger im Stand',d:'30 s/Seite',s:'großer Schritt, hinteres Bein lang, Gesäß anspannen, Becken nach vorn',zone:'Hüfte',desk:1},
+  figure4:{t:'Gesäßdehnung im Sitzen (Figur 4)',d:'30 s/Seite',s:'Knöchel aufs Knie, mit geradem Rücken nach vorn neigen',zone:'Hüfte',desk:1},
+  hipknee:{t:'Hüftbeuger kniend',d:'45 s/Seite',s:'hinteres Knie auf einem Kissen, Gesäß fest, Oberkörper aufrecht',zone:'Hüfte'},
+  ninety:{t:'90/90 Hüftrotation',d:'6 Wdh./Seite',s:'langsam von Seite zu Seite, Hände hinter dem Körper abstützen',zone:'Hüfte'},
+  chest:{t:'Brustdehnung im Türrahmen',d:'30 s/Seite',s:'Unterarm am Rahmen, Ellbogen auf Schulterhöhe, kleiner Schritt nach vorn',zone:'Brust & Schulter',desk:1},
+  tspine:{t:'Oberkörper drehen im Sitzen',d:'8 Wdh./Seite',s:'Hände vor der Brust, Becken bleibt stehen',zone:'oberer Rücken',desk:1},
+  neck:{t:'Nacken seitlich dehnen',d:'20 s/Seite',s:'Ohr Richtung Schulter, andere Schulter aktiv nach unten',zone:'Nacken',desk:1},
+  hamchair:{t:'Beinrückseite am Stuhl',d:'30 s/Seite',s:'Ferse auf die Sitzfläche, Rücken gerade, aus der Hüfte nach vorn',zone:'Beinrückseite',desk:1},
+  wgs:{t:"World's Greatest Stretch",d:'5 Wdh./Seite',s:'Ausfallschritt, Ellbogen zum Fuß, dann Arm zur Decke drehen',zone:'Hüfte & Rücken'},
+  squat:{t:'Tiefe Hocke halten',d:'2 × 30 s',s:'Fersen unten, Ellbogen schieben die Knie nach außen; Festhalten erlaubt',zone:'Sprunggelenk & Hüfte'},
+  child:{t:'Kindhaltung',d:'60 s',s:'Arme lang nach vorn, ruhig in den unteren Rücken atmen',zone:'Rücken'},
+  legswall:{t:'Beine an die Wand',d:'2 min',s:'auf dem Rücken, Beine hoch an die Wand, lange ausatmen',zone:'Entspannung'}};
+const TC_STRETCH_SLOTS=[
+  {id:'vm',h:10,t:'Vormittag · ~10 Uhr',desk:['calfwall','kneewall'],floor:['squat','kneewall']},
+  {id:'mi',h:12,t:'Mittag · ~12:30',desk:['hipstand','figure4'],floor:['hipknee','ninety']},
+  {id:'nm',h:15,t:'Nachmittag · ~15 Uhr',desk:['chest','tspine','neck','hamchair'],floor:['wgs','chest','hamchair']},
+  {id:'ab',h:20,t:'Abends · vor dem Schlafen',desk:['child','legswall'],floor:['child','legswall']}];
+function tcStretchList(){
+  const ty=tcDType(), k=Math.floor(dt(TD()).getTime()/864e5), done=tcDay().stretch||{};
+  return TC_STRETCH_SLOTS.map((sl,i)=>{ const ids=tcAtDesk(ty)&&ty!=='ho'?sl.desk:ty==='ho'?sl.desk.concat(sl.floor):sl.floor;
+    const was=ids.find(id=>done[sl.id+':'+id]);   // Abgehaktes bleibt stehen
+    const id=was||ids[(k+i)%ids.length];
+    return Object.assign({slot:sl.id,slotT:sl.t,h:sl.h,id,key:sl.id+':'+id},TC_STRETCH[id]); });
+}
+function tcStretchCard(){
+  const list=tcStretchList(), done=tcDay().stretch||{}, h=new Date().getHours(), c=tcDay().checkin||{};
+  const now=list.filter(s=>s.h<=h&&!done[s.key]).pop();
+  const n=list.filter(s=>done[s.key]).length;
+  return `<section class="card s12" id="tcStretch"><h2>Dehnen über den Tag <span class="chip">${n} von ${list.length}</span></h2>
+    <p class="small muted" style="margin-top:-4px">Je 1–2 Minuten. Halten bis leichtes Ziehen, nie in den Schmerz, ruhig weiteratmen.${c.pain>=4?' Heute mit Schmerz: nur ganz sanft.':''}</p>
+    <div class="nudges-s">${list.map(s=>`<button type="button" class="nudge${now&&now.key===s.key?' now':''}" data-tc="stretch" data-v="${s.key}" aria-pressed="${!!done[s.key]}"><span class="box">✓</span><span class="ht"><span class="slot">${esc(s.slotT)}${now&&now.key===s.key?' · jetzt dran':''}</span>${esc(s.t)} · ${esc(s.d)}<small>${esc(s.zone)}: ${esc(s.s)}</small></span></button>`).join('')}</div></section>`;
+}
+function tcDTypeRow(){
+  const ty=tcDType(), set=!!(tcDay().daytype);
+  return `<div class="s12 tc-dtype" id="tcDType" role="group" aria-label="Was für ein Tag ist heute?"><span class="small muted">Heute ist:</span>${Object.entries(TC_DTYPE).map(([k,v])=>`<button type="button" data-tc="dtype" data-v="${k}" aria-pressed="${ty===k}">${v.t}</button>`).join('')}${ty&&!set?'<span class="small muted">(vorbelegt)</span>':''}</div>`;
+}
 const TC_NUDGE_N={green:{push:20,squat:25},yellow:{push:12,squat:15}};
 function tcNudgeList(m){
   const x=tcDay(), c=x.checkin||{}, band=m.band||'yellow', h=new Date().getHours(), k=Math.floor(dt(TD()).getTime()/864e5);
@@ -622,7 +677,10 @@ function tcNudgeList(m){
   // Abgehaktes bleibt stehen, auch wenn sich die Auswahl danach ändern würde
   const nd=x.nudges||{}, keep=(cur,ids)=>{ const d=ids.find(i=>nd[i]); if(!d||d===cur.id) return cur; const o=pick(d); if(nd[d]&&nd[d].n) o.n=nd[d].n; return o; };
   body=keep(body,['walk','push','squat']);
-  return [body,keep(mob,['calf','kneewall','hipflex','tspine']),keep(head,['box','protein','sigh','arrive'])].map(n=>Object.assign(n,{t:n.t.replace('{n}',n.n||'')}));
+  // Beweglichkeit steht jetzt in „Dehnen über den Tag“; ein heute schon abgehakter Mobility-Vorschlag bleibt sichtbar
+  const mobDone=['calf','kneewall','hipflex','tspine'].find(i=>nd[i]);
+  const txt=TC_NUDGE_TXT[tcDType()]||{};
+  return [body,...(mobDone?[keep(mob,[mobDone])]:[]),keep(head,['box','protein','sigh','arrive'])].map(n=>Object.assign(n,txt[n.id]||{},{t:(txt[n.id]||n).t.replace('{n}',n.n||'')}));
 }
 
 
@@ -785,14 +843,14 @@ function renderHeute(){
   // Alles zur richtigen Zeit: morgens der Start in den Tag, tagsüber die Mini-Vorschläge, abends Reflexion und Kopf.
   const ph=tcPhase(), all=tcUi.showAll, c=x.checkin||{}, checked=!!(c.sleep&&c.energy&&c.mood&&c.stress), trained=!!(x.training&&x.training.tier);
   const card={morning:tcMorningCard, check:()=>tcCheckCard(m), tip:()=>tcTipCard(m), train:()=>tcTrainCard(m), rec:tcRecRow,
-    nudge:()=>tcNudgeCard(m), mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard};
+    nudge:()=>tcNudgeCard(m), stretch:tcStretchCard, mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard};
   const order={
     morgen:['morning','check','tip','train','rec'],
-    tag:['tip','nudge','morning',...(checked?[]:['check']),'train','food'],   // Offenes vom Morgen direkt untereinander: Ablauf, Check-in, Training
-    abend:['eve','habit','mind',...(trained?[]:['train']),'food']}[ph];
-  const rest=['eve','morning','check','tip','train','rec','nudge','mind','habit','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
+    tag:['tip','nudge','stretch','morning',...(checked?[]:['check']),'train','food'],   // Offenes vom Morgen direkt untereinander: Ablauf, Check-in, Training
+    abend:['eve','stretch','habit','mind',...(trained?[]:['train']),'food']}[ph];
+  const rest=['eve','morning','check','tip','train','rec','nudge','stretch','mind','habit','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
   const lab={morgen:'Guten Morgen',tag:'Für zwischendurch',abend:'Guten Abend'}[ph];
-  return `<div class="grid tc">${head}${restart}<div class="s12 tc-phase"><span class="chip">${lab}</span><span class="small muted">${{morgen:'Jetzt nur: dein Start in den Tag.',tag:checked&&trained?'Morgen erledigt. Jetzt nur das Kleine für zwischendurch.':'Jetzt das Kleine für zwischendurch. Check-in und Training gehen auch noch.',abend:'Jetzt nur: kurz zurückschauen und runterkommen.'}[ph]}</span></div>
+  return `<div class="grid tc">${head}${tcDTypeRow()}${restart}<div class="s12 tc-phase"><span class="chip">${lab}</span><span class="small muted">${{morgen:'Jetzt nur: dein Start in den Tag.',tag:checked&&trained?'Morgen erledigt. Jetzt nur das Kleine für zwischendurch.':'Jetzt das Kleine für zwischendurch. Check-in und Training gehen auch noch.',abend:'Jetzt nur: kurz zurückschauen und runterkommen.'}[ph]}</span></div>
     ${order.map(k=>card[k]()).join('')}
     ${all?rest.map(k=>card[k]()).join(''):''}
     <button class="card s12 rowlink" data-tc="act" data-a="showAll"><span style="flex:1"><b>${all?'Weniger anzeigen':'Alles anzeigen'}</b><br><span class="small muted">${all?'Zurück zu dem, was jetzt dran ist':'Alle Bereiche von heute auf einmal'}</span></span><span class="chev">${all?'‹':'›'}</span></button>
@@ -827,13 +885,14 @@ function tcMorningSteps(){
   const x=tcDay(), c=x.checkin||{};
   return [
     {id:'water',t:'Ein großes Glas Wasser',s:'direkt nach dem Aufstehen, noch im Bad oder in der Küche',on:(x.water||0)>=1},
+    {id:'dtype',t:'Tagestyp wählen',s:'Büro, Home Office, Wochenende oder frei – oben unter dem Datum',on:!!tcDType()},
     {id:'check',t:'Check-in im Cockpit',s:'6 kurze Fragen, 30 Sekunden – danach steht dein Tagesmodus',on:!!(c.sleep&&c.energy&&c.mood&&c.stress)},
     {id:'train',t:'Training im Keller',s:'die vorgeschlagene Stufe, danach „erledigt“ tippen',on:!!(x.training&&x.training.tier)},
     {id:'protein',t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier',on:!!(x.habits&&x.habits.protein)}];
 }
 function tcMorningCard(){
   const st=tcMorningSteps(), n=st.filter(s=>s.on).length;
-  if(n===st.length&&!tcUi.showMorning) return `<button class="card s12 rowlink" data-tc="act" data-a="showMorning"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Morgen erledigt</b><br><span class="small muted">Alle 4 Schritte geschafft.</span></span><span class="chev">›</span></button>`;
+  if(n===st.length&&!tcUi.showMorning) return `<button class="card s12 rowlink" data-tc="act" data-a="showMorning"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Morgen erledigt</b><br><span class="small muted">Alle ${st.length} Schritte geschafft.</span></span><span class="chev">›</span></button>`;
   return `<section class="card s12 morning" id="tcMorning"><h2>Dein Morgen <span class="chip">${n} von ${st.length}</span></h2>
     <p class="small muted" style="margin-top:-4px">Nach dem endgültigen Aufstehen, in dieser Reihenfolge. Tippen hakt ab oder springt zum Schritt.</p>
     <div class="habits">${st.map((s,i)=>`<button type="button" class="habit" data-tc="morning" data-v="${s.id}" aria-pressed="${s.on}"><span class="num">${s.on?'✓':i+1}</span><span class="ht">${esc(s.t)}<small>${esc(s.s)}</small></span></button>`).join('')}</div></section>`;
@@ -861,10 +920,11 @@ function tcCheckCard(m){
 }
 function tcTipCard(m){ const tip=tcTodayTip(m);
   return `<section class="card s12 tc-tip"><h2>Dein Tipp für heute</h2><h3>${esc(tip.t)}</h3><p>${esc(tip.s)}</p></section>`; }
-const k2why=(m,rec)=>m.band?` · empfohlen: ${TIERN[rec]}, weil deine Tagesampel ${m.band==='green'?'grün':m.band==='yellow'?'gelb':'rot'} ist`:m.gap>=7?` · empfohlen: ${TIERN[rec]}, weil du nach ${m.gap} Tagen Pause wieder einsteigst`:'';
+const k2why=(m,rec)=>(tcDType()==='buero'&&m.band==='green'?` · empfohlen: ${TIERN[rec]}, weil Büro-Tag (Voll geht, wenn du Zeit hast)`:'')||(m.band?` · empfohlen: ${TIERN[rec]}, weil deine Tagesampel ${m.band==='green'?'grün':m.band==='yellow'?'gelb':'rot'} ist`:m.gap>=7?` · empfohlen: ${TIERN[rec]}, weil du nach ${m.gap} Tagen Pause wieder einsteigst`:'')+(tcDType()==='we'||tcDType()==='frei'?' · Heute ohne Zeitdruck: auch später am Vormittag oder draußen mit der Familie':tcDType()==='ho'?' · Home Office: der gesparte Arbeitsweg reicht für Normal':'');
 function tcTrainCard(m){
   const s=tcSession(m), tr=tcDay().training;
-  const recTier=m.band?TC_MODE[m.band].tier:(m.gap>=7?'min':'std'), sel=tcTier||recTier, v=s[sel];
+  let recTier=m.band?TC_MODE[m.band].tier:(m.gap>=7?'min':'std'); if(tcDType()==='buero'&&recTier==='full') recTier='std';   // Büro: morgens bleibt wenig Zeit
+  const sel=tcTier||recTier, v=s[sel];
   const c=store.coach[TD()];
   const coachLine=c&&c.headline?`<p class="small" style="margin:4px 0 0"><span class="muted">Trainer:</span> ${esc(c.headline)}</p>`:'';
   const head=`<h2>Training <span class="chip">${esc(s.focus)}</span></h2><h3>${esc(s.title)}</h3>${s.note?`<p class="small muted">${esc(s.note)}</p>`:''}${s.goal?`<p class="small tc-goal"><b>Trainingsreiz:</b> ${esc(s.goal)}<br><b>Progression:</b> ${esc(s.prog)}</p>`:''}${coachLine}`;
@@ -892,7 +952,7 @@ function tcRecRow(){
 }
 function tcNudgeCard(m){
   const list=tcNudgeList(m), done=tcDay().nudges||{};
-  return `<section class="card s12"><h2>Für zwischendurch <span class="chip">Büro · 2 Minuten</span></h2>
+  return `<section class="card s12"><h2>Für zwischendurch <span class="chip">${(TC_DTYPE[tcDType()]||TC_DTYPE.buero).chip} · 2 Minuten</span></h2>
     <div class="nudges">${list.map(n=>`<button type="button" class="nudge" data-tc="nudge" data-v="${n.id}" aria-pressed="${!!done[n.id]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}${n.why?' · '+esc(n.why):''}</small></span></button>`).join('')}</div></section>`;
 }
 function tcMindCard(){
@@ -974,6 +1034,8 @@ function tcClick(e){
       const cnt=on?(n.n||0):-((prev&&prev.n)||0);   // abhaken zählt mit, zurücknehmen zieht genau das wieder ab
       if(n.rep&&cnt){ x.reps=x.reps||{}; x.reps[n.rep]=Math.max(0,(x.reps[n.rep]||0)+cnt); }
       x.habits=x.habits||{}; if(on){ x.habits.breaks=true; if(n.habit) x.habits[n.habit]=true; } }); }
+  else if(a==='dtype'){ tcPatch(x=>{ x.daytype=v; }); }
+  else if(a==='stretch'){ const s=tcStretchList().find(y=>y.key===v); tcPatch(x=>{ x.stretch=Object.assign({},x.stretch); x.stretch[v]=!x.stretch[v]; if(x.stretch[v]){ x.habits=Object.assign({},x.habits,{breaks:true}); if(s&&/Sprunggelenk/.test(s.zone)) x.habits.ankle=true; } }); }
   else if(a==='ev'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; if(k==='screen') x.evening.screen=!x.evening.screen; else x.evening[k]=x.evening[k]===+v?null:+v; }); }
   else if(a==='evt'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; let l=(x.evening[k]||[]).slice(); const only=v==='nichts'||v==='ok';
       if(l.includes(v)) l=l.filter(t=>t!==v); else l=only?[v]:l.filter(t=>t!=='nichts'&&t!=='ok').concat(v);
@@ -982,7 +1044,8 @@ function tcClick(e){
     if(v==='water') tcPatch(x=>{ x.water=(x.water||0)>=1?(x.water||0)-1:1; });
     else if(v==='protein') tcPatch(x=>{ x.habits=x.habits||{}; x.habits.protein=!x.habits.protein; });
     else if(v==='check'){ tcUi.editCheck=true; render(); go('tcCheck'); }
-    else if(v==='train') go('tcTrain'); }
+    else if(v==='train') go('tcTrain');
+    else if(v==='dtype') go('tcDType'); }
   else if(a==='act'){ const w=b.dataset.a;
     if(w==='showMorning'){ tcUi.showMorning=true; render(); return; }
     if(w==='showAll'){ tcUi.showAll=!tcUi.showAll; render(); scrollTo(0,0); return; }
