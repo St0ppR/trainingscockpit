@@ -538,7 +538,7 @@ const TC_LIB={
     goal:'Kraft der hinteren Kette (Gesäß, Rücken), Zug- und Griffkraft',prog:'Doppelprogression wie bei Kraft A',
     min:{min:10,blocks:[{name:'Zirkel',fmt:'2 Runden · Übungswechsel ohne Pause · Rundenpause 30 s · RIR 3',items:[['Einbeiniges Kreuzheben','6 Wdh./Seite','ohne Gewicht, Gleichgewicht fürs Sprunggelenk'],['KB Rudern einarmig','10 Wdh./Seite','24 kg'],['Face Pulls mit Band','15 Wdh.','']]}]},
     std:{min:30,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'3 Runden · Übungswechsel ohne Pause · Rundenpause 60 s · RIR 2 (≈ RPE 8)',items:[['KB Kreuzheben','10 Wdh.','32 kg, Hüftscharnier, Rücken neutral'],['KB Rudern einarmig','10 Wdh./Seite','24 kg, oben 1 s halten'],['Einbeiniges Kreuzheben','6 Wdh./Seite','18 kg, Tempo 3-0-1'],['Face Pulls mit Band','15 Wdh.','']]},{name:'Tragen',fmt:'2 Sätze · 60 s Satzpause',items:[['Farmer Carry','40 s','2 × 24 kg']]}]},
-    full:{min:45,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'4 Runden · Übungswechsel ohne Pause · Rundenpause 90 s · RIR 1–2 (RPE 8–9)',items:[['KB Swing','15 Wdh.','32 kg'],['Doppel-KB Rudern','8 Wdh.','2 × 24 kg'],['Bulgarian Split Squat','8 Wdh./Seite','Hinterfuß auf der Bank, Tempo 2-0-1'],['Pike Push-up','8 Wdh.','']]},{name:'Tragen',fmt:'je Übung die angegebenen Sätze · 60 s Satzpause',items:[['Farmer Carry','3 × 40 s','2 × 24 kg'],['Rack Carry','2 × 30 s','2 × 24 kg']]}]}},
+    full:{min:45,blocks:[TC_WARM,{name:'Hauptteil · Zirkel',fmt:'4 Runden · Übungswechsel ohne Pause · Rundenpause 90 s · RIR 1–2 (RPE 8–9)',items:[['KB Swing','15 Wdh.','32 kg'],['Doppel-KB Rudern','8 Wdh.','2 × 24 kg'],['Bulgarian Split Squat','8 Wdh./Seite','Hinterfuß auf der Bank, Tempo 2-0-1'],['Pike Push-up','8 Wdh.','']]},{name:'Tragen',fmt:'je Übung die angegebenen Sätze · 60 s Satzpause',items:[['Farmer Carry','3 × 40 s','2 × 24 kg'],['Rack Carry','2 × 30 s','2 × 24 kg']]},{name:'Finisher · AMRAP 6 min',fmt:'so viele Runden wie möglich in 6 min · Pause nach Bedarf · RIR 2, Technik vor Tempo · Runden notieren und nächstes Mal schlagen',items:[['KB Swing','10 Wdh.','24 kg'],['Liegestütze','8 Wdh.',''],['Goblet Squat','8 Wdh.','24 kg']]}]}},
   mob:{title:'Mobility & Atmung',focus:'aktive Erholung',
     goal:'Aktive Regeneration: Durchblutung, Beweglichkeit, Entspannung',prog:'keine, bewusst locker (RPE 2–3)',
     min:{min:10,blocks:[{name:'Mobility',fmt:'1 Durchgang · ruhig · RPE 2',items:[['Knie zur Wand','10 Wdh./Seite',''],['Tiefe Hocke','2 × 45 s','an den Dip-Bars festhalten'],['Box-Atmung','2 min','4 s ein · 4 halten · 4 aus · 4 halten']]}]},
@@ -564,6 +564,12 @@ const TC_GLOSSAR=[
   ['Tempo 3-1-1','Sekunden pro Phase: 3 s absenken (exzentrisch) · 1 s Pause unten · 1 s hoch (konzentrisch).'],
   ['EMOM','Every Minute On the Minute: Zu jeder vollen Minute die Wdh., der Rest der Minute ist Pause.'],
   ['Leiter','Wdh. steigen von Sprosse zu Sprosse (1, 2, 3 …), dazwischen nur kurz durchatmen.'],
+  ['AMRAP','As Many Rounds (oder Reps) As Possible: so viele Runden wie möglich in fester Zeit. Die Rundenzahl ist dein Messwert.'],
+  ['Tabata','Intervallprotokoll: 8 × 20 s maximal belasten, 10 s Pause = 4 min. Sehr hart (RPE 9–10).'],
+  ['HIIT · Intervalle','hochintensives Intervalltraining: Belastung über der Schwelle im Wechsel mit Pausen, z. B. 4 × 4 min.'],
+  ['Komplex','mehrere Übungen mit derselben Kettlebell direkt hintereinander, ohne sie abzustellen (z. B. Clean → Press → Squat).'],
+  ['Supersatz','zwei Übungen für gegensätzliche Muskeln direkt nacheinander, dann Pause (z. B. Drücken + Ziehen).'],
+  ['Dauermethode','gleichmäßige Belastung ohne Pause über längere Zeit, z. B. 30 min Ergometer in Zone 2.'],
   ['Zone 2','lockere Ausdauer, bei dir Puls 110–130. Sprechtest: ganze Sätze gehen noch.'],
   ['Progressive Überlastung','der Reiz wird schrittweise größer, sonst passt sich der Körper nicht weiter an.'],
   ['Doppelprogression','erst Wdh. bis zum oberen Ende des Bereichs steigern, dann Last erhöhen und wieder unten anfangen.'],
@@ -596,7 +602,16 @@ function tcMethodCard(){
       <li><b>Zu kurze Pause?</b> Wenn du den RIR nicht halten kannst, verlängere die Pause um 30 s. Lieber länger Pause als unsaubere Wdh.</li>
       <li><b>Ruhetage:</b> Sonntag ist aktive Erholung. Zone 2 und Spaziergänge zählen als leichte Belastung und fördern die Regeneration.</li>
     </ul>
-    <h4>4 · Begriffe</h4>
+    <h4>4 · Trainingsformate</h4>
+    <ul>
+      <li><b>Zirkel</b> (Kraft A/B): Hauptformat für Kraftausdauer und Muskelaufbau. Viele Muster in kurzer Zeit, die Rundenpause steuert die Dichte.</li>
+      <li><b>EMOM</b> (Kettlebell-Tag, Finisher Kraft A): feste Arbeit pro Minute. Gut für saubere Swings unter Ermüdung, weil die Pause eingebaut ist.</li>
+      <li><b>Leiter</b> (Kettlebell-Tag Voll): viel Volumen bei schweren Übungen, ohne dass ein Satz zu lang wird.</li>
+      <li><b>AMRAP</b> (Finisher Kraft B Voll): Dichte-Training mit eingebautem Test. Schreib die Runden auf, beim nächsten Mal eine mehr.</li>
+      <li><b>Dauermethode</b> (Zone 2, Erholungstag): Grundlagenausdauer.</li>
+      <li><b>Tabata und HIIT</b> sind bewusst noch nicht im Plan. Sie belasten stark (RPE 9–10) und kosten viel Erholung. Im Wiedereinstieg und bei schlechtem Schlaf bringen sie mehr Ermüdung als Nutzen. Wenn du 4 Wochen konstant trainierst und der Schlaf stabil ist, ersetzt eine Intervalleinheit (z. B. 4 × 4 min am Ergometer) eine Zone-2-Einheit.</li>
+    </ul>
+    <h4>5 · Begriffe</h4>
     <dl class="tc-gloss">${TC_GLOSSAR.map(([t,d])=>`<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl>
     <p class="small muted">Wie du eine Zeile liest: <b>Goblet Squat · 8–10 Wdh. · 24 kg, Tempo 3-1-1</b> im Block „3 Runden · Rundenpause 60 s · RIR 2“ heißt: In jeder der 3 Runden machst du 8–10 Kniebeugen mit 24 kg. Du senkst jeweils 3 s ab und hörst auf, wenn noch 2 saubere Wdh. gingen.</p>
   </div>`;

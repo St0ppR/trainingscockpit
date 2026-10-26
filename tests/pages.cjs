@@ -182,7 +182,7 @@ const tests = {
     await page.click('#tcTrain [data-a="method"]');
     await page.waitForSelector('#tcMethod');
     const txt = await page.textContent('#tcMethod');
-    for (const w of ['Mikrozyklus', 'Autoregulation', 'RIR', 'Doppelprogression', 'Deload', 'Rundenpause', 'EMOM', 'Session-RPE', 'Tempo 3-1-1'])
+    for (const w of ['Mikrozyklus', 'Autoregulation', 'RIR', 'Doppelprogression', 'Deload', 'Rundenpause', 'EMOM', 'AMRAP', 'Tabata', 'Trainingsformate', 'Session-RPE', 'Tempo 3-1-1'])
       assert.ok(txt.includes(w), 'allgemeiner Teil erklärt ' + w);
     assert.strictEqual(await page.locator('#tcMethod .tc-week li').count(), 7, 'Wochenaufbau mit 7 Tagen');
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
