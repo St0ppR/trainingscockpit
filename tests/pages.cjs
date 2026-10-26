@@ -179,10 +179,12 @@ const tests = {
     assert.ok(fmts.length > 0 && fmts.every(f => f.trim()), 'jeder Block nennt sein Format');
     assert.ok(fmts.some(f => /Runden|EMOM|Dauermethode|Durchgang|Sätze|Leiter/.test(f)), 'Format mit Runden/Sätzen/Methode');
     assert.ok(/Trainingsreiz:.*Progression:/s.test(await page.textContent('#tcTrain')), 'Trainingsreiz und Progression stehen dabei');
+    const blocks = await page.locator('#tcTrain .block').evaluateAll(bs => bs.map(b => ({ n: b.querySelector('.bh').textContent, info: !!b.querySelector('.fmt-info') })));
+    assert.ok(blocks.filter(b => /EMOM|AMRAP|Leiter|Komplex|Tabata|Intervall|Zirkel|Grundlage/.test(b.n)).every(b => b.info), 'jedes Format hat eine kurze Erklärung');
     await page.click('#tcTrain [data-a="method"]');
     await page.waitForSelector('#tcMethod');
     const txt = await page.textContent('#tcMethod');
-    for (const w of ['Mikrozyklus', 'Autoregulation', 'RIR', 'Doppelprogression', 'Deload', 'Rundenpause', 'EMOM', 'AMRAP', 'Tabata', 'Trainingsformate', 'Session-RPE', 'Tempo 3-1-1'])
+    for (const w of ['Mikrozyklus', 'Autoregulation', 'RIR', 'Doppelprogression', 'Deload', 'Rundenpause', 'EMOM', 'AMRAP', 'Tabata', 'Komplex', 'Formatwechsel', 'Aufbauphase', 'Session-RPE', 'Tempo 3-1-1'])
       assert.ok(txt.includes(w), 'allgemeiner Teil erklärt ' + w);
     assert.strictEqual(await page.locator('#tcMethod .tc-week li').count(), 7, 'Wochenaufbau mit 7 Tagen');
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
