@@ -309,6 +309,9 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .ht small{display:block;color:var(--ink-3);font-size:12px}
 .tc .ht .slot{display:block;font:600 11.5px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
 .tc .nudge.now{box-shadow:inset 0 0 0 2px var(--accent)}
+.tc-adhoc{display:grid;gap:6px;background:var(--accent-soft);border-radius:12px;padding:12px 14px}
+.tc-adhoc .chip{justify-self:start;background:var(--surface)!important}
+.tc-adhoc b{font:700 19px/1.2 var(--f-display)}
 .tc-dtype{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .tc-dtype button{font:600 13.5px var(--f-body,inherit);color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer;touch-action:manipulation}
 .tc-dtype button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -650,6 +653,23 @@ function tcStretchList(){
     const id=was||ids[(k+i)%ids.length];
     return Object.assign({slot:sl.id,slotT:sl.t,h:sl.h,id,key:sl.id+':'+id},TC_STRETCH[id]); });
 }
+/* Spontan abrufen: ein zufälliger Vorschlag (Übung oder Dehnung), passend zu Tagestyp, Tagesampel und Beschwerden */
+function tcAdhocPool(m){
+  const ty=tcDType(), c=tcDay().checkin||{}, band=m.band||'yellow', soft=band==='red'||c.sick||c.night||c.pain>=4;
+  const txt=TC_NUDGE_TXT[ty]||{}, n=TC_NUDGE_N[band==='green'?'green':'yellow'];
+  const ex=soft?[]:['push','squat'].map(id=>{ const o=Object.assign({kind:'ex',id,n:n[TC_NUDGE_POOL[id].rep]},TC_NUDGE_POOL[id],txt[id]||{}); o.t=o.t.replace('{n}',o.n); return o; });
+  const mind=['sigh','box','arrive'].map(id=>Object.assign({kind:'ex',id},TC_NUDGE_POOL[id]));
+  const st=Object.entries(TC_STRETCH).filter(([,s])=>!(ty==null||ty==='buero')||s.desk).filter(([id])=>id!=='legswall'||new Date().getHours()>=19)
+    .map(([id,s])=>({kind:'st',id,t:`${s.t} · ${s.d}`,s:`${s.zone}: ${s.s}`,ankle:/Sprunggelenk/.test(s.zone)}));
+  return ex.concat(ex,mind,st);   // Kraft doppelt gewichtet, solange das Wochenziel offen ist
+}
+function tcAdhocNext(m){ const pool=tcAdhocPool(m), cur=tcUi.adhoc, opts=pool.filter(p=>!cur||p.id!==cur.id); tcUi.adhoc=opts[Math.floor(Math.random()*opts.length)]||pool[0]; }
+function tcAdhocBox(){
+  const a=tcUi.adhoc, cnt=(tcDay().adhoc||[]).length;
+  if(!a) return `<button type="button" class="btn go bigbtn tc-adhoc-go" data-tc="adhoc" data-v="new">Jetzt was für 2 Minuten</button>${cnt?`<p class="small muted" style="margin-top:6px">Heute schon ${cnt}× spontan gemacht.</p>`:''}`;
+  return `<div class="tc-adhoc" id="tcAdhoc"><span class="chip">${a.kind==='st'?'Dehnen':'Übung'} · jetzt</span><b>${esc(a.t)}</b><span class="small muted">${esc(a.s)}</span>
+    <div class="row"><button type="button" class="btn go" data-tc="adhoc" data-v="done">✓ Gemacht</button><button type="button" class="btn ghost" data-tc="adhoc" data-v="new">Anderer Vorschlag</button><button type="button" class="btn ghost" data-tc="adhoc" data-v="close">Später</button></div></div>`;
+}
 function tcStretchCard(){
   const list=tcStretchList(), done=tcDay().stretch||{}, h=new Date().getHours(), c=tcDay().checkin||{};
   const now=list.filter(s=>s.h<=h&&!done[s.key]).pop();
@@ -953,7 +973,8 @@ function tcRecRow(){
 function tcNudgeCard(m){
   const list=tcNudgeList(m), done=tcDay().nudges||{};
   return `<section class="card s12"><h2>Für zwischendurch <span class="chip">${(TC_DTYPE[tcDType()]||TC_DTYPE.buero).chip} · 2 Minuten</span></h2>
-    <div class="nudges">${list.map(n=>`<button type="button" class="nudge" data-tc="nudge" data-v="${n.id}" aria-pressed="${!!done[n.id]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}${n.why?' · '+esc(n.why):''}</small></span></button>`).join('')}</div></section>`;
+    <div class="nudges">${list.map(n=>`<button type="button" class="nudge" data-tc="nudge" data-v="${n.id}" aria-pressed="${!!done[n.id]}"><span class="box">✓</span><span class="ht">${esc(n.t)}<small>${esc(n.s)}${n.why?' · '+esc(n.why):''}</small></span></button>`).join('')}</div>
+    <div style="margin-top:12px">${tcAdhocBox()}</div></section>`;
 }
 function tcMindCard(){
   const c=tcDay().checkin||{}, hi=c.stress>=4;
@@ -1034,6 +1055,13 @@ function tcClick(e){
       const cnt=on?(n.n||0):-((prev&&prev.n)||0);   // abhaken zählt mit, zurücknehmen zieht genau das wieder ab
       if(n.rep&&cnt){ x.reps=x.reps||{}; x.reps[n.rep]=Math.max(0,(x.reps[n.rep]||0)+cnt); }
       x.habits=x.habits||{}; if(on){ x.habits.breaks=true; if(n.habit) x.habits[n.habit]=true; } }); }
+  else if(a==='adhoc'){ const ad=tcUi.adhoc;
+    if(v==='new'){ tcAdhocNext(tcMode()); render(); setTimeout(()=>{ const el=document.getElementById('tcAdhoc'); el&&el.scrollIntoView({behavior:'smooth',block:'center'}); },30); return; }
+    if(v==='close'){ tcUi.adhoc=null; render(); return; }
+    if(v==='done'&&ad){ tcUi.adhoc=null; const rep=ad.kind==='ex'&&TC_NUDGE_POOL[ad.id]&&TC_NUDGE_POOL[ad.id].rep;
+      tcPatch(x=>{ x.adhoc=(x.adhoc||[]).concat({id:ad.id,kind:ad.kind,n:ad.n||null,at:new Date().toISOString()}); x.habits=Object.assign({},x.habits,{breaks:true});
+        if(ad.ankle||(TC_NUDGE_POOL[ad.id]||{}).habit==='ankle') x.habits.ankle=true;
+        if(rep&&ad.n){ x.reps=Object.assign({},x.reps); x.reps[rep]=(x.reps[rep]||0)+ad.n; } }); } }
   else if(a==='dtype'){ tcPatch(x=>{ x.daytype=v; }); }
   else if(a==='stretch'){ const s=tcStretchList().find(y=>y.key===v); tcPatch(x=>{ x.stretch=Object.assign({},x.stretch); x.stretch[v]=!x.stretch[v]; if(x.stretch[v]){ x.habits=Object.assign({},x.habits,{breaks:true}); if(s&&/Sprunggelenk/.test(s.zone)) x.habits.ankle=true; } }); }
   else if(a==='ev'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; if(k==='screen') x.evening.screen=!x.evening.screen; else x.evening[k]=x.evening[k]===+v?null:+v; }); }

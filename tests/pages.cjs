@@ -111,6 +111,13 @@ const tests = {
     assert.strictEqual(await page.getAttribute('[data-tc="dtype"][data-v="frei"]', 'aria-pressed'), 'true');
     assert.match(await page.locator('.nudges').first().innerText(), /zwischendurch|30 Minuten raus|Eiweiß|Box|Doppel|ankommen/);
     assert.ok(!/Schreibtisch/.test(await page.locator('.nudges').first().innerText()), 'freier Tag: kein Büro-Text');
+    await page.click('[data-tc="adhoc"][data-v="new"]');
+    await page.waitForSelector('#tcAdhoc');
+    const t1 = await page.locator('#tcAdhoc b').innerText();
+    await page.click('#tcAdhoc [data-v="new"]');
+    assert.notStrictEqual(await page.locator('#tcAdhoc b').innerText(), t1, 'Anderer Vorschlag wechselt');
+    await page.click('#tcAdhoc [data-v="done"]');
+    assert.match(await page.locator('.nudges').first().locator('..').innerText(), /1× spontan/);
     const first = page.locator('#tcStretch .nudge').first();
     await first.click();
     assert.strictEqual(await first.getAttribute('aria-pressed'), 'true');
