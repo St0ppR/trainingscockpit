@@ -1004,7 +1004,7 @@ function renderHeute(){
     abend:['eve','stretch','habit','mind',...(trained?[]:['train']),'food']}[ph];
   const rest=['eve','morning','check','tip','train','rec','nudge','stretch','mind','habit','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
   const lab={morgen:'Guten Morgen',tag:'Für zwischendurch',abend:'Guten Abend'}[ph];
-  return `<div class="grid tc">${head}${tcDTypeRow()}${restart}<div class="s12 tc-phase"><span class="chip">${lab}</span><span class="small muted">${{morgen:'Jetzt nur: dein Start in den Tag.',tag:checked&&trained?'Morgen erledigt. Jetzt nur das Kleine für zwischendurch.':'Jetzt das Kleine für zwischendurch. Check-in und Training gehen auch noch.',abend:'Jetzt nur: kurz zurückschauen und runterkommen.'}[ph]}</span></div>
+  return `<div class="grid tc">${gzHeroCard()}${head}${tcDTypeRow()}${restart}<div class="s12 tc-phase"><span class="chip">${lab}</span><span class="small muted">${{morgen:'Jetzt nur: dein Start in den Tag.',tag:checked&&trained?'Morgen erledigt. Jetzt nur das Kleine für zwischendurch.':'Jetzt das Kleine für zwischendurch. Check-in und Training gehen auch noch.',abend:'Jetzt nur: kurz zurückschauen und runterkommen.'}[ph]}</span></div>
     ${order.map(k=>card[k]()).join('')}
     ${all?rest.map(k=>card[k]()).join(''):''}
     <button class="card s12 rowlink" data-tc="act" data-a="showAll"><span style="flex:1"><b>${all?'Weniger anzeigen':'Alles anzeigen'}</b><br><span class="small muted">${all?'Zurück zu dem, was jetzt dran ist':'Alle Bereiche von heute auf einmal'}</span></span><span class="chev">${all?'‹':'›'}</span></button>
