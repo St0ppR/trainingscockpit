@@ -350,6 +350,73 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc-trio{display:grid;gap:4px}
 @media (max-width:420px){.tc .badge{width:70px;height:70px;font-size:15px}.tc .tier b{font-size:16px}.tc .week span{width:22px}.tc-tile .big{font-size:28px}}
 @media (prefers-reduced-motion:reduce){.tc .orb{transition:none}}
+/* Gesamtübersicht: Startkachel, Check-in im Vollbild, Verlauf */
+.gz-hero{display:grid;gap:14px}
+.gz-top{display:flex;gap:16px;align-items:center}
+.ampel{display:flex;flex-direction:column;gap:6px;background:#161b21;border-radius:16px;padding:8px;flex:none;border:1px solid #2a323b}
+.ampel i{width:24px;height:24px;border-radius:50%;background:#3a434d}
+.ampel i.r.on{background:#e5484d;box-shadow:0 0 14px #e5484d}
+.ampel i.y.on{background:#f0b400;box-shadow:0 0 14px #f0b400}
+.ampel i.g.on{background:#2fbf4a;box-shadow:0 0 14px #2fbf4a}
+.gz-sum{min-width:0}
+.gz-sum .lab{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.gz-word{font:700 32px/1.05 var(--f-display);margin:2px 0 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.gz-score{font-size:22px;color:var(--ink-2)} .gz-score small{font-size:13px;color:var(--ink-3)}
+.gz-vals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gz-vals>div{background:var(--surface-2);border-radius:12px;padding:10px;min-width:0}
+.gz-vals .k{font-size:12.5px;color:var(--ink-2);font-weight:600}
+.gz-vals .v{font:700 26px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.gz-vals .v small{font-size:13px;color:var(--ink-3);font-weight:600}
+.gz-e{display:block;font-size:12px;font-weight:600;line-height:1.3}
+.tone-good{color:var(--good)} .tone-bad{color:var(--crit)} .tone-mid{color:var(--ink-3)}
+.btn.ci-go{width:100%;min-height:56px;font:700 18px var(--f-body);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:8px 14px}
+.btn.ci-go small{font:500 12.5px var(--f-body);opacity:.85}
+.btn.ci-go .ok{color:var(--good)}
+.btn.ghost.ci-go{font-size:16px}
+body.ci-open{overflow:hidden}
+.ci{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 16px calc(18px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.ci-bar{display:flex;align-items:center;gap:12px;min-height:48px;max-width:520px;width:100%;margin:0 auto}
+.ci-x{min-width:48px;min-height:48px;border-radius:24px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:22px;cursor:pointer}
+.ci-prog{display:flex;gap:6px;flex:1}
+.ci-prog i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.ci-prog i.on{background:var(--accent)} .ci-prog i.cur{background:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.ci-t{font-size:12.5px;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.ci-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;max-width:520px;width:100%;margin:0 auto;padding-bottom:6vh}
+.ci-n{font-size:13px;color:var(--ink-3);font-weight:600;margin:0}
+.ci-q{font:700 30px/1.15 var(--f-display);margin:0;text-wrap:balance}
+.ci-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.ci-grid button{min-height:60px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:700 26px var(--f-display);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
+.ci-grid button small{font:500 11.5px var(--f-body);color:var(--ink-3)}
+.ci-grid button.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ci-grid button.sel small{color:inherit}
+.ci-grid.min{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ci-grid.min button{min-height:72px;font-size:22px}
+.ci-lab{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:13px;color:var(--ink-2);line-height:1.3}
+.ci-lab span:nth-child(2){text-align:center} .ci-lab span:nth-child(3){text-align:right}
+.ci-lab b{display:block;font:700 15px var(--f-display);color:var(--ink)}
+.ci-last{font-size:13.5px;color:var(--ink-3);margin:0} .ci-last span{opacity:.8}
+.ci-ok{display:flex;align-items:center;gap:12px;font:700 30px var(--f-display)}
+.ci-ok span{width:48px;height:48px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font-size:26px}
+.ci-sum{display:grid;gap:6px}
+.ci-sum>div{display:flex;align-items:baseline;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.ci-sum span{flex:1;color:var(--ink-2);font-size:14px} .ci-sum b{font:700 20px var(--f-display)} .ci-sum .gz-e{display:inline;min-width:0;text-align:right}
+.ci-more summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:14px;min-height:44px;display:flex;align-items:center}
+.ci .toggles{display:flex;flex-wrap:wrap;gap:8px}
+.ci .tg{min-height:44px}
+.gz-ovh{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:4px}
+.gz-title{font:700 22px var(--f-display);margin:0}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{min-height:44px;min-width:76px;border:0;border-radius:9px;background:transparent;color:var(--ink-2);font:600 14px var(--f-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.gz-now{display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin:-4px 0 6px}
+.gz-now .v{font:700 30px/1.05 var(--f-display);font-variant-numeric:tabular-nums}
+.gz-now .v small{font-size:15px;color:var(--ink-3)}
+.gz-now .gz-e{display:inline;font-size:13px}
+.gz-now .muted{flex-basis:100%}
+.gz-svg text{font-size:11px}
+.gz-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:12px}
+.gz-mh{display:flex;align-items:baseline;gap:8px} .gz-mh span{flex:1;font-weight:600;font-size:14px} .gz-mh b{font:700 20px var(--f-display)} .gz-mh .gz-e{display:inline}
+.gz-how summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 </style>
 
 <div class="wrap">
@@ -366,6 +433,7 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
   <footer id="foot"></footer>
 </div>
 <div id="tip" role="tooltip"></div>
+<div id="ci" class="ci hidden" role="dialog" aria-modal="true" aria-labelledby="ciQ"></div>
 <nav class="bnav" aria-label="Bereiche"><div id="bnav">
   <button data-t="heute"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>Heute</button>
   <button data-t="uebersicht"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Übersicht</button>
@@ -757,7 +825,7 @@ function tcNudgeList(m){
     body=pick(gp>=gs?'push':'squat'); body.n=TC_NUDGE_N[band][body.rep];
     body.why=`Wochenziel ${body.rep==='push'?'Liegestütze':'Kniebeugen'}: noch ${nf(Math.max(0,body.rep==='push'?tcWeekGoal('push')-tcWeekSum('push'):tcWeekGoal('squat')-tcWeekSum('squat')))}`; }
   const mob=pick(!(x.habits||{}).ankle&&!(c.pain>=4)?(k%2?'calf':'kneewall'):(k%2?'hipflex':'tspine'));
-  const head=pick(c.stress>=4?'box':h>=13&&!(x.habits||{}).plate?'protein':(k%2?'sigh':'arrive'));
+  const head=pick(tcStressHi()?'box':h>=13&&!(x.habits||{}).plate?'protein':(k%2?'sigh':'arrive'));
   // Abgehaktes bleibt stehen, auch wenn sich die Auswahl danach ändern würde
   const nd=x.nudges||{}, keep=(cur,ids)=>{ const d=ids.find(i=>nd[i]); if(!d||d===cur.id) return cur; const o=pick(d); if(nd[d]&&nd[d].n) o.n=nd[d].n; return o; };
   body=keep(body,['walk','push','squat']);
@@ -809,10 +877,12 @@ function tcLastTraining(){
 }
 function tcMode(){
   const c=tcDay().checkin||{}, why=[], parts=[];
-  if(c.sleep) parts.push(c.sleep); if(c.energy) parts.push(c.energy); if(c.mood) parts.push(c.mood); if(c.stress) parts.push(6-c.stress);
+  const am=tcDay().am;
+  if(am&&am.at){ ['sleep','energy','mood'].forEach(k=>{ if(am[k]) parts.push(1+(am[k]-1)*4/9); }); }   // 1–10 auf 1–5, Grenzen bleiben gleich
+  else { if(c.sleep) parts.push(c.sleep); if(c.energy) parts.push(c.energy); if(c.mood) parts.push(c.mood); if(c.stress) parts.push(6-c.stress); }
   const score=parts.length?parts.reduce((a,b)=>a+b,0)/parts.length:null;
   let band=null;
-  if(score!=null){ band=score>=3.7?'green':score>=2.6?'yellow':'red'; why.push(`Dein Check-in ergibt ${nf(score,1)} von 5.`); }
+  if(score!=null){ band=score>=3.7?'green':score>=2.6?'yellow':'red'; why.push(`Dein Check-in ergibt ${nf(1+(score-1)*9/4,1)} von 10.`); }
   if(c.night&&band==='green'){ band='yellow'; why.push('Die Nacht war unterbrochen – heute lieber kontrolliert.'); }
   const g=tcGarmin();
   if(g){ why.push(`Uhr: Erholung ${nf(g.recovery)} % (${BAND[g.band].t}).`); const rank={red:0,yellow:1,green:2}; if(band==null||rank[g.band]<rank[band]) band=g.band; }
@@ -895,9 +965,9 @@ function tcTodayTip(m){
   const c=tcDay().checkin||{}, g=tcGarmin(), h=new Date().getHours(), wd=dt(TD()).getDay(), x=tcDay();
   const slept=g&&g.sleep&&g.sleep.asleep?g.sleep.asleep/3600:null;
   if(c.sick) return {t:'Heute gesund werden',s:'Viel trinken, früh schlafen, Training pausieren. Ein Spaziergang ist erlaubt, wenn es sich gut anfühlt.'};
-  if(c.stress>=4) return {t:'Erst atmen, dann der Rest',s:'Dein Stress ist hoch. 2 Minuten Box-Atmung unten im Kopf-Bereich. Danach fällt dir auch das Essen heute leichter.'};
+  if(tcStressHi()) return {t:'Erst atmen, dann der Rest',s:'Dein Stress ist hoch. 2 Minuten Box-Atmung unten im Kopf-Bereich. Danach fällt dir auch das Essen heute leichter.'};
   if(m.gap>=2&&!tcTrained(TD())) return {t:'Nie zweimal auslassen',s:`Dein letztes Training war vor ${m.gap} Tagen. Heute zählt schon das 10-Minuten-Minimum als voller Erfolg.`};
-  if((slept!=null&&slept<6.5)||c.sleep<=2||c.night) return {t:`Heute früher ins Bett: ${tcBed()}`,s:'Die Nacht war kurz. Nach Nächten ab 7 Stunden ist deine Erholung messbar besser. Training heute mit Reserve.'};
+  if((slept!=null&&slept<6.5)||c.sleep<=2||(tcDay().am&&tcDay().am.sleep<=4)||c.night) return {t:`Heute früher ins Bett: ${tcBed()}`,s:'Die Nacht war kurz. Nach Nächten ab 7 Stunden ist deine Erholung messbar besser. Training heute mit Reserve.'};
   if(wd===5||wd===6) return {t:'Wochenende ohne Schlaf-Kater',s:`Deine Wochenend-Nächte sind deine schwächsten. Heute höchstens 30 Minuten später ins Bett als sonst (${tcBed()}).`};
   if(h>=17&&!(x.habits||{}).plate) return {t:'Abends: erst Teller, dann Sofa',s:'Portion auf den Teller, Packung zurück in den Schrank. Wenn der Heißhunger kommt: Glas Wasser, 10 Minuten warten.'};
   if(h<11&&!(x.habits||{}).protein) return {t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier halten bis mittags satt und schützen die Muskeln beim Abnehmen.'};
@@ -925,7 +995,7 @@ function renderHeute(){
   const head=`<div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${movedN} von ${TC_GOALS.weekDays} Bewegungstagen diese Woche${dbState==='an'?(tcSaveErr?` · <b style="color:var(--crit)">nicht gespeichert (${esc(tcSaveErr)})</b>`:tcDirty.size?' · wird gespeichert …':' · gespeichert'):dbState==='lade'?'':' · nur in diesem Browser gespeichert'}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>`;
   const restart=m.gap>=7?`<div class="tc-banner s12"><b>Wiedereinstieg nach ${m.gap} Tagen.</b> Diese Woche zählt nur eins: jeden Tag etwas machen. Minimum oder Normal mit 2–3 Wiederholungen Reserve, dann steigern.</div>`:'';
   // Alles zur richtigen Zeit: morgens der Start in den Tag, tagsüber die Mini-Vorschläge, abends Reflexion und Kopf.
-  const ph=tcPhase(), all=tcUi.showAll, c=x.checkin||{}, checked=!!(c.sleep&&c.energy&&c.mood&&c.stress), trained=!!(x.training&&x.training.tier);
+  const ph=tcPhase(), all=tcUi.showAll, c=x.checkin||{}, checked=tcAmDone(x), trained=!!(x.training&&x.training.tier);
   const card={morning:tcMorningCard, check:()=>tcCheckCard(m), tip:()=>tcTipCard(m), train:()=>tcTrainCard(m), rec:tcRecRow,
     nudge:()=>tcNudgeCard(m), stretch:tcStretchCard, mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard};
   const order={
@@ -944,7 +1014,7 @@ function renderHeute(){
 function tcPhase(){
   const h=new Date().getHours(), x=tcDay(), c=x.checkin||{};
   if(h>=17) return 'abend';
-  const started=!!(c.sleep&&c.energy&&c.mood&&c.stress)&&!!(x.training&&x.training.tier);
+  const started=tcAmDone(x)&&!!(x.training&&x.training.tier);
   return started||h>=11?'tag':'morgen';
 }
 /* Abend-Reflexion: vier Fragen zum Antippen, eine Zeile optional. Ab 17 Uhr oben in „Heute“ */
@@ -953,16 +1023,11 @@ const TC_EVE={
   food:[['ok','Im Rahmen'],['viel','Zu viel'],['suess','Süßes / Snacks'],['spaet','Spät gegessen'],['packung','Aus der Packung']]};
 const tcEveDone=e=>!!(e&&e.day&&(e.drain||[]).length&&(e.food||[]).length);
 function tcEveningCard(){
-  const e=tcDay().evening||{}, tags=(k)=>TC_EVE[k].map(([id,t])=>`<button type="button" class="tg" data-tc="evt" data-k="${k}" data-v="${id}" aria-pressed="${(e[k]||[]).includes(id)}">${t}</button>`).join('');
-  if(tcEveDone(e)&&!tcUi.showEve) return `<button class="card s12 rowlink" data-tc="act" data-a="showEve"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Abend reflektiert</b><br><span class="small muted">${e.screen?'Bildschirm aus um 22 Uhr – gute Nacht.':'Danke. Jetzt Bildschirm weg und ab Richtung Bett.'}</span></span><span class="chev">›</span></button>`;
-  return `<section class="card s12 evening" id="tcEve"><h2>Dein Abend <span class="chip">1 Minute</span></h2>
-    <p class="small muted" style="margin-top:-4px">Kurz zurückschauen, nur antippen. Daraus lernt das Cockpit, was dir Kraft kostet und wann das Essen kippt.</p>
-    <div class="q"><label>Wie war dein Tag? <span>1 schwer · 5 richtig gut</span></label><div class="scale">${[1,2,3,4,5].map(i=>`<button type="button" data-tc="ev" data-k="day" data-v="${i}" aria-pressed="${e.day===i}">${i}</button>`).join('')}</div></div>
-    <div class="q"><label>Was hat Kraft gekostet?</label><div class="toggles">${tags('drain')}</div></div>
-    <div class="q"><label>Wie lief das Essen?</label><div class="toggles">${tags('food')}</div></div>
-    <div class="q"><label>Vorsatz für jetzt</label><div class="toggles"><button type="button" class="tg" data-tc="ev" data-k="screen" data-v="1" aria-pressed="${!!e.screen}">Bildschirm aus um 22 Uhr</button></div></div>
-    <div class="q"><label for="ev-good">Ein Satz, was gut lief <span>optional</span></label><textarea id="ev-good" rows="1" placeholder="z. B. Minimum trotz Stress gemacht" data-tcev="good">${esc(e.good||'')}</textarea></div>
-    ${tcEveDone(e)?`<div class="row" style="margin-top:12px"><button class="btn" data-tc="act" data-a="closeEve">Fertig</button></div>`:''}</section>`;
+  const x=tcDay(), e=x.evening||{};
+  if(ciDone(x,'pm')) return `<button class="card s12 rowlink" data-ci="pm"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Abend-Check-in erledigt</b><br><span class="small muted">${e.screen?'Bildschirm aus um 22 Uhr – gute Nacht.':'Danke. Jetzt Bildschirm weg und ab Richtung Bett.'}</span></span><span class="chev">›</span></button>`;
+  return `<section class="card s12 evening" id="tcEve"><h2>Abend-Check-in <span class="chip">5 Fragen · 1 Minute</span></h2>
+    <p class="small muted" style="margin-top:-4px">Stimmung, Stress, Fokus, Zufriedenheit und Essen, nur antippen.</p>
+    <button class="btn go ci-go" data-ci="pm">Check-in starten</button></section>`;
 }
 /* Morgen-Ablauf: vier feste Schritte nach dem Aufstehen, jeder zum Abhaken oder Hinspringen */
 function tcMorningSteps(){
@@ -970,7 +1035,7 @@ function tcMorningSteps(){
   return [
     {id:'water',t:'Ein großes Glas Wasser',s:'direkt nach dem Aufstehen, noch im Bad oder in der Küche',on:(x.water||0)>=1},
     {id:'dtype',t:'Tagestyp wählen',s:'Büro, Home Office, Wochenende oder frei – oben unter dem Datum',on:!!tcDType()},
-    {id:'check',t:'Check-in im Cockpit',s:'6 kurze Fragen, 30 Sekunden – danach steht dein Tagesmodus',on:!!(c.sleep&&c.energy&&c.mood&&c.stress)},
+    {id:'check',t:'Check-in im Cockpit',s:'4 kurze Fragen, 30 Sekunden – danach steht dein Tagesmodus',on:tcAmDone(x)},
     {id:'train',t:'Training im Keller',s:'die vorgeschlagene Stufe, danach „erledigt“ tippen',on:!!(x.training&&x.training.tier)},
     {id:'protein',t:'Eiweiß zum Frühstück',s:'Skyr, Quark oder Eier',on:!!(x.habits&&x.habits.protein)}];
 }
@@ -982,25 +1047,19 @@ function tcMorningCard(){
     <div class="habits">${st.map((s,i)=>`<button type="button" class="habit" data-tc="morning" data-v="${s.id}" aria-pressed="${s.on}"><span class="num">${s.on?'✓':i+1}</span><span class="ht">${esc(s.t)}<small>${esc(s.s)}</small></span></button>`).join('')}</div></section>`;
 }
 function tcCheckCard(m){
-  const c=tcDay().checkin||{}, done=c.sleep&&c.energy&&c.mood&&c.stress;
+  const c=tcDay().checkin||{}, done=tcAmDone();
   if(done&&!tcUi.editCheck){
     if(!m.band) return '';
     const b=TC_MODE[m.band];
     const msg={green:'Gute Voraussetzungen. Heute darfst du fordern.',yellow:'Trainieren ja, aber mit Reserve. Das Ziel ist, morgen wieder Lust zu haben.',red:'Heute schonen. Das Minimum hält die Gewohnheit am Leben, mehr braucht es nicht.'}[m.band];
-    return `<section class="card s12"><h2>Tagesmodus <button class="btn ghost tc-mini" data-tc="act" data-a="editCheck">Check-in ändern</button></h2>
+    return `<section class="card s12"><h2>Tagesmodus <button class="btn ghost tc-mini" data-ci="am">Check-in ändern</button></h2>
       <div class="mode"><div class="badge" style="background:${b.c}">${b.t}<small>${b.sub}</small></div>
       <div><h3>${msg}</h3><ul class="why">${m.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div></div></section>`;
   }
-  const g=tcGarmin();
-  return `<section class="card s12" id="tcCheck"><h2>Morgen-Check-in <span class="chip">6 Fragen · 30 Sekunden</span></h2>
-    ${g?`<p class="small muted" style="margin-top:-4px">Die Uhr sagt: Erholung ${nf(g.recovery)} % (${BAND[g.band].t}). Wie fühlst du dich selbst?</p>`:''}
-    <div class="q"><label>Wie erholt fühlst du dich? <span>1 kaputt · 5 frisch</span></label><div class="scale">${tcScale('sleep',c.sleep)}</div></div>
-    <div class="q"><label>Energie <span>1 leer · 5 voll</span></label><div class="scale">${tcScale('energy',c.energy)}</div></div>
-    <div class="q"><label>Stimmung <span>1 mies · 5 richtig gut</span></label><div class="scale">${tcScale('mood',c.mood)}</div></div>
-    <div class="q"><label>Stress <span>1 ruhig · 5 am Limit</span></label><div class="scale">${tcScale('stress',c.stress)}</div></div>
-    <div class="q"><label>Schmerz Sprunggelenk oder Rücken <span>0 keiner · 10 stark</span></label><div class="scale s6">${[0,2,4,6,8,10].map(i=>`<button type="button" data-tc="sc" data-k="pain" data-v="${i}" aria-pressed="${c.pain===i}">${i}</button>`).join('')}</div></div>
-    <div class="toggles"><button type="button" class="tg" data-tc="tg" data-k="night" aria-pressed="${!!c.night}">Nacht unterbrochen</button><button type="button" class="tg" data-tc="tg" data-k="sick" aria-pressed="${!!c.sick}">Krank / erkältet</button></div>
-    ${done?`<div class="row" style="margin-top:12px"><button class="btn" data-tc="act" data-a="closeCheck">Fertig</button></div>`:''}</section>`;
+  if(done) return '';
+  return `<section class="card s12" id="tcCheck"><h2>Morgen-Check-in <span class="chip">4 Fragen · 30 Sekunden</span></h2>
+    <p class="small muted" style="margin-top:-4px">Schlaf, Energie, Stimmung und Zeit fürs Training. Danach steht dein Tagesmodus.</p>
+    <button class="btn go ci-go" data-ci="am">Check-in starten</button></section>`;
 }
 function tcTipCard(m){ const tip=tcTodayTip(m);
   return `<section class="card s12 tc-tip"><h2>Dein Tipp für heute</h2><h3>${esc(tip.t)}</h3><p>${esc(tip.s)}</p></section>`; }
@@ -1008,6 +1067,9 @@ const k2why=(m,rec)=>(tcDType()==='buero'&&m.band==='green'?` · empfohlen: ${TI
 function tcTrainCard(m){
   const s=tcSession(m), tr=tcDay().training;
   let recTier=m.band?TC_MODE[m.band].tier:(m.gap>=7?'min':'std'); if(tcDType()==='buero'&&recTier==='full') recTier='std';   // Büro: morgens bleibt wenig Zeit
+  // verfügbare Zeit aus dem Morgen-Check-in: nie mehr empfehlen, als hineinpasst (Minimum geht immer)
+  const avail=(tcDay().am||{}).min, ord=['min','std','full']; let timeFit='';
+  if(avail!=null){ const fit=ord.filter(k=>s[k]&&s[k].min<=Math.max(avail,10)).pop()||'min'; if(ord.indexOf(fit)<ord.indexOf(recTier)){ recTier=fit; timeFit=avail?` · passt in deine ${avail>=60?'60+':avail} Minuten`:' · heute keine Zeit eingeplant: das Minimum geht auch abends'; } }
   const sel=tcTier||recTier, v=s[sel];
   const c=store.coach[TD()];
   const coachLine=c&&c.headline?`<p class="small" style="margin:4px 0 0"><span class="muted">Trainer:</span> ${esc(c.headline)}</p>`:'';
@@ -1018,7 +1080,7 @@ function tcTrainCard(m){
     <div class="row" style="margin-top:10px"><button class="btn ghost" data-tc="act" data-a="undoTrain">Rückgängig</button></div>${meth}${tcCounters()}</section>`;
   return `<section class="card s12" id="tcTrain">${head}<div class="tiers" role="group" aria-label="Umfang wählen">
     ${['min','std','full'].map(k=>s[k]?`<button type="button" class="tier ${k===recTier?'rec':''}" data-tc="tier" data-v="${k}" aria-pressed="${k===sel}"><b>${TIERN[k]}</b><span>${s[k].min} min</span></button>`:'').join('')}</div>
-    <p class="small muted" style="margin:-4px 0 6px">${TIERN[sel]} = ${TIERI[sel]}${k2why(m,recTier)}. Die Dosis pro Übung gilt pro Runde bzw. pro Satz.</p>
+    <p class="small muted" style="margin:-4px 0 6px">${TIERN[sel]} = ${TIERI[sel]}${timeFit||k2why(m,recTier)}. Die Dosis pro Übung gilt pro Runde bzw. pro Satz.</p>
     ${v?tcExList(v.blocks):''}
     <button class="btn go bigbtn" style="margin-top:14px" data-tc="done" data-v="${sel}">✓ ${TIERN[sel]} erledigt</button>
     <div class="row" style="margin-top:8px;justify-content:space-between"><span class="small muted">Wenn die Zeit knapp wird, ist das Minimum ein voller Erfolg.</span><button class="btn ghost tc-mini" data-goview="workout">Geführt mit Timer ›</button></div>${meth}${tcCounters()}</section>`;
@@ -1041,7 +1103,7 @@ function tcNudgeCard(m){
     <div style="margin-top:12px">${tcAdhocBox()}</div></section>`;
 }
 function tcMindCard(){
-  const c=tcDay().checkin||{}, hi=c.stress>=4;
+  const hi=tcStressHi();
   return `<section class="card s12 mindcard" id="tcMind"><h2>Kopf ${hi?'<span class="chip mindchip">Stress hoch – erst atmen</span>':''}</h2>
     <div class="breath"><div class="orb" id="orb">${tcBreath.on?'':'Start'}</div>
       <div class="row" style="justify-content:center"><button class="btn ghost" data-tc="act" data-a="breath">${tcBreath.on?'Stopp':'2 Minuten Box-Atmung'}</button><span class="status" id="bleft">${tcBreath.on?'':'4 s ein · 4 halten · 4 aus · 4 halten'}</span></div></div>
@@ -1079,6 +1141,7 @@ function renderUebersicht(){
     tile('Gewicht',nf(lastW,1),' kg',`${lastW<TC_GOALS.startWeight?nf(TC_GOALS.startWeight-lastW,1)+' kg seit 12.10.':'Start 128 kg'} · Ziel ${TC_GOALS.targetWeight}`,tcSpark(ws.slice(-20),{color:'var(--good)'}),'jrn')
   ].join('');
   const ins=tcInsights();
+  if(!ins.length) ins.push({tag:'Du selbst',title:'Noch keine klaren Muster',evidence:'Deine Daten zeigen bisher keinen Zusammenhang, der stark genug ist.',tip:'Weiter einchecken: mit jeder Woche werden die Muster deutlicher.'});
   const insHTML=`<section class="card s12"><h2>Was deine Daten sagen</h2><div class="insights">${ins.map(i=>`<div class="tc-ins"><span class="chip">${esc(i.tag)}</span><h3>${esc(i.title)}</h3><p class="small muted">${esc(i.evidence)}</p><p class="tc-do"><b>Für deinen Alltag:</b> ${esc(i.tip)}</p></div>`).join('')}</div>
     <p class="tiny muted" style="margin-top:10px">Zusammenhänge, keine Beweise für Ursachen. Herzfrequenzvariabilität (HFV) in Millisekunden gegenüber deinem eigenen Schnitt.</p></section>`;
   const d28=[...Array(28)].map((_,i)=>addDays(tcMonday(TD()),i-21));
@@ -1100,12 +1163,283 @@ function renderUebersicht(){
   return `<div class="grid tc">${tiles}${insHTML}${heat}${head}${sl}${reps}</div>`;
 }
 
+/* ================= Gesamtübersicht: Check-ins 1–10, Gesamtzustand, Verlauf ================= */
+/* Neue Check-ins: days/<Datum>.am {sleep,energy,mood,min,at} und .pm {mood,stress,focus,day,food,at}, Skalen 1–10.
+   Alte Einträge (checkin 1–5, evening.day 1–5, evening.food Stichworte) bleiben lesbar und werden auf 1–10 umgerechnet. */
+const CI_Q={
+  am:{title:'Morgen-Check-in',dur:'30 Sekunden',qs:[
+    {k:'sleep',q:'Wie hast du geschlafen?',l:['sehr schlecht','geht so','sehr gut']},
+    {k:'energy',q:'Wie viel Energie hast du gerade?',l:['leer','mittel','voller Energie']},
+    {k:'mood',q:'Wie ist deine Stimmung?',l:['sehr schlecht','neutral','sehr gut']},
+    {k:'min',q:'Wie viel Zeit hast du heute fürs Training?',min:[0,10,20,30,45,60]}]},
+  pm:{title:'Abend-Check-in',dur:'1 Minute',qs:[
+    {k:'mood',q:'Wie ist deine Stimmung jetzt?',l:['sehr schlecht','neutral','sehr gut']},
+    {k:'stress',q:'Wie gestresst warst du heute?',l:['ganz ruhig','spürbar','am Limit']},
+    {k:'focus',q:'Wie konzentriert warst du heute?',l:['zerstreut','mal so, mal so','voll bei der Sache']},
+    {k:'day',q:'Wie zufrieden bist du mit dem Tag?',l:['gar nicht','okay','sehr']},
+    {k:'food',q:'Wie lief das Essen, nach Gefühl?',l:['aus dem Ruder','okay','genau richtig']}]}};
+const CI_NAME={sleep:'Schlaf gefühlt',energy:'Energie',mood:'Stimmung',stress:'Stress',focus:'Fokus',day:'Zufriedenheit',food:'Essen'};
+const s10=v=>v==null?null:Math.round((1+(v-1)*9/4)*10)/10;   // alte Skala 1–5 → 1–10
+const s5=v=>Math.max(1,Math.min(5,Math.round(1+(v-1)*4/9)));  // 1–10 → 1–5 für ältere Teile (Tagesmodus, Push-Nachrichten)
+function ciGet(d,slot,k){
+  const x=store.days[d]; if(!x) return null;
+  const n=x[slot]; if(n&&n[k]!=null) return n[k];
+  const c=x.checkin||{}, e=x.evening||{};
+  if(slot==='am'&&!(x.am&&x.am.at)&&['sleep','energy','mood'].includes(k)&&c[k]!=null) return s10(c[k]);
+  if(slot==='pm'&&!(x.pm&&x.pm.at)){
+    if(k==='day'&&e.day!=null) return s10(e.day);
+    if(k==='stress'&&c.stress!=null) return s10(c.stress);
+    if(k==='food'&&(e.food||[]).length) return e.food.includes('ok')?8:e.food.length>=2?3:4;
+  }
+  return null;
+}
+const ciDone=(x,slot)=>!!(x&&x[slot]&&x[slot].at)||(slot==='am'?!!(x&&x.checkin&&x.checkin.sleep&&x.checkin.energy&&x.checkin.mood&&x.checkin.stress):tcEveDone(x&&x.evening));
+const tcAmDone=(x=tcDay())=>ciDone(x,'am');
+const tcStressHi=(x=tcDay())=>{ const c=x.checkin||{}, y=store.days[addDays(TD(),-1)]; return c.stress>=4||!!(x.pm&&x.pm.stress>=7)||!!(y&&y.pm&&y.pm.stress>=8); };
+/* fälliger Check-in nach Uhrzeit: bis 17 Uhr der Morgen (wenn offen), ab 17 Uhr der Abend */
+function ciDue(){ const h=new Date().getHours(), x=tcDay();
+  if(h>=17) return ciDone(x,'pm')?null:'pm';
+  return ciDone(x,'am')?null:'am'; }
+/* letzter Wert als kleiner Hinweis (heute früher eingetragen zählt mit) */
+function ciLast(slot,k){
+  const ds=Object.keys(store.days).filter(d=>d<=TD()).sort().reverse();
+  for(const d of ds){ const v=ciGet(d,slot,k); if(v!=null) return {v,d}; }
+  return null;
+}
+
+/* ---------- Einordnung: jede Zahl mit kurzem Wort ---------- */
+const gzMean=a=>{ const v=a.filter(y=>y!=null&&!isNaN(y)); return v.length?v.reduce((s,y)=>s+y,0)/v.length:null; };
+const gzSd=a=>{ const v=a.filter(y=>y!=null&&!isNaN(y)); if(v.length<3) return null; const m=gzMean(v); return Math.sqrt(v.reduce((s,y)=>s+(y-m)*(y-m),0)/(v.length-1)); };
+/* up=true: höher ist besser. Vergleich mit deinem eigenen Schnitt der letzten 30 Tage, sonst feste Grenzen */
+function gzRate(v,hist,up=true,abs=null){
+  if(v==null) return {t:'noch offen',tone:'mid'};
+  const h=hist.filter(y=>y!=null), m=gzMean(h), sd=gzSd(h);
+  if(h.length>=5&&sd){ const z=(v-m)/sd;
+    if(Math.abs(z)<0.5) return {t:'wie dein Schnitt',tone:'mid'};
+    const good=up?z>0:z<0;
+    return {t:(z>0?'über':'unter')+' deinem Schnitt',tone:good?'good':'bad'}; }
+  if(abs){ const [lo,hi]=abs, good=up?v>=hi:v<=lo, bad=up?v<=lo:v>=hi; return good?{t:'gut',tone:'good'}:bad?{t:up?'niedrig':'hoch',tone:'bad'}:{t:'mittel',tone:'mid'}; }
+  return {t:'',tone:'mid'};
+}
+const gzTag=r=>r&&r.t?`<span class="gz-e tone-${r.tone}">${esc(r.t)}</span>`:'';
+
+/* ---------- Garmin-Werte pro Tag, in Alltagssprache ---------- */
+const GZ_G={
+  sleep:{name:'Schlaf',unit:'h',up:true,f:x=>x.sleep&&x.sleep.asleep?x.sleep.asleep/3600:null,fmt:v=>hc(v),abs:[6,7]},
+  hrv:{name:'Erholung über Nacht',unit:'ms',up:true,f:x=>x.parts&&x.parts.hrv&&x.parts.hrv.raw!=null?x.parts.hrv.raw:null,fmt:v=>nf(v),hint:'Herzfrequenzvariabilität (HRV) der Nacht: höher heißt meist besser erholt.'},
+  stress:{name:'Stress (Uhr)',unit:'',up:false,f:x=>x.stress!=null&&x.stress>0?x.stress:null,fmt:v=>nf(v),abs:[25,40],hint:'Tagesschnitt von 0 bis 100, gemessen am Puls. Niedriger ist ruhiger.'},
+  bb:{name:'Energie-Akku',unit:'',up:true,f:x=>x.bbHigh!=null?x.bbHigh:x.bbWake!=null?x.bbWake:null,fmt:v=>nf(v),abs:[40,70],hint:'Body Battery der Uhr, Höchststand am Morgen, 0 bis 100.'},
+  train:{name:'Training',unit:'min',up:true,f:x=>(x.acts||[]).filter(t=>CAT[t.type]&&CAT[t.type]!=='erholung'&&t.type!=='walking').reduce((s,t)=>s+(t.min||0),0),fmt:v=>nf(v)}
+};
+const gzG=(k,d)=>{ const x=DATA.days[d]; if(!x) return null; const v=GZ_G[k].f(x); return v==null||isNaN(v)?null:v; };
+/* Training: Garmin-Aktivitäten plus im Cockpit abgehakte Einheiten (Minuten aus der gewählten Stufe) */
+function gzTrainMin(d){ const g=gzG('train',d)||0, x=store.days[d], tr=x&&x.training&&x.training.tier;
+  const own=tr?({min:10,std:25,full:40}[tr]||0):0; return Math.max(g,own)||((DATA.days[d]||store.days[d])?0:null); }
+
+/* ---------- Gesamtzustand: Gewichte aus gesamtzustand.txt ---------- */
+const GZ_DEF={anteil:{koerper:50,kopf:50},
+  koerper:{schlaf:35,erholung_ueber_nacht:25,stress:20,energie_akku:20},
+  kopf:{stimmung:25,energie:20,schlaf_gefuehlt:15,stress:15,fokus:10,zufriedenheit:10,essen:5},
+  ampel:{gruen_ab:65,gelb_ab:45}};
+let GZ_CFG=JSON.parse(JSON.stringify(GZ_DEF)), GZ_SRC='eingebaut', GZ_WARN=[];
+const gzNorm=s=>s.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+function gzParse(txt){
+  const cfg=JSON.parse(JSON.stringify(GZ_DEF)), warn=[]; let sec=null;
+  String(txt).split(/\r?\n/).forEach((raw,i)=>{ const l=raw.replace(/#.*/,'').trim(); if(!l) return;
+    const s=l.match(/^\[(.+)\]$/); if(s){ sec=gzNorm(s[1]); if(!cfg[sec]) warn.push(`Zeile ${i+1}: Abschnitt „${s[1]}“ kenne ich nicht`); return; }
+    const m=l.match(/^(.+?)\s*[=:]\s*(-?\d+(?:[.,]\d+)?)\s*%?$/), k=m&&gzNorm(m[1]);
+    if(m&&sec&&cfg[sec]&&k in cfg[sec]) cfg[sec][k]=Math.max(0,parseFloat(m[2].replace(',','.')));
+    else warn.push(`Zeile ${i+1} nicht verstanden: „${raw.trim()}“`); });
+  return {cfg,warn};
+}
+async function gzLoadCfg(){
+  try{ const r=await fetch('gesamtzustand.txt',{cache:'no-store'}); if(!r.ok) return; const t=await r.text(); if(!/\[/.test(t)) return;
+    const p=gzParse(t); GZ_CFG=p.cfg; GZ_WARN=p.warn; GZ_SRC='gesamtzustand.txt'; }catch(e){}
+}
+const gz01=v=>v==null?null:Math.max(0,Math.min(100,v));
+const gzCi100=v=>v==null?null:(v-1)/9*100;
+function gzHist(f,d,n=30){ return [...Array(n)].map((_,i)=>f(addDays(d,-n+i))); }   // die n Tage vor d
+/* Körper: Schlaf gegen Bedarf, HRV und Stress gegen den eigenen Schnitt, Energie-Akku direkt */
+function gzBody(d){
+  const x=DATA.days[d]; if(!x) return null;
+  const z=(k,inv)=>{ const v=gzG(k,d); if(v==null) return null; const h=gzHist(e=>gzG(k,e),d), m=gzMean(h), sd=gzSd(h); if(m==null||!sd) return null; const zz=(v-m)/sd; return gz01(50+(inv?-zz:zz)*20); };
+  const sl=x.parts&&x.parts.sleep&&x.parts.sleep.perf!=null?gz01(x.parts.sleep.perf):(gzG('sleep',d)!=null?gz01(gzG('sleep',d)/8*100):null);
+  return {schlaf:sl, erholung_ueber_nacht:x.parts&&x.parts.hrv&&x.parts.hrv.score!=null?gz01(x.parts.hrv.score):z('hrv'), stress:z('stress',true), energie_akku:gz01(gzG('bb',d))};
+}
+function gzHead(d){
+  const am=k=>ciGet(d,'am',k), pm=k=>ciGet(d,'pm',k), mood=gzMean([am('mood'),pm('mood')]);
+  return {stimmung:gzCi100(mood), energie:gzCi100(am('energy')), schlaf_gefuehlt:gzCi100(am('sleep')),
+    stress:pm('stress')==null?null:100-gzCi100(pm('stress')), fokus:gzCi100(pm('focus')), zufriedenheit:gzCi100(pm('day')), essen:gzCi100(pm('food'))};
+}
+const gzWeighted=(vals,w)=>{ let s=0,ws=0; Object.keys(w).forEach(k=>{ if(vals&&vals[k]!=null&&w[k]>0){ s+=vals[k]*w[k]; ws+=w[k]; } }); return ws?s/ws:null; };
+function gzScore(d){
+  const c=GZ_CFG, b=gzWeighted(gzBody(d),c.koerper), k=gzWeighted(gzHead(d),c.kopf);
+  const parts=[[b,c.anteil.koerper],[k,c.anteil.kopf]].filter(([v,w])=>v!=null&&w>0);
+  const t=parts.length?parts.reduce((s,[v,w])=>s+v*w,0)/parts.reduce((s,[,w])=>s+w,0):null;
+  const band=t==null?null:t>=c.ampel.gruen_ab?'green':t>=c.ampel.gelb_ab?'yellow':'red';
+  return {total:t, body:b, head:k, band};
+}
+/* Tag für die Körperwerte: heute, sonst der letzte Tag mit Uhrdaten (morgens vor dem Abgleich) */
+const gzBodyDay=()=>{ const L=DATA.lastWithData; return DATA.days[TD()]&&DATA.days[TD()].recovery!=null?TD():L; };
+const GZ_WORD={green:{t:'Gut in Form',s:'Körper und Kopf sind bereit.'},yellow:{t:'Mittel',s:'Machbar, aber mit Reserve.'},red:{t:'Schonen',s:'Heute eher ruhig angehen.'}};
+
+/* ---------- Startkachel oben in „Heute“: Gesamtzustand, 3 Werte, fälliger Check-in ---------- */
+function gzHeroCard(){
+  const bd=gzBodyDay(), sc=gzScoreToday(), w=sc.band?GZ_WORD[sc.band]:{t:'Noch offen',s:'Es fehlen Daten von Uhr und Check-in.'};
+  const hist=k=>gzHist(e=>gzG(k,e),bd);
+  const slp=gzG('sleep',bd), bb=gzG('bb',bd);
+  const moodNow=ciGet(TD(),'pm','mood')??ciGet(TD(),'am','mood');
+  const moodHist=gzHist(e=>gzMean([ciGet(e,'am','mood'),ciGet(e,'pm','mood')]),TD());
+  const totHist=gzHist(e=>gzScore(e).total,TD()).filter(v=>v!=null);
+  const due=ciDue(), q=due&&CI_Q[due];
+  const btn=due?`<button class="btn go ci-go" data-ci="${due}">${q.title} starten <small>${q.qs.length} Fragen · ${q.dur}</small></button>`
+    :new Date().getHours()<17?`<button class="btn ghost ci-go" data-ci="am"><span class="ok">✓</span> Morgen-Check-in erledigt <small>Abend-Check-in ab 17 Uhr</small></button>`
+    :`<button class="btn ghost ci-go" data-ci="pm"><span class="ok">✓</span> Beide Check-ins erledigt <small>antippen zum Ändern</small></button>`;
+  const val=(k,v,unit,r)=>`<div><div class="k">${k}</div><div class="v">${v}${unit?`<small>${unit}</small>`:''}</div>${gzTag(r)}</div>`;
+  return `<section class="card s12 gz-hero" id="gzHero" aria-label="Gesamtzustand">
+    <div class="gz-top">${gzLamp(sc.band)}
+      <div class="gz-sum"><div class="lab">Gesamtzustand</div><div class="gz-word">${w.t}${sc.total!=null?` <span class="gz-score">${nf(sc.total)}<small>/100</small></span>`:''}</div>
+      <div class="small muted">${esc(w.s)}${sc.total!=null&&totHist.length>=5?' '+esc(gzRate(sc.total,totHist,true).t.replace(/^wie/,'Wie').replace(/^(über|unter)/,m=>m[0].toUpperCase()+m.slice(1)))+'.':''}</div></div></div>
+    <div class="gz-vals">
+      ${val('Schlaf',slp==null?'–':hc(slp),slp==null?'':' h',slp==null?null:gzRate(slp,hist('sleep'),true,GZ_G.sleep.abs))}
+      ${val('Energie-Akku',bb==null?'–':nf(bb),bb==null?'':'/100',bb==null?null:gzRate(bb,hist('bb'),true,GZ_G.bb.abs))}
+      ${val('Stimmung',moodNow==null?'–':nf(moodNow),moodNow==null?'':'/10',moodNow==null?{t:'Check-in fehlt',tone:'mid'}:gzRate(moodNow,moodHist,true,[4,7]))}
+    </div>${btn}</section>`;
+}
+const gzScoreToday=()=>{ const s=gzScore(TD()); if(s.body!=null) return s;   // vor dem Abgleich: Körper vom letzten Tag mit Daten
+  const b=gzWeighted(gzBody(gzBodyDay()),GZ_CFG.koerper), k=s.head, c=GZ_CFG, parts=[[b,c.anteil.koerper],[k,c.anteil.kopf]].filter(([v,w])=>v!=null&&w>0);
+  const t=parts.length?parts.reduce((a,[v,w])=>a+v*w,0)/parts.reduce((a,[,w])=>a+w,0):null;
+  return {total:t,body:b,head:k,band:t==null?null:t>=c.ampel.gruen_ab?'green':t>=c.ampel.gelb_ab?'yellow':'red'}; };
+const gzLamp=b=>`<div class="ampel" role="img" aria-label="Ampel ${b==='green'?'grün':b==='yellow'?'gelb':b==='red'?'rot':'aus'}"><i class="r ${b==='red'?'on':''}"></i><i class="y ${b==='yellow'?'on':''}"></i><i class="g ${b==='green'?'on':''}"></i></div>`;
+
+/* ---------- Check-in: ein Bildschirm pro Frage, Antippen geht automatisch weiter ---------- */
+let ciUi=null;
+function ciOpen(slot){ ciUi={slot,i:0,vals:{},saved:false}; renderCi(); }
+function ciClose(){ ciUi=null; renderCi(); render(); }
+function renderCi(){
+  const el=$('#ci'); if(!el) return;
+  if(!ciUi){ el.classList.add('hidden'); el.innerHTML=''; document.body.classList.remove('ci-open'); return; }
+  el.classList.remove('hidden'); document.body.classList.add('ci-open');
+  const Q=CI_Q[ciUi.slot], n=Q.qs.length;
+  const prog=`<div class="ci-prog" aria-label="Frage ${Math.min(ciUi.i+1,n)} von ${n}">${Q.qs.map((_,j)=>`<i class="${j<ciUi.i||ciUi.saved?'on':j===ciUi.i?'cur':''}"></i>`).join('')}</div>`;
+  const bar=`<div class="ci-bar"><button type="button" class="ci-x" data-cia="${ciUi.saved||!ciUi.i?'close':'back'}" aria-label="${ciUi.saved||!ciUi.i?'Schließen':'Zurück'}">${ciUi.saved||!ciUi.i?'✕':'‹'}</button>${prog}<span class="ci-t">${Q.title}</span></div>`;
+  if(ciUi.saved){ el.innerHTML=bar+ciDoneScreen(); }
+  else {
+    const q=Q.qs[ciUi.i], last=ciLast(ciUi.slot,q.k);
+    const lastTxt=last?`Zuletzt: ${q.min?(last.v>=60?'60+':last.v)+' Minuten':last.v} <span>(${last.d===TD()?'heute':dshort(last.d)})</span>`:'Noch kein früherer Wert';
+    const grid=q.min?`<div class="ci-grid min" role="group" aria-label="${esc(q.q)}">${q.min.map(v=>`<button type="button" data-civ="${v}">${v===0?'Heute keine':v===60?'60+':v}<small>${v===0?'nur Alltag':'Minuten'}</small></button>`).join('')}</div>`
+      :`<div class="ci-grid" role="group" aria-label="${esc(q.q)}">${[...Array(10)].map((_,j)=>`<button type="button" data-civ="${j+1}">${j+1}</button>`).join('')}</div>
+        <div class="ci-lab"><span><b>1</b> ${esc(q.l[0])}</span><span><b>5</b> ${esc(q.l[1])}</span><span><b>10</b> ${esc(q.l[2])}</span></div>`;
+    el.innerHTML=bar+`<div class="ci-body"><p class="ci-n">Frage ${ciUi.i+1} von ${n}</p><h2 class="ci-q" id="ciQ">${esc(q.q)}</h2>${grid}<p class="ci-last">${lastTxt}</p></div>`;
+  }
+  el.querySelectorAll('[data-civ]').forEach(b=>b.addEventListener('click',ciPick));
+  el.querySelectorAll('[data-cia]').forEach(b=>b.addEventListener('click',ciAct));
+  el.querySelectorAll('[data-tc]').forEach(b=>b.addEventListener('click',e=>{ tcClick(e); renderCi(); }));
+}
+function ciPick(e){
+  const b=e.currentTarget, Q=CI_Q[ciUi.slot], q=Q.qs[ciUi.i]; if(ciUi.lock) return;
+  ciUi.vals[q.k]=+b.dataset.civ; b.classList.add('sel'); ciUi.lock=true;
+  setTimeout(()=>{ if(!ciUi) return; ciUi.lock=false; ciUi.i++;
+    if(ciUi.i>=Q.qs.length) ciSave(); renderCi(); }, 160);
+}
+function ciSave(){
+  const slot=ciUi.slot, vals=Object.assign({},ciUi.vals,{at:new Date().toISOString()});
+  tcPatch(x=>{ x[slot]=vals;
+    if(slot==='am'){ x.checkin=Object.assign({},x.checkin); ['sleep','energy','mood'].forEach(k=>x.checkin[k]=s5(vals[k])); }   // ältere Teile lesen 1–5
+  });
+  ciUi.saved=true;
+}
+function ciAct(e){ const a=e.currentTarget.dataset.cia;
+  if(a==='close') ciClose();
+  else if(a==='back'){ ciUi.i=Math.max(0,ciUi.i-1); renderCi(); } }
+function ciDoneScreen(){
+  const slot=ciUi.slot, x=tcDay(), v=x[slot]||{}, Q=CI_Q[slot];
+  const rows=Q.qs.map(q=>{ const val=v[q.k]; if(q.min) return `<div><span>Zeit fürs Training</span><b>${val===0?'heute keine':(val>=60?'60+':val)+' min'}</b></div>`;
+    const hist=gzHist(d=>ciGet(d,slot,q.k),TD()), r=gzRate(val,hist,q.k!=='stress',q.k==='stress'?[3,7]:[4,7]);
+    return `<div><span>${CI_NAME[slot==='am'&&q.k==='sleep'?'sleep':q.k]}</span><b>${val}</b>${gzTag(r)}</div>`; }).join('');
+  const c=x.checkin||{}, e=x.evening||{};
+  const extra=slot==='am'
+    ?`<div class="toggles"><button type="button" class="tg" data-tc="tg" data-k="night" aria-pressed="${!!c.night}">Nacht unterbrochen</button><button type="button" class="tg" data-tc="ci-pain" aria-pressed="${c.pain>=4}">Schmerzen</button><button type="button" class="tg" data-tc="tg" data-k="sick" aria-pressed="${!!c.sick}">Krank</button></div>`
+    :`<div class="toggles">${TC_EVE.drain.map(([id,t])=>`<button type="button" class="tg" data-tc="evt" data-k="drain" data-v="${id}" aria-pressed="${(e.drain||[]).includes(id)}">${t}</button>`).join('')}</div>
+      <div class="toggles" style="margin-top:8px"><button type="button" class="tg" data-tc="ev" data-k="screen" data-v="1" aria-pressed="${!!e.screen}">Bildschirm aus um 22 Uhr</button></div>`;
+  return `<div class="ci-body done"><div class="ci-ok" role="status"><span>✓</span>Gespeichert</div>
+    <div class="ci-sum">${rows}</div>
+    <details class="ci-more"><summary>${slot==='am'?'Noch etwas? Schmerzen, Nacht, krank':'Noch etwas? Was hat Kraft gekostet'}</summary>${extra}</details>
+    <button type="button" class="btn go ci-go" data-cia="close">Fertig</button></div>`;
+}
+
+/* ---------- Übersicht: Garmin und Check-ins gemeinsam, 7 oder 30 Tage ---------- */
+let gzPer=7; try{ gzPer=+localStorage.getItem('cockpit.gzPer')||7; }catch(e){}
+function gzChart({ds,series,ymin=null,ymax=null,fmt=v=>nf(v),bars=false,ref=null,h=150}){
+  const w=340,L=34,R=8,T=10,B=22, iw=w-L-R, ih=h-T-B, n=ds.length;
+  const all=series.flatMap(s=>ds.map(s.f)).filter(v=>v!=null);
+  if(!all.length) return '<p class="small muted">Noch keine Werte in diesem Zeitraum.</p>';
+  let lo=ymin??Math.min(...all), hi=ymax??Math.max(...all); if(hi===lo){hi+=1;lo-=1;} if(ymin==null) lo-=(hi-lo)*.08; if(ymax==null) hi+=(hi-lo)*.08;
+  const X=i=>L+(n<=1?iw/2:(bars?(i+.5)/n*iw:i/(n-1)*iw)), Y=v=>T+ih-(v-lo)/(hi-lo)*ih;
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" class="gz-svg" role="img" aria-label="${esc(series.map(x=>x.label).join(', '))}">`;
+  [lo,(lo+hi)/2,hi].forEach(v=>{ s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--line)"/><text x="${L-5}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`; });
+  if(ref!=null) s+=`<line x1="${L}" x2="${w-R}" y1="${Y(ref).toFixed(1)}" y2="${Y(ref).toFixed(1)}" stroke="var(--band-line)" stroke-dasharray="4 4"/>`;
+  const step=n>14?7:n>7?2:1;
+  ds.forEach((d,i)=>{ if((n-1-i)%step===0) s+=`<text x="${X(i).toFixed(1)}" y="${h-6}" text-anchor="middle">${n>7?dmini(d):WD[dt(d).getDay()]}</text>`; });
+  series.forEach(se=>{
+    if(bars){ const bw=Math.max(3,iw/n*.6); ds.forEach((d,i)=>{ const v=se.f(d); if(!v) return; s+=`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${(Y(lo)-Y(v)).toFixed(1)}" rx="2" fill="${se.c}"/>`; }); return; }
+    let p='', dots=''; ds.forEach((d,i)=>{ const v=se.f(d); if(v==null) return; p+=(p?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1); if(n<=7||i===n-1) dots+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3" fill="${se.c}"/>`; });
+    s+=`<path d="${p}" fill="none" stroke="${se.c}" stroke-width="2.2" stroke-linejoin="round" ${se.dash?'stroke-dasharray="5 4"':''}/>${dots}`; });
+  return s+'</svg>'+(series.length>1?`<div class="legend">${series.map(se=>`<span><i class="sw" style="background:${se.c}"></i>${esc(se.label)}</span>`).join('')}</div>`:'');
+}
+function gzCard({title,now,unit='',rate,avgTxt,chart,hint,id}){
+  return `<section class="card s6 gz-card" ${id?`id="${id}"`:''}><h2>${esc(title)}</h2>
+    <div class="gz-now"><span class="v">${now}<small>${unit}</small></span>${gzTag(rate)}<span class="small muted">${avgTxt||''}</span></div>${chart}${hint?`<p class="tiny muted">${esc(hint)}</p>`:''}</section>`;
+}
+function renderGesamt(){
+  const N=gzPer, ds=tcLastN(N), bd=gzBodyDay(), gds=tcLastN(N,bd), last=(f,list)=>{ for(let i=list.length-1;i>=0;i--){ const v=f(list[i]); if(v!=null) return {v,d:list[i]}; } return null; };
+  const per=`<div class="seg" role="group" aria-label="Zeitraum">${[7,30].map(p=>`<button type="button" data-gzper="${p}" aria-pressed="${N===p}">${p} Tage</button>`).join('')}</div>`;
+  const avgT=(f,list,fmt)=>{ const m=gzMean(list.map(f)); return m==null?'':`Schnitt ${N} Tage: ${fmt(m)}`; };
+  const sc=gzScoreToday();
+  const cards=[];
+  cards.push(gzCard({title:'Gesamtzustand',id:'gzTotal',now:sc.total==null?'–':nf(sc.total),unit:'/100',rate:sc.band?{t:GZ_WORD[sc.band].t,tone:sc.band==='green'?'good':sc.band==='red'?'bad':'mid'}:null,
+    avgTxt:`Körper ${sc.body==null?'–':nf(sc.body)} · Kopf ${sc.head==null?'–':nf(sc.head)}`,
+    chart:gzChart({ds,ymin:0,ymax:100,series:[{label:'Körper',c:'var(--accent)',f:d=>gzScore(d).body},{label:'Kopf',c:'var(--mind)',f:d=>gzScore(d).head},{label:'Gesamt',c:'var(--ink-2)',dash:1,f:d=>gzScore(d).total}]}),
+    hint:`Ampel: grün ab ${GZ_CFG.ampel.gruen_ab}, gelb ab ${GZ_CFG.ampel.gelb_ab}. Gewichte aus ${GZ_SRC}.`}));
+  const gcard=(k,color,extra={})=>{ const G=GZ_G[k], l=last(d=>gzG(k,d),gds), hist=gzHist(d=>gzG(k,d),l?l.d:bd);
+    return gzCard(Object.assign({title:G.name,now:l?G.fmt(l.v):'–',unit:l&&G.unit?' '+G.unit:'',rate:l?gzRate(l.v,hist,G.up,G.abs):null,avgTxt:avgT(d=>gzG(k,d),gds,G.fmt),
+      chart:gzChart({ds:gds,fmt:G.fmt,series:[{label:G.name,c:color,f:d=>gzG(k,d)}]}),hint:G.hint},extra)); };
+  cards.push(gcard('sleep','var(--s-rem)',{hint:'Stunden echter Schlaf laut Uhr.'}));
+  cards.push(gcard('hrv','var(--accent)'));
+  cards.push(gcard('stress','var(--warn)'));
+  cards.push(gcard('bb','var(--good)'));
+  const tl=gzTrainMin(bd), tsum=gds.reduce((a,d)=>a+(gzTrainMin(d)||0),0), tdays=gds.filter(d=>(gzTrainMin(d)||0)>=10).length;
+  cards.push(gzCard({title:'Training',now:nf(tsum),unit:' min',rate:gzRate(tdays/N*7,[],true,[1.5,3.5]),avgTxt:`${tdays} von ${N} Tagen mit Training`,
+    chart:gzChart({ds:gds,bars:true,ymin:0,series:[{label:'Minuten',c:'var(--c-kraft)',f:d=>gzTrainMin(d)}]}),hint:'Minuten pro Tag: Uhr-Aktivitäten und abgehakte Einheiten.'}));
+  // Morgen- gegen Abendstimmung
+  const mAm=d=>ciGet(d,'am','mood'), mPm=d=>ciGet(d,'pm','mood'), both=ds.filter(d=>mAm(d)!=null&&mPm(d)!=null);
+  const diff=both.length?gzMean(both.map(d=>mPm(d)-mAm(d))):null;
+  cards.push(gzCard({title:'Stimmung: morgens und abends',id:'gzMood',now:diff==null?'–':sign(diff,1),unit:diff==null?'':' abends',
+    rate:diff==null?{t:'braucht Morgen und Abend am selben Tag',tone:'mid'}:Math.abs(diff)<0.5?{t:'kaum Unterschied',tone:'mid'}:diff>0?{t:'abends besser',tone:'good'}:{t:'abends schlechter',tone:'bad'},
+    avgTxt:`morgens Ø ${nf(gzMean(ds.map(mAm)),1)} · abends Ø ${nf(gzMean(ds.map(mPm)),1)} (${both.length} Tage mit beidem)`,
+    chart:gzChart({ds,ymin:1,ymax:10,series:[{label:'Morgens',c:'var(--warn)',f:mAm},{label:'Abends',c:'var(--mind)',f:mPm}]})}));
+  // Check-in-Werte als kleine Reihe
+  const ciRows=[['am','energy','Energie','var(--accent)'],['am','sleep','Schlaf gefühlt','var(--s-rem)'],['pm','stress','Stress','var(--warn)'],['pm','focus','Fokus','var(--c-kraft)'],['pm','day','Zufriedenheit','var(--good)'],['pm','food','Essen','var(--c-intervall)']];
+  const nCi=ds.filter(d=>ciGet(d,'am','energy')!=null||ciGet(d,'pm','mood')!=null).length;
+  const ciCard=`<section class="card s12 gz-card" id="gzCi"><h2>Deine Check-ins · ${nCi} von ${N} Tagen</h2><div class="gz-mini">${ciRows.map(([s,k,l,c])=>{ const lv=last(d=>ciGet(d,s,k),ds), up=k!=='stress', hist=gzHist(d=>ciGet(d,s,k),lv?lv.d:TD());
+      return `<div><div class="gz-mh"><span>${l}</span><b>${lv?nf(lv.v):'–'}</b>${lv?gzTag(gzRate(lv.v,hist,up,up?[4,7]:[3,7])):''}</div>${gzChart({ds,ymin:1,ymax:10,h:96,series:[{label:l,c,f:d=>ciGet(d,s,k)}]})}</div>`; }).join('')}</div>
+    <p class="tiny muted">Skala 1 bis 10. ${'Stress: niedriger ist besser.'} Ältere Einträge mit 1 bis 5 sind umgerechnet.</p></section>`;
+  const how=`<details class="card s12 gz-how"><summary>So rechnet die Ampel</summary><div class="small" style="margin-top:8px">
+    <p>Körper (${GZ_CFG.anteil.koerper} %): ${Object.entries(GZ_CFG.koerper).map(([k,v])=>`${k.replace(/_/g,' ').replace('ue','ü')} ${v}`).join(', ')}.</p>
+    <p>Kopf (${GZ_CFG.anteil.kopf} %): ${Object.entries(GZ_CFG.kopf).map(([k,v])=>`${k.replace(/_/g,' ').replace('ue','ü')} ${v}`).join(', ')}.</p>
+    <p>Jeder Wert wird auf 0 bis 100 gebracht: Schlaf gegen deinen Schlafbedarf, Erholung über Nacht und Stress gegen deinen eigenen Schnitt der letzten 30 Tage, Check-ins von 1–10 auf 0–100. Fehlt ein Wert, zählen die anderen anteilig mehr.</p>
+    <p>Ändern: Datei <b>gesamtzustand.txt</b>, Zahlen hinter dem Gleichheitszeichen anpassen. Quelle gerade: ${esc(GZ_SRC)}.</p>
+    ${GZ_WARN.length?`<p style="color:var(--crit)">${GZ_WARN.map(esc).join('<br>')}</p>`:''}</div></details>`;
+  return `<div class="s12 gz-ovh"><h2 class="gz-title">Körper und Kopf</h2>${per}</div>${cards.join('')}${ciCard}${how}`;
+}
+
 /* ---------- Bedienung ---------- */
 // direkt an jedem Knopf statt über document: in der eingebetteten Ansicht der iPhone-App kommen Tipps sonst nicht immer an
 function tcClick(e){
   const b=e.currentTarget;
   const k=b.dataset.k, v=b.dataset.v, a=b.dataset.tc;
   if(a==='sc'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=x.checkin[k]===+v&&k==='pain'?null:+v; }); }
+  else if(a==='ci-pain'){ tcPatch(x=>{ x.checkin=Object.assign({},x.checkin); x.checkin.pain=x.checkin.pain>=4?null:5; }); }
   else if(a==='tg'){ tcUi.editCheck=true; tcPatch(x=>{ x.checkin=x.checkin||{}; x.checkin[k]=!x.checkin[k]; }); }
   else if(a==='tier'){ tcTier=v; render(); }
   else if(a==='done'){ tcPatch(x=>{ x.training={tier:v,session:tcSession(tcMode()).title,at:new Date().toISOString()}; x.habits=x.habits||{}; x.habits.move=true; }); }
@@ -1135,7 +1469,7 @@ function tcClick(e){
   else if(a==='morning'){ const go=id=>setTimeout(()=>{ const el=document.getElementById(id); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'start'}); el.classList.add('tc-flash'); setTimeout(()=>el.classList.remove('tc-flash'),1600); },30);   // Rahmen leuchtet kurz auf, falls die App nicht scrollt
     if(v==='water') tcPatch(x=>{ x.water=(x.water||0)>=1?(x.water||0)-1:1; });
     else if(v==='protein') tcPatch(x=>{ x.habits=x.habits||{}; x.habits.protein=!x.habits.protein; });
-    else if(v==='check'){ tcUi.editCheck=true; render(); go('tcCheck'); }
+    else if(v==='check') ciOpen('am');
     else if(v==='train') go('tcTrain');
     else if(v==='dtype') go('tcDType'); }
   else if(a==='act'){ const w=b.dataset.a;
@@ -2374,14 +2708,18 @@ function render(){
     if(!slot.time && !slot.min){ st.textContent='Bitte Uhrzeit oder Dauer angeben.'; return; }
     try{ const j=Object.assign({date:DATA.today},store.journal[DATA.today]||{},{slot,updatedAt:new Date().toISOString()}); await db.doc('journal/'+DATA.today).set(j); }catch(e){}
     slotDraft=null; await coachNow(sg, st, slot); };
-  v.querySelectorAll('[data-tc]').forEach(b=>b.addEventListener('click',tcClick)); v.querySelectorAll('[data-tcev]').forEach(t=>t.addEventListener('input',tcInput));
+  v.querySelectorAll('[data-tc]').forEach(b=>b.addEventListener('click',tcClick));
+  v.querySelectorAll('[data-ci]').forEach(b=>b.addEventListener('click',()=>ciOpen(b.dataset.ci)));
+  v.querySelectorAll('[data-gzper]').forEach(b=>b.addEventListener('click',()=>{ gzPer=+b.dataset.gzper; try{localStorage.setItem('cockpit.gzPer',gzPer);}catch(e){} render(); })); v.querySelectorAll('[data-tcev]').forEach(t=>t.addEventListener('input',tcInput));
   bindJournal(v); if(view==='coach') bindCoach(v); if(view==='workout') bindWorkout(v); if(view==='food') bindFood(v); if(view==='trd') bindTrd(v); tipBind(v);
   if (active){ const el=document.getElementById(active); if(el && el.focus) el.focus(); }
 }
 function saveView(){ try{ localStorage.setItem('cockpit.view',view); }catch(e){} }
 async function boot(){
   if (EMBED) DATA = EMBED;
-  else { try { const r = await fetch('dashboard-data.json', {cache:'no-store'}); DATA = await r.json(); } catch(e){ $('#view').innerHTML='<div class="card"><p>Die Daten (dashboard-data.json) konnten nicht geladen werden.</p></div>'; return; } }
+  const cfgP = gzLoadCfg();
+  if (!EMBED) { try { const r = await fetch('dashboard-data.json', {cache:'no-store'}); DATA = await r.json(); } catch(e){ $('#view').innerHTML='<div class="card"><p>Die Daten (dashboard-data.json) konnten nicht geladen werden.</p></div>'; return; } }
+  await cfgP;
   days = Object.keys(DATA.days).sort();
   cur = DATA.lastWithData || days[days.length-1];
   parseHash();
@@ -2394,7 +2732,7 @@ async function boot(){
   document.querySelectorAll('#bnav button').forEach(b=>b.onclick=()=>{ if (b.dataset.t==='more') sheet.classList.toggle('hidden'); else go(b.dataset.t); });
   sheet.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>go(b.dataset.mv));
   sheet.querySelector('[data-close]').onclick=()=>sheet.classList.add('hidden');
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') sheet.classList.add('hidden'); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ sheet.classList.add('hidden'); if(ciUi) ciClose(); } });
   document.addEventListener('keydown',e=>{ if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return; if(!DAYVIEWS.includes(view)) return; if(e.key==='ArrowLeft') $('#prev').click(); if(e.key==='ArrowRight') $('#next').click(); });
   $('#foot').innerHTML = '';
   render();
