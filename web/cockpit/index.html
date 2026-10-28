@@ -1160,7 +1160,7 @@ function renderUebersicht(){
     <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Liegestütze (Ziel diese Woche ${tcWeekGoal('push')}, Fernziel ${TC_GOALS.weekPush})</span><span><i class="sw" style="background:var(--good)"></i>Kniebeugen (Ziel diese Woche ${tcWeekGoal('squat')}, Fernziel ${TC_GOALS.weekSquat})</span></div></section>`;
   const sl=`<section class="card s6"><h2>Schlaf · 14 Nächte</h2>${lineChart({pts:d14.map(d=>({x:d,y:slp(d)})),label:'Schlaf',yfmt:v=>hc(v),avg:false,h:170,color:'var(--s-rem)',refLine:n7||8,ymin:Math.min(4,...d14.map(slp).filter(v=>v!=null)),ymax:Math.max((n7||8)+0.5,...d14.map(slp).filter(v=>v!=null))})}
     <p class="small muted">Gestrichelt: dein Schlafbedarf. ${DATA.plan&&DATA.plan.bedSD!=null?`Einschlafzeit schwankt um ± ${nf(DATA.plan.bedSD)} min${DATA.plan.bedSD>45?' – gleichmäßiger wäre besser.':'.'}`:''}</p></section>`;
-  return `<div class="grid tc">${tiles}${insHTML}${heat}${head}${sl}${reps}</div>`;
+  return `<div class="grid tc">${renderGesamt()}<div class="s12 gz-ovh"><h2 class="gz-title">Woche und Gewohnheiten</h2></div>${tiles}${insHTML}${heat}${sl}${reps}</div>`;
 }
 
 /* ================= Gesamtübersicht: Check-ins 1–10, Gesamtzustand, Verlauf ================= */
