@@ -1,7 +1,4 @@
 <title>Trainingscockpit</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: Instrumententafel – Kopf mit Datum, Reiterleiste, darunter Karten im 12er-Raster; Zahlen in schmaler Sportschrift */
 :root{
@@ -13,8 +10,8 @@
   --accent-ink:#ffffff; --good-soft:rgba(12,163,12,.13); --warn-soft:rgba(232,161,0,.15); --mind:#6b5fb5; --mind-soft:rgba(107,95,181,.12);
   --s-deep:#2a78d6; --s-light:#eb6834; --s-rem:#1baf7a; --s-awake:#eda100;
   --c-kraft:#2a78d6; --c-intervall:#eb6834; --c-ausdauer:#1baf7a; --c-erholung:#eda100; --c-sonstige:#a3a9b0;
-  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
-  --f-body:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --f-display:"Avenir Next Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
   --r:12px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -454,6 +451,8 @@ body.ci-open{overflow:hidden}
 
 <script>
 const EMBED = /*__DATA__*/null;
+// Morgens (4 bis 9 Uhr) dunkel, sonst wie das iPhone eingestellt ist
+(()=>{ const h=new Date().getHours(); if(h>=4&&h<9) document.documentElement.dataset.theme='dark'; })();
 let DATA, days, cur, view = 'heute';
 try { const h = location.hash.slice(1); if (h) view = h; else { const v = localStorage.getItem('cockpit.view'); if (v) view = v; } } catch(e){}
 
