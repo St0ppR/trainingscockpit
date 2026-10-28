@@ -247,8 +247,8 @@ footer{margin-top:24px;color:var(--ink-3);font-size:12px}
 .tc .scale button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:9px;padding:8px 0;font:600 17px var(--f-display);cursor:pointer;min-width:0}
 .tc .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .tc .toggles{display:flex;flex-wrap:wrap;gap:6px}
-.tc .tg{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:500 13.5px var(--f-body);cursor:pointer}
-.tc .tg[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.tc .tg,.ci .tg{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:500 13.5px var(--f-body);cursor:pointer}
+.tc .tg[aria-pressed="true"],.ci .tg[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
 .tc-tip{border-left:4px solid var(--accent)}
 .tc-tip p{margin:0;color:var(--ink-2)}
 .tc .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}
@@ -396,10 +396,13 @@ body.ci-open{overflow:hidden}
 .ci-ok span{width:48px;height:48px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font-size:26px}
 .ci-sum{display:grid;gap:6px}
 .ci-sum>div{display:flex;align-items:baseline;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
-.ci-sum span{flex:1;color:var(--ink-2);font-size:14px} .ci-sum b{font:700 20px var(--f-display)} .ci-sum .gz-e{display:inline;min-width:0;text-align:right}
-.ci-more summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:14px;min-height:44px;display:flex;align-items:center}
+.ci-sum>div>span:first-child{flex:1;color:var(--ink-2);font-size:14px} .ci-sum b{font:700 20px var(--f-display);min-width:2ch;text-align:right} .ci-sum .gz-e{display:inline;min-width:9.5em;text-align:right}
+.ci-more summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:14px;min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
+.ci-more summary::-webkit-details-marker{display:none}
+.ci-more summary::before,.gz-how summary::before{content:'+';display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);font-weight:700;flex:none}
+.ci-more[open] summary::before,.gz-how[open] summary::before{content:'−'}
 .ci .toggles{display:flex;flex-wrap:wrap;gap:8px}
-.ci .tg{min-height:44px}
+.ci .tg{min-height:44px;padding:8px 14px;font-size:14.5px}
 .gz-ovh{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:4px}
 .gz-title{font:700 22px var(--f-display);margin:0}
 .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px}
@@ -413,7 +416,8 @@ body.ci-open{overflow:hidden}
 .gz-svg text{font-size:11px}
 .gz-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:12px}
 .gz-mh{display:flex;align-items:baseline;gap:8px} .gz-mh span{flex:1;font-weight:600;font-size:14px} .gz-mh b{font:700 20px var(--f-display)} .gz-mh .gz-e{display:inline}
-.gz-how summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.gz-how summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
+.gz-how summary::-webkit-details-marker{display:none}
 </style>
 
 <div class="wrap">
@@ -1024,9 +1028,7 @@ const tcEveDone=e=>!!(e&&e.day&&(e.drain||[]).length&&(e.food||[]).length);
 function tcEveningCard(){
   const x=tcDay(), e=x.evening||{};
   if(ciDone(x,'pm')) return `<button class="card s12 rowlink" data-ci="pm"><span class="ck" style="color:var(--good);font-weight:700">✓</span><span style="flex:1"><b>Abend-Check-in erledigt</b><br><span class="small muted">${e.screen?'Bildschirm aus um 22 Uhr – gute Nacht.':'Danke. Jetzt Bildschirm weg und ab Richtung Bett.'}</span></span><span class="chev">›</span></button>`;
-  return `<section class="card s12 evening" id="tcEve"><h2>Abend-Check-in <span class="chip">5 Fragen · 1 Minute</span></h2>
-    <p class="small muted" style="margin-top:-4px">Stimmung, Stress, Fokus, Zufriedenheit und Essen, nur antippen.</p>
-    <button class="btn go ci-go" data-ci="pm">Check-in starten</button></section>`;
+  return '';   // offen: der Knopf steht oben in der Startkachel
 }
 /* Morgen-Ablauf: vier feste Schritte nach dem Aufstehen, jeder zum Abhaken oder Hinspringen */
 function tcMorningSteps(){
@@ -1055,10 +1057,7 @@ function tcCheckCard(m){
       <div class="mode"><div class="badge" style="background:${b.c}">${b.t}<small>${b.sub}</small></div>
       <div><h3>${msg}</h3><ul class="why">${m.why.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div></div></section>`;
   }
-  if(done) return '';
-  return `<section class="card s12" id="tcCheck"><h2>Morgen-Check-in <span class="chip">4 Fragen · 30 Sekunden</span></h2>
-    <p class="small muted" style="margin-top:-4px">Schlaf, Energie, Stimmung und Zeit fürs Training. Danach steht dein Tagesmodus.</p>
-    <button class="btn go ci-go" data-ci="am">Check-in starten</button></section>`;
+  return '';   // offen: der Knopf steht oben in der Startkachel
 }
 function tcTipCard(m){ const tip=tcTodayTip(m);
   return `<section class="card s12 tc-tip"><h2>Dein Tipp für heute</h2><h3>${esc(tip.t)}</h3><p>${esc(tip.s)}</p></section>`; }
@@ -1326,7 +1325,7 @@ function renderCi(){
   else {
     const q=Q.qs[ciUi.i], last=ciLast(ciUi.slot,q.k);
     const lastTxt=last?`Zuletzt: ${q.min?(last.v>=60?'60+':last.v)+' Minuten':last.v} <span>(${last.d===TD()?'heute':dshort(last.d)})</span>`:'Noch kein früherer Wert';
-    const grid=q.min?`<div class="ci-grid min" role="group" aria-label="${esc(q.q)}">${q.min.map(v=>`<button type="button" data-civ="${v}">${v===0?'Heute keine':v===60?'60+':v}<small>${v===0?'nur Alltag':'Minuten'}</small></button>`).join('')}</div>`
+    const grid=q.min?`<div class="ci-grid min" role="group" aria-label="${esc(q.q)}">${q.min.map(v=>`<button type="button" data-civ="${v}">${v===60?'60+':v}<small>${v===0?'heute keine':'Minuten'}</small></button>`).join('')}</div>`
       :`<div class="ci-grid" role="group" aria-label="${esc(q.q)}">${[...Array(10)].map((_,j)=>`<button type="button" data-civ="${j+1}">${j+1}</button>`).join('')}</div>
         <div class="ci-lab"><span><b>1</b> ${esc(q.l[0])}</span><span><b>5</b> ${esc(q.l[1])}</span><span><b>10</b> ${esc(q.l[2])}</span></div>`;
     el.innerHTML=bar+`<div class="ci-body"><p class="ci-n">Frage ${ciUi.i+1} von ${n}</p><h2 class="ci-q" id="ciQ">${esc(q.q)}</h2>${grid}<p class="ci-last">${lastTxt}</p></div>`;
@@ -1369,14 +1368,14 @@ function ciDoneScreen(){
 
 /* ---------- Übersicht: Garmin und Check-ins gemeinsam, 7 oder 30 Tage ---------- */
 let gzPer=7; try{ gzPer=+localStorage.getItem('cockpit.gzPer')||7; }catch(e){}
-function gzChart({ds,series,ymin=null,ymax=null,fmt=v=>nf(v),bars=false,ref=null,h=150}){
+function gzChart({ds,series,ymin=null,ymax=null,fmt=v=>nf(v),bars=false,ref=null,h=150,ticks=null}){
   const w=340,L=34,R=8,T=10,B=22, iw=w-L-R, ih=h-T-B, n=ds.length;
   const all=series.flatMap(s=>ds.map(s.f)).filter(v=>v!=null);
   if(!all.length) return '<p class="small muted">Noch keine Werte in diesem Zeitraum.</p>';
   let lo=ymin??Math.min(...all), hi=ymax??Math.max(...all); if(hi===lo){hi+=1;lo-=1;} if(ymin==null) lo-=(hi-lo)*.08; if(ymax==null) hi+=(hi-lo)*.08;
   const X=i=>L+(n<=1?iw/2:(bars?(i+.5)/n*iw:i/(n-1)*iw)), Y=v=>T+ih-(v-lo)/(hi-lo)*ih;
   let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" class="gz-svg" role="img" aria-label="${esc(series.map(x=>x.label).join(', '))}">`;
-  [lo,(lo+hi)/2,hi].forEach(v=>{ s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--line)"/><text x="${L-5}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`; });
+  (ticks||[lo,(lo+hi)/2,hi]).forEach(v=>{ s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--line)"/><text x="${L-5}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`; });
   if(ref!=null) s+=`<line x1="${L}" x2="${w-R}" y1="${Y(ref).toFixed(1)}" y2="${Y(ref).toFixed(1)}" stroke="var(--band-line)" stroke-dasharray="4 4"/>`;
   const step=n>14?7:n>7?2:1;
   ds.forEach((d,i)=>{ if((n-1-i)%step===0) s+=`<text x="${X(i).toFixed(1)}" y="${h-6}" text-anchor="middle">${n>7?dmini(d):WD[dt(d).getDay()]}</text>`; });
@@ -1416,12 +1415,12 @@ function renderGesamt(){
   cards.push(gzCard({title:'Stimmung: morgens und abends',id:'gzMood',now:diff==null?'–':sign(diff,1),unit:diff==null?'':' abends',
     rate:diff==null?{t:'braucht Morgen und Abend am selben Tag',tone:'mid'}:Math.abs(diff)<0.5?{t:'kaum Unterschied',tone:'mid'}:diff>0?{t:'abends besser',tone:'good'}:{t:'abends schlechter',tone:'bad'},
     avgTxt:`morgens Ø ${nf(gzMean(ds.map(mAm)),1)} · abends Ø ${nf(gzMean(ds.map(mPm)),1)} (${both.length} Tage mit beidem)`,
-    chart:gzChart({ds,ymin:1,ymax:10,series:[{label:'Morgens',c:'var(--warn)',f:mAm},{label:'Abends',c:'var(--mind)',f:mPm}]})}));
+    chart:gzChart({ds,ymin:1,ymax:10,ticks:[1,5,10],series:[{label:'Morgens',c:'var(--warn)',f:mAm},{label:'Abends',c:'var(--mind)',f:mPm}]})}));
   // Check-in-Werte als kleine Reihe
   const ciRows=[['am','energy','Energie','var(--accent)'],['am','sleep','Schlaf gefühlt','var(--s-rem)'],['pm','stress','Stress','var(--warn)'],['pm','focus','Fokus','var(--c-kraft)'],['pm','day','Zufriedenheit','var(--good)'],['pm','food','Essen','var(--c-intervall)']];
   const nCi=ds.filter(d=>ciGet(d,'am','energy')!=null||ciGet(d,'pm','mood')!=null).length;
   const ciCard=`<section class="card s12 gz-card" id="gzCi"><h2>Deine Check-ins · ${nCi} von ${N} Tagen</h2><div class="gz-mini">${ciRows.map(([s,k,l,c])=>{ const lv=last(d=>ciGet(d,s,k),ds), up=k!=='stress', hist=gzHist(d=>ciGet(d,s,k),lv?lv.d:TD());
-      return `<div><div class="gz-mh"><span>${l}</span><b>${lv?nf(lv.v):'–'}</b>${lv?gzTag(gzRate(lv.v,hist,up,up?[4,7]:[3,7])):''}</div>${gzChart({ds,ymin:1,ymax:10,h:96,series:[{label:l,c,f:d=>ciGet(d,s,k)}]})}</div>`; }).join('')}</div>
+      return `<div><div class="gz-mh"><span>${l}</span><b>${lv?nf(lv.v):'–'}</b>${lv?gzTag(gzRate(lv.v,hist,up,up?[4,7]:[3,7])):''}</div>${gzChart({ds,ymin:1,ymax:10,ticks:[1,5,10],h:96,series:[{label:l,c,f:d=>ciGet(d,s,k)}]})}</div>`; }).join('')}</div>
     <p class="tiny muted">Skala 1 bis 10. ${'Stress: niedriger ist besser.'} Ältere Einträge mit 1 bis 5 sind umgerechnet.</p></section>`;
   const how=`<details class="card s12 gz-how"><summary>So rechnet die Ampel</summary><div class="small" style="margin-top:8px">
     <p>Körper (${GZ_CFG.anteil.koerper} %): ${Object.entries(GZ_CFG.koerper).map(([k,v])=>`${k.replace(/_/g,' ').replace('ue','ü')} ${v}`).join(', ')}.</p>

@@ -170,13 +170,14 @@ const tests = {
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(13)));
     await page.waitForSelector('.nudges');
     assert.strictEqual(await page.locator('#tcEve').count(), 0);
-    assert.ok(await page.evaluate(() => document.querySelector('#tcMorning').nextElementSibling.id === 'tcCheck'), 'tagsüber: Check-in direkt unter dem Morgen-Ablauf');
+    assert.strictEqual(await page.getAttribute('#gzHero .ci-go', 'data-ci'), 'am', 'tagsüber: offener Morgen-Check-in oben in der Startkachel');
+    assert.strictEqual(await page.locator('#view [data-ci="am"]').count(), 1, 'nur ein Knopf für den Check-in');
     await page.click('[data-tc="morning"][data-v="check"]');
     await page.waitForSelector('#ci .ci-q');
     assert.match(await page.locator('#ci .ci-q').innerText(), /geschlafen/);
     assert.deepStrictEqual(errors, []); await page.close();
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(20)));
-    await page.waitForSelector('#tcEve');
+    await page.waitForSelector('#gzHero [data-ci="pm"]');
     assert.strictEqual(await page.locator('.nudges').count(), 0, 'abends keine Büro-Vorschläge');
     assert.ok(await page.locator('#tcMind').count() === 1);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
@@ -214,7 +215,7 @@ const tests = {
         doc: p => ({ onSnapshot: cb => { setTimeout(() => cb({ exists: false, data: () => null }), 20); return () => {}; },
           set: async v => { window.__writes++; const [c, id] = p.split('/'); if (c === 'days') days[id] = v; } }) } }; };
     const { page, errors } = await open(b, 'cockpit', DATA, 390, null, init);
-    await page.waitForSelector('#tcCheck'); await page.waitForTimeout(200);
+    await page.waitForSelector('#gzHero'); await page.waitForTimeout(200);
     await checkin(page, 'am', [6, 6, 6, 30]); await closeCi(page);
     assert.match(await page.locator('#gzHero').innerText(), /Morgen-Check-in erledigt/);
     await page.click('[data-tc="morning"][data-v="protein"]');
