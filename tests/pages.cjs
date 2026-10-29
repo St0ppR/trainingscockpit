@@ -4,10 +4,15 @@ const fs = require('fs'), path = require('path'), assert = require('assert');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '..');
 const DATA = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+// 30 Tage Beispiel-Check-ins aus make_fixture.py (liegen neben dashboard-data.json); ohne Datei: keine
+const CI_FILE = path.join(path.dirname(process.argv[2]), 'checkins.json');
+const CI = fs.existsSync(CI_FILE) ? JSON.parse(fs.readFileSync(CI_FILE, 'utf8')) : {};
+const CFG = fs.readFileSync(path.join(ROOT, 'web', 'cockpit', 'gesamtzustand.txt'), 'utf8');
 const wrap = html => '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>' + html + '</body></html>';
 
-async function open(browser, app, data, width = 390, time = null, init = null) {
-  const page = await browser.newPage({ viewport: { width, height: 844 } });
+async function open(browser, app, data, width = 390, time = null, init = null, { ci = CI, cfg = CFG, scheme = 'light' } = {}) {
+  const page = await browser.newPage({ viewport: { width, height: 844 }, colorScheme: scheme });
+  if (ci) await page.addInitScript(c => { try { if (!localStorage.getItem('cockpit.days')) localStorage.setItem('cockpit.days', c); } catch (e) {} }, JSON.stringify(ci));
   if (init) await page.addInitScript(init);
   // Uhrzeit fest auf 08:00, damit „Heute“ immer dieselbe Tagesphase zeigt (nur Date; Timer laufen normal)
   if (!time) { time = new Date(); time.setHours(8, 0, 0, 0); }
@@ -19,6 +24,7 @@ async function open(browser, app, data, width = 390, time = null, init = null) {
     const u = new URL(r.request().url());
     if (u.hostname !== 'test.local') return r.fulfill({ status: 200, body: '' });   // keine Netzzugriffe (Schriften usw.)
     if (u.pathname.endsWith('/dashboard-data.json')) return r.fulfill({ contentType: 'application/json', body: JSON.stringify(data) });
+    if (u.pathname.endsWith('/gesamtzustand.txt')) return cfg == null ? r.fulfill({ status: 404, body: '' }) : r.fulfill({ contentType: 'text/plain; charset=utf-8', body: cfg });
     const f = path.join(ROOT, 'web', app, 'index.html');
     return r.fulfill({ contentType: 'text/html', body: wrap(fs.readFileSync(f, 'utf8')) });
   });
@@ -26,14 +32,23 @@ async function open(browser, app, data, width = 390, time = null, init = null) {
   return { page, errors };
 }
 
+// Check-in im Vollbild: öffnen und Werte antippen; gibt die Zahl der Taps zurück
+async function checkin(page, slot, vals) {
+  let taps = 0;
+  await page.click(`#view [data-ci="${slot}"] >> nth=0`); taps++;
+  for (const v of vals) { await page.click(`#ci [data-civ="${v}"]`); taps++; await page.waitForTimeout(220); }
+  await page.waitForSelector('#ci .ci-ok');
+  return taps;
+}
+async function closeCi(page) { await page.click('#ci [data-cia="close"] >> nth=-1'); await page.waitForSelector('#ci', { state: 'hidden' }); }
 const noHScroll = page => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
 
 const tests = {
-  async 'Cockpit: Heute zeigt Recovery, kein Banner bei frischen Daten'(b) {
+  async 'Cockpit: Heute zeigt Gesamtzustand mit Uhrwerten, kein Banner bei frischen Daten'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForFunction(() => document.querySelector('#view').innerText.length > 50);
     const v = await page.locator('#view').innerText();
-    assert.match(v, /Recovery|Erholung/i);
+    assert.match(v, /Gesamtzustand[\s\S]*Schlaf[\s\S]*Energie-Akku[\s\S]*Stimmung/i);
     assert.strictEqual((await page.locator('#banner').innerText()).trim(), '');
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
@@ -61,9 +76,8 @@ const tests = {
   },
   async 'Cockpit Heute: Check-in, Training, Mini-Vorschlag und Speichern im Browser'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
-    await page.waitForSelector('#tcCheck');
-    for (const k of ['sleep', 'energy', 'mood', 'stress']) await page.click(`[data-tc="sc"][data-k="${k}"][data-v="4"]`);
-    await page.click('[data-tc="act"][data-a="closeCheck"]');
+    await page.waitForSelector('#gzHero');
+    await checkin(page, 'am', [7, 7, 7, 30]); await closeCi(page);
     await page.waitForSelector('.tc .badge');
     assert.match(await page.locator('.tc .badge').innerText(), /Voll|Normal|Minimum/i);
     await page.click('[data-tc="done"]');
@@ -89,8 +103,8 @@ const tests = {
     await page.click('[data-tc="morning"][data-v="water"]');
     assert.strictEqual(await page.getAttribute('[data-tc="morning"][data-v="water"]', 'aria-pressed'), 'true');
     await page.click('[data-tc="morning"][data-v="check"]');
-    for (const k of ['sleep', 'energy', 'mood', 'stress']) await page.click(`[data-tc="sc"][data-k="${k}"][data-v="3"]`);
-    await page.click('[data-tc="act"][data-a="closeCheck"]');
+    for (const v of [5, 5, 5, 20]) { await page.click(`#ci [data-civ="${v}"]`); await page.waitForTimeout(220); }
+    await closeCi(page);
     await page.click('[data-tc="done"]');
     await page.click('[data-tc="morning"][data-v="protein"]');
     assert.match(await page.locator('#view').innerText(), /Morgen erledigt/);
@@ -125,25 +139,22 @@ const tests = {
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
-  async 'Cockpit Heute: Abend-Reflexion ab 17 Uhr, nur antippen'(b) {
+  async 'Cockpit Heute: Abend-Check-in ab 17 Uhr, nur antippen, bleibt nach Neuladen'(b) {
     const evening = new Date(); evening.setHours(19, 30, 0, 0);
     const { page, errors } = await open(b, 'cockpit', DATA, 390, evening);
-    await page.waitForSelector('#tcEve');
-    await page.click('[data-tc="ev"][data-k="day"][data-v="4"]');
-    await page.click('[data-tc="evt"][data-k="drain"][data-v="arbeit"]');
-    await page.click('[data-tc="evt"][data-k="drain"][data-v="familie"]');
-    await page.click('[data-tc="evt"][data-k="food"][data-v="ok"]');
-    await page.click('[data-tc="evt"][data-k="food"][data-v="suess"]');   // "Im Rahmen" fällt dann weg
-    assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="food"][data-v="ok"]', 'aria-pressed'), 'false');
-    await page.click('[data-tc="ev"][data-k="screen"]');
-    await page.fill('#ev-good', 'Minimum trotz Stress');
-    await page.click('[data-tc="act"][data-a="closeEve"]');
-    assert.match(await page.locator('#view').innerText(), /Abend reflektiert/);
+    await page.waitForSelector('#gzHero [data-ci="pm"]');
+    const taps = await checkin(page, 'pm', [8, 3, 6, 7, 5]);
+    assert.ok(taps <= 6, 'höchstens 6 Taps bis Gespeichert, waren ' + taps);
+    await page.click('#ci .ci-more summary');
+    await page.click('#ci [data-tc="evt"][data-k="drain"][data-v="arbeit"]');
+    assert.strictEqual(await page.getAttribute('#ci [data-tc="evt"][data-k="drain"][data-v="arbeit"]', 'aria-pressed'), 'true');
+    await closeCi(page);
+    assert.match(await page.locator('#view').innerText(), /Abend-Check-in erledigt/);
     await page.reload();
-    await page.waitForSelector('[data-a="showEve"]');
-    await page.click('[data-a="showEve"]');
-    assert.strictEqual(await page.inputValue('#ev-good'), 'Minimum trotz Stress');
-    assert.strictEqual(await page.getAttribute('[data-tc="evt"][data-k="drain"][data-v="familie"]', 'aria-pressed'), 'true');
+    await page.waitForSelector('#gzHero');
+    const pm = await page.evaluate(() => JSON.parse(localStorage.getItem('cockpit.days'))[todayISO()].pm);
+    assert.deepStrictEqual([pm.mood, pm.stress, pm.focus, pm.day, pm.food], [8, 3, 6, 7, 5]);
+    assert.match(await page.locator('#view').innerText(), /Abend-Check-in erledigt/);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
   },
@@ -159,13 +170,14 @@ const tests = {
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(13)));
     await page.waitForSelector('.nudges');
     assert.strictEqual(await page.locator('#tcEve').count(), 0);
-    assert.ok(await page.evaluate(() => document.querySelector('#tcMorning').nextElementSibling.id === 'tcCheck'), 'tagsüber: Check-in direkt unter dem Morgen-Ablauf');
+    assert.strictEqual(await page.getAttribute('#gzHero .ci-go', 'data-ci'), 'am', 'tagsüber: offener Morgen-Check-in oben in der Startkachel');
+    assert.strictEqual(await page.locator('#view [data-ci="am"]').count(), 1, 'nur ein Knopf für den Check-in');
     await page.click('[data-tc="morning"][data-v="check"]');
-    await page.click('[data-tc="sc"][data-k="sleep"][data-v="3"]');
-    assert.strictEqual(await page.getAttribute('[data-tc="sc"][data-k="sleep"][data-v="3"]', 'aria-pressed'), 'true');
+    await page.waitForSelector('#ci .ci-q');
+    assert.match(await page.locator('#ci .ci-q').innerText(), /geschlafen/);
     assert.deepStrictEqual(errors, []); await page.close();
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(20)));
-    await page.waitForSelector('#tcEve');
+    await page.waitForSelector('#gzHero [data-ci="pm"]');
     assert.strictEqual(await page.locator('.nudges').count(), 0, 'abends keine Büro-Vorschläge');
     assert.ok(await page.locator('#tcMind').count() === 1);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
@@ -203,9 +215,9 @@ const tests = {
         doc: p => ({ onSnapshot: cb => { setTimeout(() => cb({ exists: false, data: () => null }), 20); return () => {}; },
           set: async v => { window.__writes++; const [c, id] = p.split('/'); if (c === 'days') days[id] = v; } }) } }; };
     const { page, errors } = await open(b, 'cockpit', DATA, 390, null, init);
-    await page.waitForSelector('#tcCheck'); await page.waitForTimeout(200);
-    await page.click('[data-tc="sc"][data-k="sleep"][data-v="3"]');
-    assert.strictEqual(await page.getAttribute('[data-tc="sc"][data-k="sleep"][data-v="3"]', 'aria-pressed'), 'true');
+    await page.waitForSelector('#gzHero'); await page.waitForTimeout(200);
+    await checkin(page, 'am', [6, 6, 6, 30]); await closeCi(page);
+    assert.match(await page.locator('#gzHero').innerText(), /Morgen-Check-in erledigt/);
     await page.click('[data-tc="morning"][data-v="protein"]');
     assert.strictEqual(await page.getAttribute('[data-tc="morning"][data-v="protein"]', 'aria-pressed'), 'true');
     await page.waitForTimeout(1200);
@@ -221,6 +233,110 @@ const tests = {
     assert.ok(await page.locator('.tc-ins').count() >= 1);
     assert.match(await page.locator('.insights').innerText(), /Für deinen Alltag/);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Gesamtübersicht 1: Morgen-Check-in startet neutral, zeigt den letzten Wert, max. 6 Taps bis Gespeichert'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#gzHero [data-ci="am"]');
+    await page.click('#gzHero [data-ci="am"]');
+    await page.waitForSelector('#ci .ci-q');
+    assert.strictEqual(await page.locator('#ci .sel, #ci [aria-pressed="true"]').count(), 0, 'kein Wert vorausgewählt');
+    assert.match(await page.locator('#ci .ci-last').innerText(), /Zuletzt: \d+/);
+    const lab = await page.locator('#ci .ci-lab').innerText();
+    assert.match(lab, /1[\s\S]*sehr schlecht[\s\S]*5[\s\S]*geht so[\s\S]*10[\s\S]*sehr gut/, 'Beschriftung für 1, 5 und 10');
+    await page.click('#ci [data-cia="close"]');
+    const taps = await checkin(page, 'am', [6, 5, 7, 20]);
+    assert.ok(taps <= 6, 'höchstens 6 Taps, waren ' + taps);
+    assert.match(await page.locator('#ci .ci-ok').innerText(), /Gespeichert/);
+    const x = await page.evaluate(() => JSON.parse(localStorage.getItem('cockpit.days'))[todayISO()]);
+    assert.deepStrictEqual([x.am.sleep, x.am.energy, x.am.mood, x.am.min], [6, 5, 7, 20]);
+    assert.deepStrictEqual([x.checkin.sleep, x.checkin.energy, x.checkin.mood], [3, 3, 4], 'Spiegel 1–5 für ältere Teile');
+    await closeCi(page);
+    assert.match(await page.locator('#tcTrain').innerText(), /passt in deine 20 Minuten|Minimum|Normal/);
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Gesamtübersicht 1: Check-in passend zur Uhrzeit, alte Einträge (1–5) bleiben lesbar'(b) {
+    const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d; };
+    for (const [h, slot] of [[5, 'am'], [13, 'am'], [18, 'pm']]) {
+      const { page, errors } = await open(b, 'cockpit', DATA, 390, at(h));
+      await page.waitForSelector('#gzHero');
+      assert.strictEqual(await page.getAttribute('#gzHero .ci-go', 'data-ci'), slot, `${h} Uhr → ${slot}`);
+      assert.deepStrictEqual(errors, []); await page.close();
+    }
+    const legacy = Object.keys(CI).sort().slice(0, 3);
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#gzHero');
+    const v = await page.evaluate(ds => ds.map(d => [ciGet(d, 'am', 'mood'), ciGet(d, 'pm', 'day')]), legacy);
+    v.forEach(([m, d], i) => { assert.ok(m >= 1 && m <= 10 && d >= 1 && d <= 10, 'umgerechnet ' + legacy[i]); });
+    assert.strictEqual(await page.evaluate(() => s10(1) + '|' + s10(3) + '|' + s10(5)), '1|5.5|10');
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Gesamtübersicht 2: 30 Tage Beispieldaten füllen alle Diagramme (7 und 30 Tage)'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#bnav button[data-t="uebersicht"]');
+    await page.click('#bnav button[data-t="uebersicht"]');
+    await page.waitForSelector('.gz-card');
+    for (const per of [7, 30]) {
+      await page.click(`[data-gzper="${per}"]`);
+      const cards = await page.locator('.gz-card').evaluateAll(cs => cs.map(c => ({ t: c.querySelector('h2').textContent, svgs: c.querySelectorAll('svg').length,
+        marks: c.querySelectorAll('svg path[d^="M"], svg rect[rx]').length, empty: /Noch keine Werte/.test(c.textContent) })));
+      const titles = cards.map(c => c.t).join(' | ');
+      for (const t of ['Gesamtzustand', 'Schlaf', 'Erholung über Nacht', 'Stress', 'Energie-Akku', 'Training', 'morgens und abends', 'Check-ins'])
+        assert.ok(titles.includes(t), `${per} Tage: Diagramm „${t}“ fehlt (${titles})`);
+      for (const c of cards) assert.ok(c.svgs >= 1 && c.marks >= 1 && !c.empty, `${per} Tage: „${c.t}“ ist leer`);
+      assert.strictEqual(await page.locator('#gzCi svg').count(), 6, 'sechs Check-in-Verläufe');
+      assert.match(await page.locator('#gzCi h2').innerText(), new RegExp(`· (${per}|${per - 1}) von ${per} Tagen`, 'i'));
+      assert.match(await page.locator('#gzMood').innerText(), /morgens Ø \d+,\d · abends Ø \d+,\d/);
+      assert.ok(await noHScroll(page), 'horizontaler Bildlauf bei ' + per);
+    }
+    const tags = await page.locator('.gz-card .gz-now').allInnerTexts();
+    assert.ok(tags.every(t => /Schnitt|gut|niedrig|hoch|mittel|besser|schlechter|Unterschied|Form|Schonen|Mittel/.test(t)), 'jede Zahl mit Einordnung: ' + tags.join(' / '));
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Gesamtübersicht 3: Ampel aus gesamtzustand.txt, Gewichte ändern das Ergebnis'(b) {
+    const read = async cfg => { const { page, errors } = await open(b, 'cockpit', DATA, 390, null, null, { cfg });
+      await page.waitForSelector('#gzHero'); const r = await page.evaluate(() => ({ s: gzScoreToday(), src: GZ_SRC, warn: GZ_WARN, cfg: GZ_CFG }));
+      assert.deepStrictEqual(errors.filter(e => !(cfg == null && /404/.test(e))), []); await page.close(); return r; };
+    const std = await read(CFG);
+    assert.strictEqual(std.src, 'gesamtzustand.txt'); assert.deepStrictEqual(std.warn, []);
+    assert.deepStrictEqual(std.cfg.koerper, { schlaf: 35, erholung_ueber_nacht: 25, stress: 20, energie_akku: 20 });
+    assert.ok(std.s.total >= 0 && std.s.total <= 100 && ['green', 'yellow', 'red'].includes(std.s.band));
+    const body = await read(CFG.replace('Kopf = 50', 'Kopf = 0'));
+    assert.ok(Math.abs(body.s.total - body.s.body) < 1e-9, 'Kopf = 0 → nur Körper');
+    const strict = await read(CFG.replace('Grün ab = 65', 'Grün ab = 101').replace('Gelb ab = 45', 'Gelb ab = 100'));
+    assert.strictEqual(strict.s.band, 'red', 'Grenzen aus der Datei');
+    const bad = await read(CFG + '\nQuatsch = 3\n');
+    assert.ok(bad.warn.length === 1 && /nicht verstanden/.test(bad.warn[0]), 'unbekannte Zeile wird gemeldet');
+    const none = await read(null);
+    assert.strictEqual(none.src, 'eingebaut', 'ohne Datei: eingebaute Werte');
+  },
+  async 'Gesamtübersicht 4: Startbildschirm ohne Scrollen, Touch-Ziele ≥ 44 px, morgens dunkel'(b) {
+    const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d; };
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, at(6));
+    await page.waitForSelector('#gzHero');
+    const box = await page.evaluate(() => { const h = document.querySelector('#gzHero').getBoundingClientRect(), n = document.querySelector('.bnav').getBoundingClientRect();
+      return { bottom: h.bottom, nav: n.top, vals: document.querySelectorAll('#gzHero .gz-vals > div').length, lamp: !!document.querySelector('#gzHero .ampel'), btn: document.querySelector('#gzHero .ci-go').getBoundingClientRect().height }; });
+    assert.ok(box.bottom <= box.nav, `Startkachel endet bei ${box.bottom}px, Leiste beginnt bei ${box.nav}px`);
+    assert.ok(box.vals === 3 && box.lamp && box.btn >= 44);
+    assert.strictEqual(await page.evaluate(() => document.documentElement.dataset.theme), 'dark', 'um 6 Uhr dunkel');
+    await page.click('#gzHero [data-ci="am"]');
+    const small = await page.locator('#ci button').evaluateAll(bs => bs.map(b => b.getBoundingClientRect()).filter(r => r.width && (r.width < 44 || r.height < 44)).length);
+    assert.strictEqual(small, 0, 'alle Knöpfe im Check-in mindestens 44 × 44 px');
+    assert.ok(await noHScroll(page));
+    assert.deepStrictEqual(errors, []); await page.close();
+    const day = await open(b, 'cockpit', DATA, 390, at(13));
+    await day.page.waitForSelector('#gzHero');
+    assert.notStrictEqual(await day.page.evaluate(() => document.documentElement.dataset.theme), 'dark', 'mittags hell');
+    assert.deepStrictEqual(day.errors, []);
+  },
+  async 'Gesamtübersicht 4: Ladezeit unter 2 Sekunden bis zur Startkachel'(b) {
+    const t0 = Date.now();
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.waitForSelector('#gzHero .ci-go');
+    const ms = Date.now() - t0;
+    const nav = await page.evaluate(() => Math.round(performance.now()));
+    console.log(`      Ladezeit bis Startkachel: ${ms} ms (Seite: ${nav} ms)`);
+    assert.ok(ms < 2000, 'zu langsam: ' + ms + ' ms');
     assert.deepStrictEqual(errors, []);
   },
   async 'Tagescoach: Check-in ausfüllen ohne Fehler'(b) {

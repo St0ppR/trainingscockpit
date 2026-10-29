@@ -1,0 +1,33 @@
+# Gesamtzustand: wie stark zählt was?
+#
+# So änderst du es: nur die Zahlen hinter dem Gleichheitszeichen anpassen und speichern.
+# Höhere Zahl = zählt mehr. 0 = zählt gar nicht. Die Zahlen müssen nicht 100 ergeben,
+# das Cockpit rechnet sie selbst in Anteile um.
+# Zeilen, die mit # anfangen, sind nur Erklärungen.
+
+[Anteil]
+# Wie viel Körper (Uhr) und Kopf (deine Check-ins) am Gesamtzustand ausmachen
+Körper = 50
+Kopf = 50
+
+[Körper]
+# Werte der Garmin-Uhr
+Schlaf = 35                  # geschlafene Stunden gegen deinen Schlafbedarf
+Erholung über Nacht = 25     # HRV der Nacht gegen deinen eigenen Schnitt
+Stress = 20                  # Stress-Schnitt der Uhr, weniger ist besser
+Energie-Akku = 20            # Body Battery am Morgen
+
+[Kopf]
+# Werte aus deinen Check-ins (1 bis 10)
+Stimmung = 25                # Schnitt aus Morgen und Abend
+Energie = 20                 # Morgen-Check-in
+Schlaf gefühlt = 15          # Morgen-Check-in
+Stress = 15                  # Abend-Check-in, weniger ist besser
+Fokus = 10                   # Abend-Check-in
+Zufriedenheit = 10           # Abend-Check-in: Zufriedenheit mit dem Tag
+Essen = 5                    # Abend-Check-in: Essen nach Gefühl
+
+[Ampel]
+# Ab welchem Wert (0 bis 100) die Ampel grün bzw. gelb zeigt. Darunter ist sie rot.
+Grün ab = 65
+Gelb ab = 45

@@ -62,6 +62,28 @@ def make(days=60, end=None, seed=7):
     return out
 
 
+def checkins(n=30, end=None, seed=7):
+    """Ausgedachte Check-ins der letzten n Tage vor heute (heute bleibt offen), Skalen 1–10.
+    Die drei ältesten Tage stehen im alten Format (1–5), damit die Umrechnung mitgetestet wird."""
+    rnd = random.Random(seed)
+    end = end or dt.datetime.now(ZoneInfo("Europe/Berlin")).date()
+    out, c = {}, lambda v: max(1, min(10, round(v)))
+    for i in range(n, 0, -1):
+        day = end - dt.timedelta(days=i); d = day.isoformat()
+        base = 6 + (1.2 if day.weekday() < 5 else -0.5) + rnd.uniform(-2, 2)
+        if i > n - 3:
+            out[d] = {"date": d, "checkin": {"sleep": rnd.randint(2, 5), "energy": rnd.randint(2, 5), "mood": rnd.randint(2, 5), "stress": rnd.randint(1, 4)},
+                      "evening": {"day": rnd.randint(2, 5), "food": rnd.choice([["ok"], ["suess"], ["viel", "spaet"]]), "drain": ["arbeit"]}}
+            continue
+        am = {"sleep": c(base + rnd.uniform(-2, 1)), "energy": c(base + rnd.uniform(-1.5, 1.5)), "mood": c(base + rnd.uniform(-1, 1)),
+              "min": rnd.choice([0, 10, 20, 30, 30, 45, 60]), "at": f"{d}T05:{rnd.randint(10, 50)}:00.000Z"}
+        pm = {"mood": c(am["mood"] + rnd.uniform(-1, 2)), "stress": c(9 - base + rnd.uniform(-1.5, 2)), "focus": c(base + rnd.uniform(-2, 1.5)),
+              "day": c(base + rnd.uniform(-1, 1.5)), "food": c(base + rnd.uniform(-3, 1)), "at": f"{d}T19:{rnd.randint(10, 50)}:00.000Z"}
+        s5 = lambda v: max(1, min(5, round(1 + (v - 1) * 4 / 9)))
+        out[d] = {"date": d, "am": am, "pm": pm, "checkin": {k: s5(am[k]) for k in ("sleep", "energy", "mood")}}
+    return out
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("target"); ap.add_argument("--days", type=int, default=60); ap.add_argument("--end")
@@ -69,3 +91,4 @@ if __name__ == "__main__":
     end = dt.date.fromisoformat(a.end) if a.end else None
     Path(a.target).mkdir(parents=True, exist_ok=True)
     (Path(a.target) / "data.json").write_text(json.dumps(make(a.days, end)), encoding="utf-8")
+    (Path(a.target) / "checkins.json").write_text(json.dumps(checkins(30, end), indent=1), encoding="utf-8")
