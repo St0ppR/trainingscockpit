@@ -157,7 +157,7 @@ header.top{margin-bottom:14px}
 @media (max-width:640px){.brand h1{font-size:24px}.brand .sub{font-size:11.5px}.card{padding:14px 14px}input[type=text],input[type=number],input[type=date],input[type=time],textarea,select{font-size:16px}}
 .bnav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
 @supports (backdrop-filter:blur(8px)) or (-webkit-backdrop-filter:blur(8px)){.bnav{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}}
-.bnav>div{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));max-width:560px;margin:0 auto}
+.bnav>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:420px;margin:0 auto}
 .bnav button{border:0;background:none;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0 3px;font:600 11.5px var(--f-body);cursor:pointer;border-radius:10px;-webkit-tap-highlight-color:transparent}
 .bnav svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .bnav button[aria-current="page"]{color:var(--accent)}
@@ -437,6 +437,63 @@ body.ci-open{overflow:hidden}
 .g27in .tg{min-height:44px}
 .g27tab td,.g27tab th{padding:6px 5px;font-size:13px}
 .g27tab td.ok{color:var(--good);font-weight:700}
+
+/* ---------- Coach: Heute und Woche (Nov. 2026) ---------- */
+.co-hero{display:grid;gap:8px}
+.co-hero .lab,.co-area{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.card .co-h{font:700 26px/1.12 var(--f-display);margin:0;text-wrap:balance;color:var(--ink);text-transform:none;letter-spacing:0;display:block}
+.co-s{margin:0;color:var(--ink-2);font-size:15.5px;line-height:1.45}
+.co-facts{display:flex;flex-wrap:wrap;gap:6px}
+.co-facts span{background:var(--surface-2);border-radius:999px;padding:4px 10px;font-size:13px;color:var(--ink-2)}
+.co-facts b{color:var(--ink);font-variant-numeric:tabular-nums}
+.co-hero .ci-go{margin-top:4px}
+.co-weigh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+.co-weigh span{flex:1 1 100%;font-weight:600}
+.co-weigh input{flex:1;min-width:0;height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:16px var(--f-body);background:var(--surface);color:var(--ink)}
+.co-weigh .btn{height:44px}
+.co-plan h2{margin-bottom:4px}
+.co-it{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.co-plan h2+.co-it{border-top:0}
+.co-ck{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:transparent;font:700 20px var(--f-body);cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+.co-ck[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.co-main{flex:1;min-width:0}
+.co-t{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;border:0;background:none;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;width:100%}
+.co-t .co-area{flex:1 1 100%}
+.co-t b{font:700 19px/1.25 var(--f-body);flex:1}
+.co-more{font-size:13px;color:var(--accent);font-weight:600;white-space:nowrap}
+.co-it.is-done .co-t b{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1.5px}
+.co-why{margin:4px 0 0;color:var(--ink-2);font-size:14.5px;line-height:1.45}
+.co-it.is-done .co-why{display:none}
+.co-tip{margin:8px 0 0;font-size:14px;background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.co-it .block{margin-top:10px}
+.co-go{margin-top:12px;gap:8px}.co-go .btn{min-height:46px;flex:1}
+.co-alt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.co-alt .tg,.co-ask .tg{min-height:40px}
+.co-ask{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+.co-ask>span{font-weight:600}.co-ask>div{display:flex;gap:6px;flex-wrap:wrap}
+.co-fb{margin:4px 0 0;font-size:14px;color:var(--ink-2)}
+.co-breath{margin-top:10px}
+.co-next{margin:10px 0 0;border-top:1px solid var(--line);padding-top:10px}
+.co-nd{display:grid;gap:8px}
+.co-nd-row{display:flex;gap:12px;align-items:flex-start}.co-nd-row b{font-size:16px}
+.co-nd .tc-mini{justify-self:start}
+.co-nd-done{margin:0;grid-column:span 12}
+.co-links .rowlink{background:none;border:0;padding:6px 2px}
+.co-wl{font-size:16px;color:var(--ink)}
+.co-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+@media (min-width:821px){.co-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.co-tile{background:var(--surface-2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.co-tile .lab{font:600 12.5px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.co-tile .big{font:700 30px/1.05 var(--f-display);font-variant-numeric:tabular-nums}
+.co-tile .big small{font-size:14px;color:var(--ink-3);font-weight:600;margin-left:2px}
+.co-tile svg{margin-top:4px}
+.co-ins{padding:12px 0;border-top:1px solid var(--line);display:grid;gap:4px}
+#coIns h2+.co-ins{border-top:0;padding-top:0}
+.co-ins .chip{justify-self:start}.co-ins h3{font-size:19px;margin:4px 0 0}.co-ins p{margin:0}
+.ci-plan{display:grid;gap:6px;margin-bottom:12px}
+.ci-plan .lab{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.ci-plan>div:not(.lab):not(.toggles){background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;display:grid}
+.ci-plan>div>span{font-size:12.5px;color:var(--ink-3)}.ci-plan>div>b{font-size:16px}
 </style>
 
 <div class="wrap">
@@ -456,12 +513,14 @@ body.ci-open{overflow:hidden}
 <div id="ci" class="ci hidden" role="dialog" aria-modal="true" aria-labelledby="ciQ"></div>
 <nav class="bnav" aria-label="Bereiche"><div id="bnav">
   <button data-t="heute"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>Heute</button>
-  <button data-t="uebersicht"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Übersicht</button>
-  <button data-t="workout"><svg viewBox="0 0 24 24"><path d="M8.6 8.2a3.4 3.4 0 1 1 6.8 0"/><path d="M7.2 9h9.6l1.7 5.6a5.6 5.6 0 0 1-5.4 6.9h-2.2a5.6 5.6 0 0 1-5.4-6.9z"/></svg>Training</button>
-  <button data-t="food"><svg viewBox="0 0 24 24"><path d="M6.5 3v7.5M4.5 3v5a2 2 0 0 0 4 0V3M6.5 10.5V21M17.5 21V3c-2.4 1.6-3.2 5-3.2 9h3.2"/></svg>Essen</button>
+  <button data-t="uebersicht"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Woche</button>
   <button data-t="more"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>Mehr</button>
 </div></nav>
 <div id="sheet" class="hidden"><div class="sheet-bg" data-close></div><div class="sheet" role="dialog" aria-label="Weitere Bereiche"><div class="grab"></div>
+  <button class="mi" data-mv="workout"><span class="ico">K</span><span>Training<small>Einheiten mit Timer, Wochenplan</small></span></button>
+  <button class="mi" data-mv="food"><span class="ico">E</span><span>Essen<small>Mahlzeiten, Eiweiß, Wochenplan</small></span></button>
+  <button class="mi" data-mv="tag"><span class="ico">✓</span><span>Alles von heute<small>Gewohnheiten, Dehnen, Atmung, Zähler</small></span></button>
+  <button class="mi" data-mv="werte"><span class="ico">↗</span><span>Alle Werte<small>Gesamtzustand, Uhr, Check-ins, 7 und 30 Tage</small></span></button>
   <button class="mi" data-mv="coach"><span class="ico">T</span><span>Trainer<small>Fragen, Profil, Tagesempfehlung</small></span></button>
   <button class="mi" data-mv="rec"><span class="ico">E</span><span>Erholung<small>HFV, Ruhepuls, Schlaf</small></span></button>
   <button class="mi" data-mv="str"><span class="ico">B</span><span>Belastung<small>Tagesbelastung aus dem Puls</small></span></button>
@@ -477,7 +536,7 @@ const EMBED = /*__DATA__*/null;
 // Morgens (4 bis 9 Uhr) dunkel, sonst wie das iPhone eingestellt ist
 (()=>{ const h=new Date().getHours(); if(h>=4&&h<9) document.documentElement.dataset.theme='dark'; })();
 let DATA, days, cur, view = 'heute';
-try { const h = location.hash.slice(1); if (h) view = h; else { const v = localStorage.getItem('cockpit.view'); if (v) view = v; } } catch(e){}
+try { const h = location.hash.slice(1); if (h) view = h; } catch(e){}   // ohne Link immer „Heute“: das ist der tägliche Einstieg
 
 /* ---------- Formatierung ---------- */
 const $ = s => document.querySelector(s);
@@ -574,7 +633,7 @@ const own = v => v==null ? v : JSON.parse(JSON.stringify(v));
 const store = { journal:{}, coach:{}, profile:null, meals:{}, mealplan:{} };
 const listeners = new Set();
 function onStore(fn){ listeners.add(fn); }
-function emit(){ listeners.forEach(f=>{ try{f()}catch(e){} }); const ae=document.activeElement; if (view==='heute' && ae && ae.tagName==='TEXTAREA' && $('#view').contains(ae)) return; if (['heute','uebersicht','jrn','coach','workout','food','trd'].includes(view)) render(); }
+function emit(){ listeners.forEach(f=>{ try{f()}catch(e){} }); const ae=document.activeElement; if (['heute','tag'].includes(view) && ae && ['TEXTAREA','INPUT'].includes(ae.tagName) && $('#view').contains(ae)) return; if (['heute','uebersicht','tag','werte','jrn','coach','workout','food','trd'].includes(view)) render(); }
 async function initDb(){
   if (!window.claude || !window.claude.use){ dbState='lokal'; return; }
   try { db = await window.claude.use('db'); } catch(e){ db = null; }
@@ -1010,7 +1069,7 @@ function tcSpark(pts,{w=300,h=64,color='var(--accent)',lo=null,hi=null}={}){
 const tcLastN=(n,ref=TD())=>[...Array(n)].map((_,i)=>addDays(ref,i-n+1));
 
 /* ---------- HEUTE ---------- */
-function renderHeute(){
+function renderTag(){
   const m=tcMode(), x=tcDay(), t=dt(TD());
   const week=tcWeek().map(d=>`<span class="${tcMoved(d)?'on':''} ${d===TD()?'today':''}" title="${dshort(d)}">${WD[dt(d).getDay()]}</span>`).join('');
   const movedN=tcWeek().filter(tcMoved).length;
@@ -1222,8 +1281,237 @@ function g27Act(a,v){
   else if(a==='hist'){ tcUi.g27h=!tcUi.g27h; }
 }
 
-/* ---------- ÜBERSICHT ---------- */
-function renderUebersicht(){
+/* ================= COACH: ein Urteil, drei Dinge ================= */
+/* „Heute“ zeigt nur noch, was der Trainer für heute entschieden hat: ein Satz, warum, und genau drei Dinge
+   (Bewegung, Schlaf, Essen oder Kopf). Florian gibt Feedback (Check-in, „zu leicht / passt / zu hart“), der Trainer passt an.
+   Alles Weitere (Gewohnheiten, Dehnen, Zähler, Diagramme) steht unter „Mehr“. */
+const CO_QUICK={title:'6 Minuten Kraft, überall',min:6,reps:{push:24,squat:30},blocks:[{name:'3 Runden',fmt:'Übungen direkt nacheinander · 30 s Pause nach jeder Runde · 2–3 Wiederholungen Reserve',items:[
+  ['Kniebeugen zum Stuhl','10 Wdh.','Po tippt kurz an, Knie nach außen'],
+  ['Liegestütze an Tisch oder Kante','8 Wdh.','Körper gerade wie ein Brett'],
+  ['Wandsitz','20 s','Rücken an der Wand, Knie über den Füßen']]}]};
+const CO_TIERS=['quick','min','std','full'];
+TIERN.quick='6 Minuten'; TIERI.quick='Rettungsdosis';
+const coFeel=(d=TD())=>{ const x=store.days[d]||{}; if(x.am&&x.am.at) return {sleep:x.am.sleep,energy:x.am.energy,mood:x.am.mood,min:x.am.min};
+  const c=x.checkin||{}; return c.sleep&&c.energy?{sleep:s10(c.sleep),energy:s10(c.energy),mood:s10(c.mood),min:null}:null; };
+const coWatchSleep=d=>{ const g=DATA.days[d]; return g&&g.sleep&&g.sleep.asleep>3600?g.sleep.asleep/3600:null; };
+const coPlan=()=>DATA.plan||(DATA.brief&&DATA.brief.bedtimePlan)||{};
+const coClock=m=>{ m=((m%1440)+1440)%1440; return Math.floor(m/60)+':'+String(m%60).padStart(2,'0'); };
+/* Zustand heute: eine Stufe aus Check-in und Uhr, keine zweite Ampel */
+function coState(){
+  const x=tcDay(), c=x.checkin||{}, f=coFeel(), g=DATA.days[TD()]||{}, ws=coWatchSleep(TD()), why=[];
+  let lvl=null;
+  if(f){ const s=gzMean([f.sleep,f.energy,f.mood]); lvl=f.energy<=3||s<=4?'low':s>=7?'good':'mid'; }
+  if(g.band==='red'&&lvl!=='low'){ lvl=lvl==='good'?'mid':'low'; why.push('Die Uhr zeigt wenig Erholung.'); }
+  if(ws!=null&&ws<5.5&&lvl==='good') lvl='mid';
+  if(c.pain>=6||c.night&&lvl==='good') lvl=lvl==='good'?'mid':'low';
+  if(c.sick) lvl='sick';
+  const gap=tcBetween(tcLastTraining(),TD()), y=addDays(TD(),-1);
+  return {lvl,f,ws,bb:gzG('bb',TD()),gap,why,ystress:ciGet(y,'pm','stress'),yfood:ciGet(y,'pm','food'),c};
+}
+/* Stufe fürs Training: Zustand × verfügbare Zeit × Wiedereinstieg × letztes Feedback */
+function coTier(st){
+  if(st.lvl==='sick') return null;
+  const avail=st.f&&st.f.min!=null?Math.max(5,st.f.min):null;
+  let t=st.lvl==='good'?'full':st.lvl==='low'?'quick':'std';
+  // Wiedereinstieg: nach ≥ 3 Tagen Pause höchstens das Minimum; solange keine 3 Bewegungstage in 7, höchstens Normal
+  const moved7=tcLastN(7,addDays(TD(),-1)).filter(tcTrained).length;
+  if(st.gap>=3) t=CO_TIERS.indexOf(t)>1?'min':t; else if(moved7<3&&t==='full') t='std';
+  // Feedback der letzten Einheit: zu leicht → eine Stufe mehr, zu hart → eine weniger
+  const lastD=Object.keys(store.days).filter(d=>d<TD()&&store.days[d].training&&store.days[d].training.rpe).sort().pop(), rpe=lastD&&store.days[lastD].training.rpe;
+  if(rpe&&tcBetween(lastD,TD())<=4){ const i=CO_TIERS.indexOf(t); if(rpe<=4&&st.lvl!=='low') t=CO_TIERS[Math.min(3,i+1)]; if(rpe>=9) t=CO_TIERS[Math.max(0,i-1)]; }
+  // passt in die angegebene Zeit (6 Minuten gehen immer)
+  if(avail!=null){ const s=tcSession({band:st.lvl==='low'?'red':'yellow'}); while(t!=='quick'&&s[t]&&s[t].min>Math.max(avail,10)) t=CO_TIERS[CO_TIERS.indexOf(t)-1]; }
+  if(st.lvl==='low'&&t!=='quick') t='quick';
+  return t;
+}
+function coBedtime(st){
+  const p=coPlan(), short=(st.ws!=null&&st.ws<6.5)||(st.f&&st.f.sleep<=3)||st.lvl==='low'||st.lvl==='sick';
+  return short?'22:00':G27.bed;
+}
+/* Die drei Dinge für heute */
+function coItems(st){
+  const x=tcDay(), h=x.habits||{}, hr=new Date().getHours(), wd=dt(TD()).getDay(), items=[];
+  /* 1 · Bewegung */
+  const tier=tcUi.coTier||coTier(st), tr=x.training, sess=tcSession({band:st.lvl==='low'?'red':st.lvl==='good'?'green':'yellow'});
+  if(st.lvl==='sick') items.push({id:'mv',ico:'🚶',area:'Bewegung',title:'Heute Pause, nur kurz an die Luft',why:'Krank trainiert man nicht. 10 Minuten langsam gehen sind erlaubt, wenn es sich gut anfühlt.',done:!!h.move,tc:'hb',k:'move'});
+  else {
+    const isQ=(tr&&tr.tier||tier)==='quick', s=isQ?CO_QUICK:sess[tr&&tr.tier||tier]||sess.min;
+    const title=isQ?CO_QUICK.title:`${sess.title} · ${TIERN[tr&&tr.tier||tier]}, ${s.min} min`;
+    let why;
+    if(st.gap>=7) why=`Dein letztes Training ist ${st.gap} Tage her. Wir fangen klein an: lieber ${s.min} Minuten jeden Tag als 45 Minuten einmal. Am besten direkt nach dem Check-in, bevor der Tag dich hat.`;
+    else if(st.gap>=2) why='Gestern war Pause. Nie zweimal hintereinander auslassen: Heute zählt jede Minute voll.';
+    else if(st.lvl==='low') why=`Bei Energie ${st.f?st.f.energy:'–'}/10 bewusst leicht. Kurze Bewegung hebt die Energie, ein hartes Training würde sie heute kosten.`;
+    else if(st.lvl==='good') why='Du bist gut drauf. Heute darf es mehr sein, 2 Wiederholungen Reserve bleiben trotzdem.';
+    else why='Normaler Tag, normale Dosis. Gleichmäßig zählt mehr als heldenhaft.';
+    if(st.f&&st.f.min!=null&&st.f.min<=5&&!isQ) why+=' Passt auch in eine kurze Pause.';
+    items.push({id:'mv',ico:'💪',area:'Bewegung',title,why,done:!!(tr&&tr.tier),tier:tr&&tr.tier||tier,s,sess,isQ});
+  }
+  /* 2 · Schlaf */
+  const bed=coBedtime(st), p=coPlan(), ins=tcIns('Einschlafzeit');
+  let sw;
+  if(st.f&&st.f.sleep<=4&&st.ws!=null&&st.ws>=6.3) sw=`Die Uhr misst ${hc(st.ws)} h, gefühlt war es ${st.f.sleep}/10. Dir fehlt eher Ruhe als Dauer: Wer jeden Abend zur selben Zeit schläft, schläft tiefer.`;
+  else if(st.ws!=null&&st.ws<6.5) sw=`Letzte Nacht ${hc(st.ws)} h. Eine kurze Nacht holst du am besten am selben Abend nach, nicht mit Kaffee.`;
+  else if(p.typicalBed&&p.bedSD>45) sw=`Zuletzt bist du meist gegen ${p.typicalBed} eingeschlafen, mit Schwankungen von rund ${Math.round(p.bedSD/15)*15} Minuten. Eine feste Zeit ist dein größter Hebel${ins?': Früh eingeschlafen erholst du dich messbar besser':''}.`;
+  else sw='Eine feste Zeit, auch am Wochenende: So wird Schlaf von allein besser.';
+  const ritual=wd===5||wd===6?'Auch am Wochenende höchstens 30 Minuten später. Deine Wochenendnächte sind laut Uhr deine schwächsten.'
+    :'30 Minuten vorher Handy raus aus dem Schlafzimmer. Tablette und Wasser schon ans Bett, dann brauchst du um 4 Uhr kein Licht und schläfst schneller wieder ein.';
+  items.push({id:'sl',ico:'🌙',area:'Schlaf',title:`Heute Licht aus um ${bed}`,why:sw,tip:ritual,done:!!h.bed,tc:'hb',k:'bed'});
+  /* 3 · Essen oder Kopf: was gerade mehr hilft */
+  const foods=tcLastN(3,addDays(TD(),-1)).map(d=>ciGet(d,'pm','food')).filter(v=>v!=null), badFood=foods.filter(v=>v<=4).length;
+  const yd=store.days[addDays(TD(),-1)]||{}, sweetY=yd.nosweets===false;
+  const stressy=(st.ystress!=null&&st.ystress>=6)||(st.f&&st.f.mood<=4);
+  if(badFood>=1||sweetY){
+    if(hr<17) items.push({id:'fd',ico:'🥣',area:'Essen',title:'Eiweiß-Snack um 15:30',why:`${badFood?`An ${badFood} der letzten ${foods.length} Abende lag dein Essen bei 4/10 oder darunter.`:'Gestern gab es Süßes.'} Abends kippt es, wenn der Nachmittag leer war. Skyr, Quark oder eine Handvoll Nüsse, bevor der Hunger kommt.`,done:!!h.snack,tc:'hb',k:'snack'});
+    else items.push({id:'fd',ico:'🍽️',area:'Essen',title:'Heute Abend ohne Süßes',why:'Portion auf den Teller, Packung zurück in den Schrank. Wenn der Heißhunger kommt: Glas Wasser, 10 Minuten warten, dann neu entscheiden.',done:x.nosweets===true,tc:'g27',a:'sweet',v:'1'});
+  } else if(stressy){
+    items.push({id:'kp',ico:'🫁',area:'Kopf',title:'Ankommen, bevor du reingehst',why:`${st.ystress>=6?`Gestern Abend lag dein Stress bei ${st.ystress}/10.`:`Stimmung heute ${st.f.mood}/10.`} Eine Minute zwischen Arbeit und Familie: Im Auto oder vor der Tür 3 tiefe Atemzüge, lang aus. Dann nimmst du den Tag nicht mit rein.`,done:!!h.arrive,tc:'hb',k:'arrive',breath:true});
+  } else if(hr<11){
+    items.push({id:'fd',ico:'🥚',area:'Essen',title:'Eiweiß zum Frühstück',why:'Skyr, Quark oder Eier halten bis mittags satt. Wer morgens genug Eiweiß isst, greift abends seltener zu Süßem.',done:!!h.protein,tc:'hb',k:'protein'});
+  } else items.push({id:'fd',ico:'🍽️',area:'Essen',title:'Heute Abend ohne Süßes',why:'Ziel 2027: 5 Abende pro Woche. Portion auf den Teller, Packung zurück in den Schrank.',done:x.nosweets===true,tc:'g27',a:'sweet',v:'1'});
+  // abends zuerst, was jetzt noch geht: Schlaf, dann Essen/Kopf, Bewegung zuletzt
+  return hr>=17?[items[1],items[2],items[0]]:items;
+}
+/* Kopfsatz: ein Urteil, verständlich, mit den Zahlen dahinter */
+function coHead(st,items){
+  const due=ciDue(), hr=new Date().getHours(), x=tcDay(), done=items.filter(i=>i.done).length;
+  if(due==='am'&&!st.f&&hr<10) return {t:'Guten Morgen.',s:'Erst 30 Sekunden Check-in, dann steht dein Plan für heute.'};
+  if(due==='am'&&hr>=10) return {t:'Noch kein Check-in heute.',s:'Der Plan unten gilt trotzdem. Mit Check-in passt dein Trainer ihn an dich an.'};
+  const T={sick:['Heute nur gesund werden.','Viel trinken, früh schlafen, kein Training.'],
+    low:['Heute: Sparflamme mit Plan.','Kurz bewegen, früh ins Bett, sonst nichts Großes. Genau das ist heute richtig.'],
+    mid:['Ein normaler Tag. Mach die drei Dinge.','Mehr braucht es heute nicht.'],
+    good:['Guter Tag. Nutz ihn.','Du bist gut drauf, heute darf das Training etwas mehr sein.']}[st.lvl||'mid'];
+  let t=T[0], s=T[1];
+  if(hr>=17){ t=done===items.length?'Alles erledigt. Stark.':done?`${done} von ${items.length} geschafft.`:'Der Abend zählt auch noch.';
+    s=items.find(i=>i.id==='sl').title+'. '+(ciDone(x,'pm')?'Danke für den Abend-Check-in.':'Vorher noch kurz einchecken.'); }
+  else if(done===items.length) { t='Alle drei erledigt.'; s='Mehr ist heute nicht nötig. Der Rest ist Bonus.'; }
+  return {t,s};
+}
+function coFacts(st){
+  const out=[]; if(st.f) out.push(`Schlaf gefühlt <b>${st.f.sleep}</b>/10`,`Energie <b>${st.f.energy}</b>/10`);
+  if(st.ws!=null) out.push(`Uhr <b>${hc(st.ws)}</b> h Schlaf`); else if(DATA.lastWithData!==TD()||!coWatchSleep(TD())) out.push('Uhr noch nicht abgeglichen');
+  if(st.bb!=null) out.push(`Akku <b>${nf(st.bb)}</b>`);
+  return out.map(f=>`<span>${f}</span>`).join('');
+}
+function coItemHTML(it){
+  const open=tcUi.coOpen===it.id, btn=it.tc?`data-tc="${it.tc}"${it.k?` data-k="${it.k}"`:''}${it.a?` data-a="${it.a}"`:''}${it.v?` data-v="${it.v}"`:''}`:'data-tc="co" data-a="mvdone"';
+  let body='';
+  if(it.id==='mv'&&it.s){
+    const tr=tcDay().training;
+    if(it.done){ const fb=tr&&tr.rpe;
+      body=fb?`<p class="co-fb">${fb<=4?'Zu leicht, notiert: Nächstes Mal legt dein Trainer eine Stufe drauf.':fb>=9?'Zu hart, notiert: Nächstes Mal eine Stufe leichter.':'Passt, notiert: So bleibt die Dosis.'}</p>`
+        :`<div class="co-ask"><span>Wie war’s?</span><div>${[[4,'Zu leicht'],[7,'Passt'],[9,'Zu hart']].map(([v,l])=>`<button type="button" class="tg" data-tc="rpe" data-v="${v}">${l}</button>`).join('')}</div></div>`;
+    } else if(open){
+      body=`${it.s.blocks?tcExList(it.s.blocks):''}
+        <div class="row co-go"><button type="button" class="btn go" data-tc="co" data-a="mvdone">✓ Erledigt</button>${it.isQ?'':'<button type="button" class="btn ghost" data-goview="workout">Mit Timer ›</button>'}</div>
+        <div class="co-alt"><span class="small muted">Andere Stufe:</span>${CO_TIERS.filter(k=>k==='quick'||it.sess[k]).map(k=>`<button type="button" class="tg" data-tc="co" data-a="tier" data-v="${k}" aria-pressed="${k===it.tier}">${TIERN[k]}</button>`).join('')}</div>`;
+    }
+  } else if(open&&it.breath){
+    body=`<div class="breath co-breath"><div class="orb" id="orb">${tcBreath.on?'':'Start'}</div><div class="row" style="justify-content:center"><button class="btn ghost" data-tc="act" data-a="breath">${tcBreath.on?'Stopp':'2 Minuten Box-Atmung'}</button><span class="status" id="bleft">${tcBreath.on?'':'4 s ein · 4 halten · 4 aus · 4 halten'}</span></div></div>`;
+  }
+  const expandable=(it.id==='mv'&&it.s&&!it.done)||it.breath||it.tip;
+  return `<div class="co-it ${it.done?'is-done':''} ${open?'open':''}" id="co-${it.id}">
+    <button type="button" class="co-ck" ${btn} aria-pressed="${it.done}" aria-label="${esc(it.title)} ${it.done?'erledigt':'abhaken'}">✓</button>
+    <div class="co-main">
+      <button type="button" class="co-t" ${expandable?`data-tc="co" data-a="open" data-v="${it.id}" aria-expanded="${open}"`:'tabindex="-1"'}><span class="co-area">${it.area}</span><b>${esc(it.title)}</b>${expandable&&!it.done?`<span class="co-more">${open?'weniger':it.id==='mv'?'Übungen':'mehr'}</span>`:''}</button>
+      <p class="co-why">${esc(it.why)}</p>${open&&it.tip?`<p class="co-tip">${esc(it.tip)}</p>`:''}${body}
+    </div></div>`;
+}
+/* Für zwischendurch: genau ein Vorschlag, passend zu Ort und Tag */
+function coNudge(){
+  const list=tcNudgeList(tcMode()), nd=tcDay().nudges||{}, open=list.filter(n=>!nd[n.id]);
+  if(!open.length) return `<p class="small muted co-nd-done">✓ Für zwischendurch erledigt.</p>`;
+  const n=open[(tcUi.coNd||0)%open.length];
+  return `<section class="card s12 co-nd" aria-label="Für zwischendurch"><div class="co-area">Für zwischendurch · 2 Minuten</div>
+    <div class="co-nd-row"><button type="button" class="co-ck" data-tc="nudge" data-v="${n.id}" aria-pressed="false" aria-label="${esc(n.t)} abhaken">✓</button>
+    <div><b>${esc(n.t)}</b><p class="co-why">${esc(n.s)}${n.why?' · '+esc(n.why):''}</p></div></div>
+    ${open.length>1?`<button type="button" class="btn ghost tc-mini" data-tc="co" data-a="nd">Anderer Vorschlag</button>`:''}</section>`;
+}
+function renderHeute(){
+  const st=coState(), items=coItems(st), hd=coHead(st,items), x=tcDay(), t=dt(TD()), hr=new Date().getHours(), due=ciDue();
+  const week=tcWeek().map(d=>`<span class="${tcMoved(d)?'on':''} ${d===TD()?'today':''}" title="${dshort(d)}">${WD[dt(d).getDay()]}</span>`).join('');
+  const save=dbState==='an'?(tcSaveErr?` · <b style="color:var(--crit)">nicht gespeichert (${esc(tcSaveErr)})</b>`:tcDirty.size?' · wird gespeichert …':''):dbState==='lade'?'':' · nur in diesem Browser';
+  const q=due&&CI_Q[due];
+  const ci=due?`<button class="btn go ci-go" data-ci="${due}">${q.title} <small>${q.qs.length} Fragen · ${q.dur}</small></button>`:'';
+  const planned=!!st.f||hr>=10;   // vor 10 Uhr erst der Check-in, danach steht der Plan auch ohne
+  const sunday=t.getDay()===0&&hr<14&&x.weight==null?`<div class="co-weigh"><span>Sonntag: kurz wiegen</span><input type="text" inputmode="decimal" id="g27w" data-g27="w" placeholder="kg" value="${esc(tcUi.g27w??'')}" aria-label="Gewicht heute in kg"><button type="button" class="btn" data-tc="g27" data-a="weight">Speichern</button></div>`:'';
+  const tomorrow=hr>=17?(()=>{ const d=addDays(TD(),1), k=TC_ROT[dt(d).getDay()], L=TC_LIB[k]; return `<p class="small muted co-next">Morgen früh: ${esc(L.title)}. Dein Trainer legt die Stufe nach deinem Check-in fest.</p>`; })():'';
+  return `<div class="grid tc co">
+    <div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${tcWeek().filter(tcMoved).length} Bewegungstage diese Woche${save}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>
+    <section class="card s12 co-hero" id="gzHero" aria-label="Dein Trainer heute">
+      <div class="lab">Dein Trainer heute</div><h2 class="co-h">${esc(hd.t)}</h2><p class="co-s">${esc(hd.s)}</p>
+      <div class="co-facts">${coFacts(st)}</div>${ci}${sunday}</section>
+    ${planned?`<section class="card s12 co-plan" id="coPlan" aria-label="Deine drei für heute"><h2>Deine drei für heute <span class="chip">${items.filter(i=>i.done).length} von 3</span></h2>${items.map(coItemHTML).join('')}${tomorrow}</section>`:''}
+    ${planned&&hr>=10&&hr<17?coNudge():''}
+    <div class="s12 co-links">
+      <button class="rowlink" data-goview="tag"><span style="flex:1"><b>Alles von heute</b><br><span class="small muted">Gewohnheiten, Dehnen, Atmung, Zähler, Training im Detail</span></span><span class="chev">›</span></button>
+    </div></div>`;
+}
+
+/* ================= WOCHE: ein Brief statt zwanzig Diagramme ================= */
+function coWeekStats(ds){
+  const am=k=>gzMean(ds.map(d=>ciGet(d,'am',k))), pm=k=>gzMean(ds.map(d=>ciGet(d,'pm',k)));
+  return {ci:ds.filter(d=>ciDone(store.days[d],'am')).length, pmN:ds.filter(d=>ciDone(store.days[d],'pm')).length,
+    moved:ds.filter(tcMoved).length, trained:ds.filter(tcTrained).length,
+    sleepW:gzMean(ds.map(coWatchSleep)), sleepF:am('sleep'), energy:am('energy'), moodAm:am('mood'), moodPm:pm('mood'), food:pm('food'), stress:pm('stress'),
+    sweetsNo:ds.filter(d=>(store.days[d]||{}).nosweets===true).length};
+}
+function coInsights(){
+  const ds=tcLastN(14), w=coWeekStats(tcLastN(7)), out=[], add=(score,tag,title,ev,act)=>out.push({score,tag,title,ev,act});
+  const ciN=tcLastN(14).filter(d=>ciDone(store.days[d],'am')).length;
+  // 1 · stärkste Gewohnheit als Anker
+  if(ciN>=8&&w.trained<=2) add(10,'Dein Anker',`Der Check-in ist deine stärkste Gewohnheit`,`${ciN} von 14 Morgen eingecheckt, aber nur an ${w.trained} von 7 Tagen trainiert.`,
+    'Wir hängen das Training direkt an den Check-in: Fertig getippt, aufstehen, 6 Minuten. Wer eine neue Gewohnheit an eine bestehende koppelt, hält sie deutlich öfter durch.');
+  // 2 · Schlaf: Gefühl gegen Uhr
+  const pairs=ds.map(d=>[ciGet(d,'am','sleep'),coWatchSleep(d)]).filter(([a,b])=>a!=null&&b!=null);
+  if(pairs.length>=4){ const f=gzMean(pairs.map(p=>p[0])), h=gzMean(pairs.map(p=>p[1]));
+    if(f<=5&&h>=6.3) add(9,'Schlaf',`Genug Stunden, trotzdem nicht erholt`,`Die Uhr misst im Schnitt ${hc(h)} h, du fühlst dich wie ${nf(f,1)}/10 (${pairs.length} Nächte).`,
+      `Es fehlt eher Ruhe als Dauer. Die zwei Hebel: jeden Abend Licht aus um ${G27.bed}, und um 4 Uhr bei der Tablette kein Licht, kein Handy. Alles liegt schon griffbereit am Bett.`); }
+  // 3 · Einschlafzeit schwankt
+  const p=coPlan(); if(p.bedSD>45) add(7,'Schlaf',`Deine Einschlafzeit schwankt um rund ${Math.round(p.bedSD/15)*15} Minuten`,`Meist schläfst du gegen ${p.typicalBed||'–'} ein${tcIns('Einschlafzeit')?`. ${tcIns('Einschlafzeit').hi[0].toUpperCase()+tcIns('Einschlafzeit').hi.slice(1)} erholst du dich laut Uhr messbar besser`:''}.`,
+    `Diese Woche eine feste Zeit, auch Freitag und Samstag: Licht aus um ${G27.bed}. Ein Wecker um ${coClock(g27Clock(G27.bed)-30)} erinnert dich ans Handy-Weglegen.`);
+  // 4 · Essen hängt am Stress
+  const ev=ds.map(d=>[ciGet(d,'pm','stress'),ciGet(d,'pm','food')]).filter(([a,b])=>a!=null&&b!=null);
+  if(ev.length>=4){ const hi=ev.filter(e=>e[0]>=6).map(e=>e[1]), lo=ev.filter(e=>e[0]<6).map(e=>e[1]);
+    if(hi.length>=2&&lo.length>=2&&gzMean(lo)-gzMean(hi)>=1.5) add(8,'Essen',`An stressigen Tagen kippt das Essen`,`Stress ab 6: Essen im Schnitt ${nf(gzMean(hi),1)}/10, an ruhigeren Tagen ${nf(gzMean(lo),1)}/10 (${ev.length} Abende).`,
+      'An harten Tagen nicht mit Disziplin gegensteuern, sondern vorplanen: Eiweiß-Snack um 15:30, abends Teller statt Packung, vor dem Kühlschrank einmal tief durchatmen.'); }
+  if(w.food!=null&&w.food<=5&&!out.some(o=>o.tag==='Essen')) add(6,'Essen',`Das Essen lief diese Woche eher schwer`,`Abends im Schnitt ${nf(w.food,1)}/10 nach deinem Gefühl.`,
+    'Ein Hebel reicht: der Eiweiß-Snack am Nachmittag. Wer satt in den Abend geht, muss weniger widerstehen.');
+  // 5 · Stimmung über den Tag
+  if(w.moodAm!=null&&w.moodPm!=null&&Math.abs(w.moodPm-w.moodAm)>=1) add(5,'Kopf',w.moodPm>w.moodAm?'Deine Abende sind besser als deine Morgen':'Der Tag zieht deine Stimmung runter',`Stimmung morgens ${nf(w.moodAm,1)}, abends ${nf(w.moodPm,1)} von 10.`,
+    w.moodPm>w.moodAm?'Die Morgen sind die Baustelle, nicht das Leben. Meist steckt die Nacht dahinter, darum zählt der Schlaf doppelt.':'Plane einen Puffer zwischen Arbeit und Familie: eine Minute ankommen, bevor du reingehst.');
+  // 6 · Erkenntnisse aus den Uhrdaten (bisherige Liste), nachrangig
+  tcInsights().filter(i=>!/^own-wait|^bed$/.test(i.key)).slice(0,2).forEach((i,k)=>add(3-k,i.tag,i.title,i.evidence,i.tip));
+  return out.sort((a,b)=>b.score-a.score).slice(0,3);
+}
+function coWeekLine(w,prev){
+  const parts=[];
+  if(w.ci>=5) parts.push(`Check-in an ${w.ci} von 7 Tagen, das sitzt.`); else parts.push(`Check-in an ${w.ci} von 7 Tagen.`);
+  parts.push(w.moved>=5?`Bewegt an ${w.moved} Tagen, stark.`:w.moved>=3?`Bewegt an ${w.moved} Tagen, da geht noch einer.`:`Bewegt nur an ${w.moved} von 7 Tagen. Das ist diese Woche die größte Lücke.`);
+  if(w.sleepF!=null) parts.push(`Schlaf gefühlt ${nf(w.sleepF,1)}/10${w.sleepW!=null?`, laut Uhr ${hc(w.sleepW)} h`:''}.`);
+  return parts.join(' ');
+}
+function renderWoche(){
+  const ds=tcLastN(7), w=coWeekStats(ds), pv=coWeekStats(tcLastN(7,addDays(TD(),-7)));
+  const dl=(a,b,d=1,up=true)=>a==null||b==null||Math.abs(a-b)<0.05?'':`<span class="trend ${(a>b)===up?'up':'down'}">${a>b?'▲':'▼'} ${nf(Math.abs(a-b),d)}</span> zur Vorwoche`;
+  const sp=f=>tcSpark(ds.map(d=>({x:d,y:f(d)})),{h:36});
+  const tile=(lab,val,unit,sub,spark)=>`<div class="co-tile"><span class="lab">${lab}</span><span class="big">${val}<small>${unit}</small></span><span class="small muted">${sub}</span>${spark}</div>`;
+  const tiles=[
+    tile('Bewegung',w.moved,'/7 Tage',`${w.trained} mit Training`,`<div class="dots7">${ds.map(d=>`<i class="${tcMoved(d)?'on':''}"></i>`).join('')}</div>`),
+    tile('Schlaf gefühlt',w.sleepF==null?'–':nf(w.sleepF,1),'/10',w.sleepW!=null?`Uhr Ø ${hc(w.sleepW)} h`:dl(w.sleepF,pv.sleepF),sp(d=>ciGet(d,'am','sleep'))),
+    tile('Essen abends',w.food==null?'–':nf(w.food,1),'/10',dl(w.food,pv.food)||`${w.pmN} Abende eingetragen`,sp(d=>ciGet(d,'pm','food'))),
+    tile('Stimmung',w.moodAm==null&&w.moodPm==null?'–':nf(gzMean([w.moodAm,w.moodPm]),1),'/10',w.moodAm!=null&&w.moodPm!=null?`morgens ${nf(w.moodAm,1)} · abends ${nf(w.moodPm,1)}`:'',sp(d=>gzMean([ciGet(d,'am','mood'),ciGet(d,'pm','mood')])))].join('');
+  const ins=coInsights();
+  return `<div class="grid tc co">
+    <section class="card s12 co-hero" id="coWeek"><div class="lab">Deine Woche · ${dmini(ds[0])} bis ${dmini(ds[6])}</div><p class="co-s co-wl">${esc(coWeekLine(w,pv))}</p><div class="co-tiles">${tiles}</div></section>
+    <section class="card s12" id="coIns"><h2>Was dein Trainer daraus macht</h2>${ins.length?ins.map((i,n)=>`<div class="co-ins"><span class="chip">${esc(i.tag)}</span><h3>${esc(i.title)}</h3><p class="small muted">${esc(i.ev)}</p><p class="tc-do"><b>${n?'Außerdem':'Diese Woche'}:</b> ${esc(i.act)}</p></div>`).join(''):'<p class="small muted">Nach ein paar Check-ins stehen hier deine persönlichen Muster.</p>'}
+      <p class="tiny muted" style="margin-top:8px">Zusammenhänge aus deinen eigenen Daten, keine Beweise für Ursachen.</p></section>
+    ${g27Card(false)}
+    <div class="s12 co-links"><button class="rowlink" data-goview="werte"><span style="flex:1"><b>Alle Werte und Diagramme</b><br><span class="small muted">Gesamtzustand, Uhr, Check-in-Verläufe, 7 und 30 Tage, Gewichtspfad</span></span><span class="chev">›</span></button></div>
+  </div>`;
+}
+
+/* ---------- ALLE WERTE (frühere Übersicht) ---------- */
+function renderWerte(){
   const d14=tcLastN(14), d7=d14.slice(7), p7=d14.slice(0,7);
   const avg=a=>{ const v=a.filter(y=>y!=null); return v.length?v.reduce((s,y)=>s+y,0)/v.length:null; };
   const rec=d=>{ const x=DATA.days[d]; return x&&x.recovery!=null?x.recovery:null; };
@@ -1270,7 +1558,7 @@ const CI_Q={
     {k:'sleep',q:'Wie hast du geschlafen?',l:['sehr schlecht','geht so','sehr gut']},
     {k:'energy',q:'Wie viel Energie hast du gerade?',l:['leer','mittel','voller Energie']},
     {k:'mood',q:'Wie ist deine Stimmung?',l:['sehr schlecht','neutral','sehr gut']},
-    {k:'min',q:'Wie viel Zeit hast du heute fürs Training?',min:[0,10,20,30,45,60]}]},
+    {k:'min',q:'Wie viel Zeit hast du heute für Bewegung?',min:[5,10,20,30,45,60]}]},
   pm:{title:'Abend-Check-in',dur:'1 Minute',qs:[
     {k:'mood',q:'Wie ist deine Stimmung jetzt?',l:['sehr schlecht','neutral','sehr gut']},
     {k:'stress',q:'Wie gestresst warst du heute?',l:['ganz ruhig','spürbar','am Limit']},
@@ -1333,7 +1621,7 @@ const GZ_G={
 const gzG=(k,d)=>{ const x=DATA.days[d]; if(!x) return null; const v=GZ_G[k].f(x); return v==null||isNaN(v)?null:v; };
 /* Training: Garmin-Aktivitäten plus im Cockpit abgehakte Einheiten (Minuten aus der gewählten Stufe) */
 function gzTrainMin(d){ const g=gzG('train',d)||0, x=store.days[d], tr=x&&x.training&&x.training.tier;
-  const own=tr?({min:10,std:25,full:40}[tr]||0):0; return Math.max(g,own)||((DATA.days[d]||store.days[d])?0:null); }
+  const own=tr?({quick:6,min:10,std:25,full:40}[tr]||0):0; return Math.max(g,own)||((DATA.days[d]||store.days[d])?0:null); }
 
 /* ---------- Gesamtzustand: Gewichte aus gesamtzustand.txt ---------- */
 const GZ_DEF={anteil:{koerper:50,kopf:50},
@@ -1426,7 +1714,7 @@ function renderCi(){
   else {
     const q=Q.qs[ciUi.i], last=ciLast(ciUi.slot,q.k);
     const lastTxt=last?`Zuletzt: ${q.min?(last.v>=60?'60+':last.v)+' Minuten':last.v} <span>(${last.d===TD()?'heute':dshort(last.d)})</span>`:'Noch kein früherer Wert';
-    const grid=q.min?`<div class="ci-grid min" role="group" aria-label="${esc(q.q)}">${q.min.map(v=>`<button type="button" data-civ="${v}">${v===60?'60+':v}<small>${v===0?'heute keine':'Minuten'}</small></button>`).join('')}</div>`
+    const grid=q.min?`<div class="ci-grid min" role="group" aria-label="${esc(q.q)}">${q.min.map(v=>`<button type="button" data-civ="${v}">${v===60?'60+':v}<small>${v===0?'heute keine':v===5?'nur kurz':'Minuten'}</small></button>`).join('')}</div>`
       :`<div class="ci-grid" role="group" aria-label="${esc(q.q)}">${[...Array(10)].map((_,j)=>`<button type="button" data-civ="${j+1}">${j+1}</button>`).join('')}</div>
         <div class="ci-lab"><span><b>1</b> ${esc(q.l[0])}</span><span><b>5</b> ${esc(q.l[1])}</span><span><b>10</b> ${esc(q.l[2])}</span></div>`;
     el.innerHTML=bar+`<div class="ci-body"><p class="ci-n">Frage ${ciUi.i+1} von ${n}</p><h2 class="ci-q" id="ciQ">${esc(q.q)}</h2>${grid}<p class="ci-last">${lastTxt}</p></div>`;
@@ -1453,7 +1741,7 @@ function ciAct(e){ const a=e.currentTarget.dataset.cia;
   else if(a==='back'){ ciUi.i=Math.max(0,ciUi.i-1); renderCi(); } }
 function ciDoneScreen(){
   const slot=ciUi.slot, x=tcDay(), v=x[slot]||{}, Q=CI_Q[slot];
-  const rows=Q.qs.map(q=>{ const val=v[q.k]; if(q.min) return `<div><span>Zeit fürs Training</span><b>${val===0?'heute keine':(val>=60?'60+':val)+' min'}</b></div>`;
+  const rows=Q.qs.map(q=>{ const val=v[q.k]; if(q.min) return `<div><span>Zeit für Bewegung</span><b>${val===0?'heute keine':(val>=60?'60+':val)+' min'}</b></div>`;
     const hist=gzHist(d=>ciGet(d,slot,q.k),TD()), r=gzRate(val,hist,q.k!=='stress',q.k==='stress'?[3,7]:[4,7]);
     return `<div><span>${CI_NAME[slot==='am'&&q.k==='sleep'?'sleep':q.k]}</span><b>${val}</b>${gzTag(r)}</div>`; }).join('');
   const c=x.checkin||{}, e=x.evening||{};
@@ -1461,8 +1749,10 @@ function ciDoneScreen(){
     ?`<div class="toggles"><button type="button" class="tg" data-tc="tg" data-k="night" aria-pressed="${!!c.night}">Nacht unterbrochen</button><button type="button" class="tg" data-tc="ci-pain" aria-pressed="${c.pain>=4}">Schmerzen</button><button type="button" class="tg" data-tc="tg" data-k="sick" aria-pressed="${!!c.sick}">Krank</button></div>`
     :`<div class="toggles">${TC_EVE.drain.map(([id,t])=>`<button type="button" class="tg" data-tc="evt" data-k="drain" data-v="${id}" aria-pressed="${(e.drain||[]).includes(id)}">${t}</button>`).join('')}</div>
       <div class="toggles" style="margin-top:8px"><button type="button" class="tg" data-tc="ev" data-k="screen" data-v="1" aria-pressed="${!!e.screen}">Bildschirm aus um 22 Uhr</button></div>`;
+  const plan=slot==='am'?`<div class="ci-plan"><div class="lab">Dein Trainer hat entschieden</div>${coItems(coState()).map(i=>`<div><span>${i.area}</span><b>${esc(i.title)}</b></div>`).join('')}</div>`
+    :`<div class="ci-plan"><div class="lab">Heute Abend</div><div class="toggles"><button type="button" class="tg" data-tc="g27" data-a="sweet" data-v="1" aria-pressed="${x.nosweets===true}">Abend ohne Süßes</button><button type="button" class="tg" data-tc="g27" data-a="sweet" data-v="0" aria-pressed="${x.nosweets===false}">Süßes gegessen</button></div></div>`;
   return `<div class="ci-body done"><div class="ci-ok" role="status"><span>✓</span>Gespeichert</div>
-    <div class="ci-sum">${rows}</div>
+    ${plan}<div class="ci-sum">${rows}</div>
     <details class="ci-more"><summary>${slot==='am'?'Noch etwas? Schmerzen, Nacht, krank':'Noch etwas? Was hat Kraft gekostet'}</summary>${extra}</details>
     <button type="button" class="btn go ci-go" data-cia="close">Fertig</button></div>`;
 }
@@ -1559,6 +1849,17 @@ function tcClick(e){
       tcPatch(x=>{ x.adhoc=(x.adhoc||[]).concat({id:ad.id,kind:ad.kind,n:ad.n||null,at:new Date().toISOString()}); x.habits=Object.assign({},x.habits,{breaks:true});
         if(ad.ankle||(TC_NUDGE_POOL[ad.id]||{}).habit==='ankle') x.habits.ankle=true;
         if(rep&&ad.n){ x.reps=Object.assign({},x.reps); x.reps[rep]=(x.reps[rep]||0)+ad.n; } }); } }
+  else if(a==='co'){ const w=b.dataset.a;
+    if(w==='open'){ tcUi.coOpen=tcUi.coOpen===v?null:v; render(); return; }
+    if(w==='tier'){ tcUi.coTier=v; tcUi.coOpen='mv'; render(); return; }
+    if(w==='nd'){ tcUi.coNd=(tcUi.coNd||0)+1; render(); return; }
+    if(w==='mvdone'){ const st=coState(), t=tcUi.coTier||coTier(st);
+      tcPatch(x=>{ const prev=x.training;
+        if(prev&&prev.tier){ if(prev.tier==='quick'){ x.reps=Object.assign({},x.reps); x.reps.push=Math.max(0,(x.reps.push||0)-CO_QUICK.reps.push); x.reps.squat=Math.max(0,(x.reps.squat||0)-CO_QUICK.reps.squat); } delete x.training; return; }
+        x.training={tier:t,session:t==='quick'?CO_QUICK.title:tcSession({band:st.lvl==='low'?'red':st.lvl==='good'?'green':'yellow'}).title,at:new Date().toISOString()};
+        x.habits=Object.assign({},x.habits,{move:true});
+        if(t==='quick'){ x.reps=Object.assign({},x.reps); x.reps.push=(x.reps.push||0)+CO_QUICK.reps.push; x.reps.squat=(x.reps.squat||0)+CO_QUICK.reps.squat; } });
+      tcUi.coOpen=null; return; } }
   else if(a==='dtype'){ tcPatch(x=>{ x.daytype=v; }); }
   else if(a==='g27'){ g27Act(b.dataset.a,v); }
   else if(a==='stretch'){ const s=tcStretchList().find(y=>y.key===v); tcPatch(x=>{ x.stretch=Object.assign({},x.stretch); x.stretch[v]=!x.stretch[v]; if(x.stretch[v]){ x.habits=Object.assign({},x.habits,{breaks:true}); if(s&&/Sprunggelenk/.test(s.zone)) x.habits.ankle=true; } }); }
@@ -2783,17 +3084,18 @@ function render(){
   if (!DATA) return;
   const active = document.activeElement && document.activeElement.id;
   $('#daynav').classList.toggle('hidden', !DAYVIEWS.includes(view));
+  document.querySelector('header.top').classList.toggle('hidden', ['heute'].includes(view));
   $('#date').textContent = dlong(cur);
   $('#prev').disabled = days.indexOf(cur)===0; $('#next').disabled = days.indexOf(cur)===days.length-1;
-  const tab = ['heute','uebersicht','workout','food'].includes(view) ? view : 'more';
-  $('#ttl').textContent = {heute:'Heute', uebersicht:'Übersicht', workout:'Training', food:'Essen', coach:'Trainer', rec:'Erholung', str:'Belastung', slp:'Schlaf', trn:'Trainingsanalyse', trd:'Verlauf', jrn:'Tagebuch'}[view] || 'Trainingscockpit';
+  const tab = view==='heute'?'heute':view==='uebersicht'?'uebersicht':'more';
+  $('#ttl').textContent = {heute:'Heute', uebersicht:'Woche', tag:'Alles von heute', werte:'Alle Werte', workout:'Training', food:'Essen', coach:'Trainer', rec:'Erholung', str:'Belastung', slp:'Schlaf', trn:'Trainingsanalyse', trd:'Verlauf', jrn:'Tagebuch'}[view] || 'Trainingscockpit';
   document.querySelectorAll('#bnav button').forEach(b=>{ if (b.dataset.t===tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   const x = DATA.days[cur];
-  $('#banner').innerHTML = ['food','coach','workout','trn','trd','jrn','uebersicht'].includes(view) ? '' : DATA.today!==DATA.lastWithData && (view==='heute' || cur===DATA.lastWithData)
+  $('#banner').innerHTML = ['food','coach','workout','trn','trd','jrn','uebersicht','werte'].includes(view)||(view==='heute'&&new Date().getHours()<11) /* morgens gleicht die Uhr oft erst später ab: Hinweis erst ab 11 Uhr */ ? '' : DATA.today!==DATA.lastWithData && (view==='heute' || cur===DATA.lastWithData)
     ? `<div class="banner"><b>Noch keine Daten von heute.</b> Angezeigt wird ${dshort(DATA.lastWithData)} Garmin-App öffnen, damit die Uhr abgleicht.</div>`
     : (DAYVIEWS.includes(view) && x && x.recovery==null ? `<div class="banner"><b>Für ${dlong(cur)} liegen noch keine Daten vor.</b></div>` : '');
   const v = $('#view');
-  const html = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='uebersicht'?renderUebersicht():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
+  const html = view==='workout'?renderWorkout():view==='food'?renderFood():view==='heute'?renderHeute():view==='uebersicht'?renderWoche():view==='tag'?renderTag():view==='werte'?renderWerte():view==='rec'?renderRec():view==='str'?renderStr():view==='slp'?renderSlp():view==='trn'?renderTrn():view==='trd'?renderTrd():view==='jrn'?renderJrn():renderCoach();
   // Unverändertes nicht neu zeichnen: sonst geht auf dem iPhone ein Tipp verloren, wenn zwischen Berühren und Loslassen neu gezeichnet wird
   if (html===v._html) return;
   v.innerHTML = html; v._html = html;
@@ -2824,7 +3126,7 @@ async function boot(){
   days = Object.keys(DATA.days).sort();
   cur = DATA.lastWithData || days[days.length-1];
   parseHash();
-  if (!['heute','uebersicht','workout','food','rec','str','slp','trn','trd','jrn','coach'].includes(view)) view='heute';
+  if (!['heute','uebersicht','tag','werte','workout','food','rec','str','slp','trn','trd','jrn','coach'].includes(view)) view='heute';
   gLoad(); if (G) gRun();
   $('#meta').textContent = `Trainingscockpit · Stand ${DATA.lastSync?dmini(DATA.lastSync.slice(0,10))+', '+DATA.lastSync.slice(11,16)+' Uhr':'–'}`;
   $('#prev').onclick=()=>{ const i=days.indexOf(cur); if(i>0){cur=days[i-1];render();} };

@@ -10,6 +10,8 @@ const CI = fs.existsSync(CI_FILE) ? JSON.parse(fs.readFileSync(CI_FILE, 'utf8'))
 const CFG = fs.readFileSync(path.join(ROOT, 'web', 'cockpit', 'gesamtzustand.txt'), 'utf8');
 const wrap = html => '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>' + html + '</body></html>';
 
+// Ansicht beim Öffnen: '' = neues Heute; ältere Tests prüfen die Detailansichten „Alles von heute“ (tag) und „Alle Werte“ (werte)
+let HASH = '';
 async function open(browser, app, data, width = 390, time = null, init = null, { ci = CI, cfg = CFG, scheme = 'light' } = {}) {
   const page = await browser.newPage({ viewport: { width, height: 844 }, colorScheme: scheme });
   if (ci) await page.addInitScript(c => { try { if (!localStorage.getItem('cockpit.days')) localStorage.setItem('cockpit.days', c); } catch (e) {} }, JSON.stringify(ci));
@@ -28,7 +30,7 @@ async function open(browser, app, data, width = 390, time = null, init = null, {
     const f = path.join(ROOT, 'web', app, 'index.html');
     return r.fulfill({ contentType: 'text/html', body: wrap(fs.readFileSync(f, 'utf8')) });
   });
-  await page.goto(`http://test.local/${app}/index.html`);
+  await page.goto(`http://test.local/${app}/index.html${HASH ? '#' + HASH : ''}`);
   return { page, errors };
 }
 
@@ -48,7 +50,7 @@ const tests = {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForFunction(() => document.querySelector('#view').innerText.length > 50);
     const v = await page.locator('#view').innerText();
-    assert.match(v, /Gesamtzustand[\s\S]*Schlaf[\s\S]*Energie-Akku[\s\S]*Stimmung/i);
+    assert.match(v, /Dein Trainer heute/i);
     assert.strictEqual((await page.locator('#banner').innerText()).trim(), '');
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf dem Handy');
     assert.deepStrictEqual(errors, []);
@@ -56,11 +58,12 @@ const tests = {
   async 'Cockpit: alle Bereiche lassen sich öffnen'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
     await page.waitForFunction(() => document.querySelector('#view').innerText.length > 50);
-    for (const t of ['uebersicht', 'workout', 'food', 'heute']) {
+    assert.strictEqual(await page.locator('#bnav button').count(), 3, 'drei Bereiche unten');
+    for (const t of ['uebersicht', 'heute']) {
       await page.click(`#bnav button[data-t="${t}"]`);
       assert.ok((await page.locator('#view').innerText()).length > 20, t);
     }
-    for (const t of ['coach', 'rec', 'str', 'slp', 'trn', 'trd', 'jrn']) {
+    for (const t of ['workout', 'food', 'tag', 'werte', 'coach', 'rec', 'str', 'slp', 'trn', 'trd', 'jrn']) {
       await page.click('#bnav button[data-t="more"]');
       await page.click(`[data-mv="${t}"]`);
       assert.ok((await page.locator('#view').innerText()).length > 20, t);
@@ -69,7 +72,8 @@ const tests = {
   },
   async 'Cockpit: Banner bei veralteten Daten'(b) {
     const stale = Object.assign({}, DATA, { today: '2099-01-01' });
-    const { page, errors } = await open(b, 'cockpit', stale);
+    const noon = new Date(); noon.setHours(13, 0, 0, 0);   // morgens ohne Hinweis, die Uhr gleicht oft erst später ab
+    const { page, errors } = await open(b, 'cockpit', stale, 390, noon);
     await page.waitForSelector('#banner .banner');
     assert.match(await page.locator('#banner').innerText(), /Noch keine Daten von heute/);
     assert.deepStrictEqual(errors, []);
@@ -226,8 +230,6 @@ const tests = {
   },
   async 'Cockpit Übersicht: Kacheln, Erkenntnisse mit Alltagstipp'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
-    await page.waitForSelector('#bnav button[data-t="uebersicht"]');
-    await page.click('#bnav button[data-t="uebersicht"]');
     await page.waitForSelector('.tc-tile');
     assert.strictEqual(await page.locator('.tc-tile').count(), 4);
     assert.ok(await page.locator('.tc-ins').count() >= 1);
@@ -252,7 +254,8 @@ const tests = {
     assert.deepStrictEqual([x.am.sleep, x.am.energy, x.am.mood, x.am.min], [6, 5, 7, 20]);
     assert.deepStrictEqual([x.checkin.sleep, x.checkin.energy, x.checkin.mood], [3, 3, 4], 'Spiegel 1–5 für ältere Teile');
     await closeCi(page);
-    assert.match(await page.locator('#tcTrain').innerText(), /passt in deine 20 Minuten|Minimum|Normal/);
+    assert.match(await page.locator('#co-mv').innerText(), /6 Minuten|Minimum|Normal/);
+    assert.strictEqual(await page.locator('#coPlan .co-it').count(), 3, 'genau drei Dinge');
     assert.deepStrictEqual(errors, []);
   },
   async 'Gesamtübersicht 1: Check-in passend zur Uhrzeit, alte Einträge (1–5) bleiben lesbar'(b) {
@@ -273,8 +276,6 @@ const tests = {
   },
   async 'Gesamtübersicht 2: 30 Tage Beispieldaten füllen alle Diagramme (7 und 30 Tage)'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
-    await page.waitForSelector('#bnav button[data-t="uebersicht"]');
-    await page.click('#bnav button[data-t="uebersicht"]');
     await page.waitForSelector('.gz-card');
     for (const per of [7, 30]) {
       await page.click(`[data-gzper="${per}"]`);
@@ -361,11 +362,69 @@ const tests = {
     assert.match(t2, /Abende ohne Süßes[\s\S]*2\s*\/5/);
     assert.match(t2, /Freund getroffen[\s\S]*Michi \(Mi\)[\s\S]*1\s*\/1/);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf Heute');
-    await page.click('#bnav button[data-t="uebersicht"]');
+    await page.click('#bnav button[data-t="more"]'); await page.click('[data-mv="werte"]');
     await page.waitForSelector('#g27 svg');
     assert.match(await page.locator('#g27').innerText(), /0 von 0 abgeschlossenen Wochen/);
     assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf der Übersicht');
     await page.screenshot({ path: path.join(require('os').tmpdir(), 'ziele2027.png'), fullPage: false });
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Heute neu: Trainer-Satz und genau drei Dinge, Abhaken, Feedback zur Einheit'(b) {
+    const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d; };
+    let { page, errors } = await open(b, 'cockpit', DATA, 390, at(7), null, { ci: null });
+    await page.waitForSelector('#gzHero');
+    assert.match(await page.locator('#gzHero').innerText(), /Guten Morgen/);
+    assert.strictEqual(await page.locator('#coPlan').count(), 0, 'vor dem Check-in nur der Check-in');
+    assert.ok(await page.locator('header.top').isHidden(), 'keine doppelte Kopfzeile');
+    const box = await page.evaluate(() => { const h = document.querySelector('#gzHero .ci-go').getBoundingClientRect(), n = document.querySelector('.bnav').getBoundingClientRect(); return { b: h.bottom, n: n.top }; });
+    assert.ok(box.b <= box.n, 'Check-in-Knopf ohne Scrollen sichtbar');
+    await checkin(page, 'am', [3, 3, 4, 5]);
+    assert.match(await page.locator('#ci .ci-plan').innerText(), /Dein Trainer hat entschieden[\s\S]*Bewegung[\s\S]*Schlaf/i);
+    await closeCi(page);
+    assert.strictEqual(await page.locator('#coPlan .co-it').count(), 3, 'genau drei Dinge');
+    assert.match(await page.locator('#gzHero').innerText(), /Sparflamme/);
+    assert.match(await page.locator('#co-mv').innerText(), /6 Minuten/, 'wenig Energie und wenig Zeit: 6 Minuten');
+    assert.match(await page.locator('#co-sl').innerText(), /Licht aus um 22:00/, 'kurze Nacht: früher ins Bett');
+    const why = await page.locator('#coPlan .co-why').allInnerTexts();
+    assert.ok(why.every(t => t.length > 30 && !/undefined|NaN|null/.test(t)), 'jeder Punkt mit Begründung: ' + why.join(' / '));
+    await page.click('#co-mv .co-t');
+    assert.ok(await page.locator('#co-mv .block').count() >= 1, 'Übungen klappen auf');
+    await page.click('#co-mv [data-a="mvdone"] >> nth=0');
+    await page.click('#co-mv [data-tc="rpe"][data-v="4"]');
+    assert.match(await page.locator('#co-mv').innerText(), /Zu leicht, notiert/);
+    await page.click('#co-sl .co-ck');
+    assert.match(await page.locator('#coPlan h2').innerText(), /2 von 3/);
+    await page.reload(); await page.waitForSelector('#coPlan');
+    const x = await page.evaluate(() => JSON.parse(localStorage.getItem('cockpit.days'))[todayISO()]);
+    assert.deepStrictEqual([x.training.tier, x.training.rpe, x.reps.push, x.reps.squat, x.habits.bed, x.habits.move], ['quick', 4, 24, 30, true, true]);
+    assert.ok(await noHScroll(page));
+    assert.deepStrictEqual(errors, []); await page.close();
+    // abends: Abend-Check-in oben, Plan bleibt, kein Vorschlag für zwischendurch
+    ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(20), null, { ci: null }));
+    await page.waitForSelector('#gzHero [data-ci="pm"]');
+    assert.strictEqual(await page.locator('.co-nd').count(), 0);
+    assert.match(await page.locator('#coPlan').innerText(), /Morgen früh/);
+    assert.deepStrictEqual(errors, []); await page.close();
+    // mittags: genau ein Vorschlag für zwischendurch, „Anderer Vorschlag“ wechselt
+    ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(13)));
+    await page.waitForSelector('.co-nd');
+    const t1 = await page.locator('.co-nd b').innerText();
+    await page.click('.co-nd [data-a="nd"]');
+    assert.notStrictEqual(await page.locator('.co-nd b').innerText(), t1);
+    assert.deepStrictEqual(errors, []);
+  },
+  async 'Woche: Wochenbrief, höchstens 3 Erkenntnisse mit Handlung, Ziele 2027'(b) {
+    const { page, errors } = await open(b, 'cockpit', DATA);
+    await page.click('#bnav button[data-t="uebersicht"]');
+    await page.waitForSelector('#coWeek');
+    assert.match(await page.locator('#coWeek').innerText(), /Check-in an \d von 7 Tagen/);
+    assert.strictEqual(await page.locator('#coWeek .co-tile').count(), 4);
+    const n = await page.locator('#coIns .co-ins').count();
+    assert.ok(n >= 1 && n <= 3, 'ein bis drei Erkenntnisse, waren ' + n);
+    assert.match(await page.locator('#coIns').innerText(), /Diese Woche:/);
+    assert.ok(!/undefined|NaN/.test(await page.locator('#view').innerText()));
+    assert.strictEqual(await page.locator('#g27').count(), 1);
+    assert.ok(await noHScroll(page));
     assert.deepStrictEqual(errors, []);
   },
   async 'Tagescoach: Check-in ausfüllen ohne Fehler'(b) {
@@ -382,6 +441,7 @@ const tests = {
   const browser = await chromium.launch();
   let failed = 0;
   for (const [name, fn] of Object.entries(tests)) {
+    HASH = /^Cockpit Heute:|^Gesamtübersicht 4: Startbildschirm/.test(name) ? 'tag' : /^Cockpit Übersicht:|^Gesamtübersicht 2/.test(name) ? 'werte' : /^Ziele 2027/.test(name) ? 'tag' : '';
     try { await fn(browser); console.log('ok  ', name); }
     catch (e) { failed++; console.log('FEHL', name, '\n     ', e.message.split('\n').slice(0, 12).join('\n      ')); }
   }

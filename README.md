@@ -5,7 +5,7 @@ Florians tägliches Trainings- und Gesundheits-Cockpit: Garmin-Daten vom Mac, au
 | Ordner | Inhalt |
 |---|---|
 | `mac/` | Läuft auf dem Mac in `~/garmin`: `sync.py` (Garmin Connect), `analyze.py` (Auswertung), `formulas.py` (reine Formeln), `check_fresh.py` (Warnung bei alten Daten), `nudges.py` (Mini-Vorschläge nach iCloud Drive fürs iPhone, Anleitung in `docs/iphone-mini-vorschlaege.md`), `garmin.sh`, launchd-Job |
-| `web/cockpit/` | Seite des Trainingscockpits (Claude-Artifact) und `gesamtzustand.txt` (Gewichte der Ampel). Start ist **Heute** mit der Kachel Gesamtzustand oben (Morgen-Ablauf in 4 Schritten, ab 17 Uhr Abend-Reflexion zum Antippen, Check-in, Tagesmodus, Tipp, Training in 3 Stufen, Mini-Vorschläge, Kopf, Gewohnheiten), daneben **Übersicht** (Woche, Trends, Erkenntnisse mit Alltagstipp) |
+| `web/cockpit/` | Seite des Trainingscockpits (Claude-Artifact) und `gesamtzustand.txt` (Gewichte der Ampel). Unten nur drei Bereiche: **Heute** (Trainer-Satz und genau drei Dinge für den Tag), **Woche** (Wochenbrief, höchstens drei Erkenntnisse mit Handlung, Ziele 2027) und **Mehr** (Training, Essen, „Alles von heute“, „Alle Werte“ und die Detailseiten) |
 | `web/tagescoach/` | Alter, eigenständiger Tagescoach; steckt jetzt im Cockpit und kann nach dem Umzug der Daten weg |
 | `tests/` | Tests; `make_fixture.py` erzeugt ausgedachte Garmin-Daten |
 | `COACH.md` | Leitfaden für den Coach (Plan-Schema, Übungen) |
@@ -27,6 +27,19 @@ Ermittelt aus `mac/garmin.sh`, `mac/de.garmin.dashboard.plist`, dem Ordner `~/ga
 4. **Eingaben vom iPhone** (Check-ins, Häkchen, Abend) speichert die Seite dauerhaft in der privaten Artifact-Datenbank, Sammlung `days/<Datum>`. Nur Florian als Besitzer kann sie lesen und schreiben. Ohne Datenbank (lokale Vorschau) fällt sie auf den Browser-Speicher zurück.
 
 Der Umbau ändert nur Dateien in `web/cockpit/` und fügt die Datei `gesamtzustand.txt` hinzu. `~/garmin`, der launchd-Job, `sync.py` und die Claude-Aufgabe bleiben unverändert. Die Aufgabe ersetzt beim Veröffentlichen nur `dashboard-data.json`, alle anderen Dateien des Artifacts bleiben erhalten.
+
+## Heute und Woche: so entscheidet der Trainer (seit 15.11.2026)
+
+Grundsatz: weniger zeigen, mehr entscheiden. Florian checkt ein, der Trainer legt fest, Florian gibt nur Feedback.
+
+- **Heute** (`renderHeute`, Funktionen `co*`): oben ein Satz mit Urteil („Heute: Sparflamme mit Plan.“) aus Check-in und Uhr, darunter Schlaf gefühlt, Energie, Uhr-Schlaf, Akku. Vor 10 Uhr ohne Check-in nur der Check-in-Knopf, danach **genau drei Dinge**, jedes mit Begründung aus seinen eigenen Zahlen und einem Kreis zum Abhaken:
+  1. **Bewegung**: Stufe aus Zustand, Zeit aus dem Check-in, Wiedereinstieg (nach ≥ 3 Tagen Pause höchstens Minimum, bei wenig Energie die 6-Minuten-Einheit ohne Geräte `CO_QUICK`) und Feedback der letzten Einheit („Zu leicht“ = eine Stufe mehr, „Zu hart“ = eine weniger). Speichert `training.tier` (`quick`, `min`, `std`, `full`) und `training.rpe` (4, 7, 9). Die 6-Minuten-Einheit zählt 24 Liegestütze und 30 Kniebeugen.
+  2. **Schlaf**: Licht aus um 22:30, nach kurzer oder schlechter Nacht 22:00 (`habits.bed`). Tipp dazu: Handy raus, Tablette und Wasser schon ans Bett für 4 Uhr.
+  3. **Essen oder Kopf**: Eiweiß-Snack um 15:30 bzw. „Abend ohne Süßes“ (`nosweets`), wenn das Essen zuletzt schwer lief; „Ankommen, bevor du reingehst“ mit Box-Atmung (`habits.arrive`) nach stressigen Abenden; sonst Eiweiß zum Frühstück.
+  Zwischen 10 und 17 Uhr ein einziger Vorschlag für zwischendurch. Ab 17 Uhr Abend-Check-in oben, Schlaf zuerst, Ausblick auf morgen. Sonntags das Wiegen in der Startkachel.
+- **Check-in**: Frage 4 heißt jetzt „Zeit für Bewegung“ mit 5 („nur kurz“) statt 0. Nach dem Morgen-Check-in zeigt „Gespeichert“ die drei Entscheidungen, nach dem Abend-Check-in „Abend ohne Süßes / Süßes gegessen“.
+- **Woche** (`renderWoche`): ein Satz zur Woche, vier Kacheln (Bewegung, Schlaf gefühlt mit Uhr, Essen abends, Stimmung) und höchstens drei Erkenntnisse aus den eigenen Check-ins, jede mit „Diese Woche:“. Danach Ziele 2027. „Alle Werte und Diagramme“ führt zur früheren Übersicht.
+- Die früheren Ansichten bleiben vollständig unter **Mehr**: „Alles von heute“ (`#tag`, früheres Heute) und „Alle Werte“ (`#werte`, frühere Übersicht). Die App öffnet ohne Link immer auf Heute.
 
 ## Gesundheits-Gesamtübersicht: Aufbau
 
