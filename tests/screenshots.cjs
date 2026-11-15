@@ -40,7 +40,8 @@ async function shot(page, name, full = false) {
   await p.click('#gzHero [data-ci="am"]');
   for (const [i, v] of [[1, 7], [2, 6], [3, 8], [4, 30]]) { await shot(p, `03-checkin-morgen-${i}`); await p.click(`#ci [data-civ="${v}"]`); await p.waitForTimeout(250); }
   await shot(p, '03-checkin-morgen-gespeichert');
-  await p.click('#ci [data-cia="close"] >> nth=-1'); await shot(p, '04-heute-nach-checkin'); await p.close();
+  await p.click('#ci [data-cia="close"] >> nth=-1'); await shot(p, '04-heute-nach-checkin'); await shot(p, '04-heute-plan-ganz', true);
+  await p.click('#co-mv .co-t'); await shot(p, '04-heute-uebungen', true); await p.close();
   p = await open(b, 13); await shot(p, '05-heute-mittags'); await p.close();
   p = await open(b, 19);
   await shot(p, '06-heute-abends-start');
@@ -50,9 +51,10 @@ async function shot(page, name, full = false) {
   await p.click('#ci [data-cia="close"] >> nth=-1'); await p.close();
   // Übersicht 7 und 30 Tage, Rest der Bereiche
   p = await open(b, 13);
-  await p.click('#bnav button[data-t="uebersicht"]'); await p.click('[data-gzper="7"]'); await shot(p, '08-uebersicht-start'); await shot(p, '09-uebersicht-7-tage', true);
-  await p.click('[data-gzper="30"]'); await shot(p, '10-uebersicht-30-tage', true);
-  for (const [n, t] of [['11-training', 'workout'], ['12-essen', 'food']]) { await p.click(`#bnav button[data-t="${t}"]`); await shot(p, n, true); }
+  await p.click('#bnav button[data-t="uebersicht"]'); await shot(p, '08-woche-start'); await shot(p, '08-woche-ganz', true);
+  await p.click('#bnav button[data-t="more"]'); await p.click('[data-mv="werte"]'); await p.click('[data-gzper="7"]'); await shot(p, '09-alle-werte-7-tage', true);
+  await p.click('[data-gzper="30"]'); await shot(p, '10-alle-werte-30-tage', true);
+  for (const [n, t] of [['11-training', 'workout'], ['12-essen', 'food'], ['12-alles-von-heute', 'tag']]) { await p.click('#bnav button[data-t="more"]'); await p.click(`[data-mv="${t}"]`); await shot(p, n, true); }
   await p.click('#bnav button[data-t="more"]'); await shot(p, '13-mehr');
   for (const [n, t] of [['14-trainer', 'coach'], ['15-erholung', 'rec'], ['16-belastung', 'str'], ['17-schlaf', 'slp'], ['18-trainingsanalyse', 'trn'], ['19-verlauf', 'trd'], ['20-tagebuch', 'jrn']]) {
     if (await p.evaluate(() => document.querySelector('#sheet').classList.contains('hidden'))) await p.click('#bnav button[data-t="more"]');
