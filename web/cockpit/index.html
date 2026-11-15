@@ -418,6 +418,25 @@ body.ci-open{overflow:hidden}
 .gz-mh{display:flex;align-items:baseline;gap:8px} .gz-mh span{flex:1;font-weight:600;font-size:14px} .gz-mh b{font:700 20px var(--f-display)} .gz-mh .gz-e{display:inline}
 .gz-how summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
 .gz-how summary::-webkit-details-marker{display:none}
+/* Ziele 2027: Wochenzahlen aus dem PRD */
+.g27rows{display:grid;gap:2px}
+.g27r{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(3.4em,auto);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.g27r:last-child{border-bottom:0}
+.g27r b{font-size:14.5px}
+.g27r small{display:block;color:var(--ink-3);font-size:12px;line-height:1.3}
+.g27d{display:flex;gap:3px}
+.g27d i{width:12px;height:12px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line)}
+.g27d i.on{background:var(--good);border-color:var(--good)}
+.g27d i.no{background:var(--crit);border-color:var(--crit);opacity:.55}
+.g27d i.fut{opacity:.35}
+.g27v{font:700 22px/1 var(--f-display);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.g27v small{display:inline;font-size:13px;color:var(--ink-3);font-weight:600;margin-left:1px}
+.g27v.ok{color:var(--good)}
+.g27in{display:grid;gap:10px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.g27in .row input{flex:1;min-width:0;width:auto}
+.g27in .tg{min-height:44px}
+.g27tab td,.g27tab th{padding:6px 5px;font-size:13px}
+.g27tab td.ok{color:var(--good);font-weight:700}
 </style>
 
 <div class="wrap">
@@ -1000,12 +1019,12 @@ function renderHeute(){
   // Alles zur richtigen Zeit: morgens der Start in den Tag, tagsüber die Mini-Vorschläge, abends Reflexion und Kopf.
   const ph=tcPhase(), all=tcUi.showAll, c=x.checkin||{}, checked=tcAmDone(x), trained=!!(x.training&&x.training.tier);
   const card={morning:tcMorningCard, check:()=>tcCheckCard(m), tip:()=>tcTipCard(m), train:()=>tcTrainCard(m), rec:tcRecRow,
-    nudge:()=>tcNudgeCard(m), stretch:tcStretchCard, mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard};
+    nudge:()=>tcNudgeCard(m), stretch:tcStretchCard, mind:tcMindCard, habit:tcHabitCard, food:foodTile, eve:tcEveningCard, g27:()=>g27Card(false)};
   const order={
-    morgen:['morning','check','tip','train','rec'],
+    morgen:['morning',...(t.getDay()===0?['g27']:[]),'check','tip','train','rec'],   // sonntags: wiegen
     tag:['tip','nudge','stretch','morning',...(checked?[]:['check']),'train','food'],   // Offenes vom Morgen direkt untereinander: Ablauf, Check-in, Training
-    abend:['eve','stretch','habit','mind',...(trained?[]:['train']),'food']}[ph];
-  const rest=['eve','morning','check','tip','train','rec','nudge','stretch','mind','habit','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
+    abend:['eve','g27','stretch','habit','mind',...(trained?[]:['train']),'food']}[ph];
+  const rest=['eve','morning','check','tip','train','rec','nudge','stretch','mind','habit','g27','food'].filter(k=>!order.includes(k)&&!(k==='eve'&&ph!=='abend'));
   const lab={morgen:'Guten Morgen',tag:'Für zwischendurch',abend:'Guten Abend'}[ph];
   return `<div class="grid tc">${gzHeroCard()}${head}${tcDTypeRow()}${restart}<div class="s12 tc-phase"><span class="chip">${lab}</span><span class="small muted">${{morgen:'Jetzt nur: dein Start in den Tag.',tag:checked&&trained?'Morgen erledigt. Jetzt nur das Kleine für zwischendurch.':'Jetzt das Kleine für zwischendurch. Check-in und Training gehen auch noch.',abend:'Jetzt nur: kurz zurückschauen und runterkommen.'}[ph]}</span></div>
     ${order.map(k=>card[k]()).join('')}
@@ -1121,6 +1140,88 @@ function tcHabitCard(){
     <div class="water">${[...Array(TC_GOALS.water)].map((_,i)=>`<button type="button" data-tc="water" data-v="${i+1}" class="${i<w?'f':''}" aria-label="${i+1} Gläser"></button>`).join('')}</div></div></section>`;
 }
 
+/* ---------- Ziele 2027 (My 2027 PRD, Abschnitte 5, 7 und 11) ---------- */
+/* Wochenzahlen gegen die Ziele und das Gewicht gegen den Monatspfad 128 kg (15.11.2026) bis 105 kg (31.12.2027).
+   Training und Schlaf kommen aus Garmin bzw. dem Cockpit. Eingaben: days/<Datum>.weight (kg), .nosweets (true = ohne Süßes,
+   false = Süßes gegessen), .friend (Name), Dehnen = habits.ankle. Was nicht eingetragen ist, zählt nicht. */
+const G27={start:'2026-11-16',bed:'22:30',goals:{bed:4,sweets:5,stretch:6,friend:1},
+  path:[['2026-11-15',128],['2026-12-31',126],['2027-01-31',124.5],['2027-02-28',123],['2027-03-31',121],['2027-04-30',119],['2027-05-31',117],['2027-06-30',115],['2027-07-31',113],['2027-08-31',111],['2027-09-30',109.5],['2027-10-31',108],['2027-11-30',106.5],['2027-12-31',105]]};
+const g27TrainGoal=w=>w<'2027-01-01'?3:5;   // Vorlauf bis Jahresende 3, ab Januar 5 pro Woche
+function g27Path(d){ const P=G27.path; if(d<=P[0][0]) return P[0][1];
+  for(let i=1;i<P.length;i++){ const [a,wa]=P[i-1],[b,wb]=P[i]; if(d<=b) return wa+(wb-wa)*tcBetween(a,d)/tcBetween(a,b); } return P[P.length-1][1]; }
+const g27Clock=s=>{ if(!s||!/^\d\d?:\d\d$/.test(s)) return null; const [h,m]=s.split(':').map(Number), v=h*60+m; return v<720?v+1440:v; };   // Minuten ab Mittag
+/* Morgentraining: Garmin-Aktivität ab 10 Minuten mit Start vor 12 Uhr (ohne Gehen und Atemübung) oder im Cockpit vor 12 Uhr erledigt */
+function g27Train(d){
+  const acts=((DATA.days[d]||{}).acts||[]).filter(a=>(a.min||0)>=10&&a.time&&a.time<'12:00'&&!['walking','breathwork','meditation'].includes(a.type));
+  const tr=(store.days[d]||{}).training, own=tr&&tr.tier&&tr.at&&new Date(tr.at).getHours()<12;
+  return acts.length>0||!!own;
+}
+/* Nacht vor dem Morgen d: Einschlafzeit laut Garmin bis 22:30, sonst Häkchen „Im Bett bis 22:30“ vom Vorabend; null = unbekannt */
+function g27Bed(d){
+  const s=(DATA.days[d]||{}).sleep, c=s&&g27Clock(s.bed); if(c!=null) return c<=g27Clock(G27.bed);
+  const h=(store.days[addDays(d,-1)]||{}).habits; return h&&h.bed?true:null;
+}
+function g27Week(w){
+  const ds=tcWeek(w), X=d=>store.days[d]||{}, past=d=>d<=TD(), wd=ds.slice(0,5);
+  const ws=tcWeights().filter(p=>p.x>=ds[0]&&p.x<=ds[6]), wt=ws.find(p=>p.x===ds[6])||ws[ws.length-1]||null;
+  const r={w,ds,
+    train:{dots:ds.map(d=>past(d)?(g27Train(d)?'on':''):'fut'),goal:g27TrainGoal(w)},
+    bed:{dots:wd.map(d=>{ if(!past(d)) return 'fut'; const b=g27Bed(d); return b===true?'on':b===false?'no':''; }),goal:G27.goals.bed},
+    sweets:{dots:ds.map(d=>!past(d)?'fut':X(d).nosweets===true?'on':X(d).nosweets===false?'no':''),goal:G27.goals.sweets},
+    stretch:{dots:ds.map(d=>!past(d)?'fut':(X(d).habits||{}).ankle?'on':''),goal:G27.goals.stretch},
+    friend:{dots:ds.map(d=>!past(d)?'fut':X(d).friend?'on':''),goal:G27.goals.friend,who:ds.filter(d=>X(d).friend).map(d=>X(d).friend+' ('+WD[dt(d).getDay()]+')')},
+    weight:wt?{kg:wt.y,date:wt.x,path:g27Path(wt.x)}:null};
+  ['train','bed','sweets','stretch','friend'].forEach(k=>{ r[k].n=r[k].dots.filter(v=>v==='on').length; r[k].ok=r[k].n>=r[k].goal; });
+  r.hit=['train','bed','sweets','stretch','friend'].filter(k=>r[k].ok).length;
+  return r;
+}
+const g27Weeks=()=>{ const out=[]; for(let w=G27.start, c=tcMonday(TD()); w<=c; w=addDays(w,7)) out.push(w); return out; };
+function g27Chart(){
+  const a=G27.path[0][0], b=[addDays(TD(),42),G27.path[G27.path.length-1][0]].sort()[0], n=tcBetween(a,b);
+  const ws=tcWeights().filter(p=>p.x>=a), pp=[]; for(let i=0;i<=n;i+=7) pp.push({x:addDays(a,i),y:g27Path(addDays(a,i))}); pp.push({x:b,y:g27Path(b)});
+  const vals=[...ws.map(p=>p.y),...pp.map(p=>p.y)], lo=Math.floor(Math.min(...vals)-1), hi=Math.ceil(Math.max(...vals)+1);
+  const w=640,h=150,L=36,R=10,T=10,B=22, X=d=>L+tcBetween(a,d)/Math.max(1,n)*(w-L-R), Y=v=>T+(h-T-B)-(v-lo)/(hi-lo)*(h-T-B);
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Gewicht gegen den Pfad">`;
+  [lo,(lo+hi)/2,hi].forEach(v=>{ s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${nf(v)}</text>`; });
+  [a,addDays(a,Math.round(n/2)),b].forEach((d,i)=>{ s+=`<text x="${X(d)}" y="${h-6}" text-anchor="${['start','middle','end'][i]}">${dmini(d)}</text>`; });
+  s+=`<path d="${pp.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+','+Y(p.y).toFixed(1)).join('')}" fill="none" stroke="var(--band-line)" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+  if(ws.length>1) s+=`<path d="${ws.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+','+Y(p.y).toFixed(1)).join('')}" fill="none" stroke="var(--accent)" stroke-width="2.2"/>`;
+  ws.forEach(p=>{ s+=`<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="3.5" fill="var(--accent)" data-tip="${dlong(p.x)}<br>${nf(p.y,1)} kg · Pfad ${nf(g27Path(p.x),1)} kg"/>`; });
+  return s+'</svg>';
+}
+function g27Card(full){
+  const today=TD(), ref=today<G27.start?G27.start:today, r=g27Week(tcMonday(ref)), x=tcDay(), wk=r.weight;
+  const row=(k,lab,sub)=>`<div class="g27r"><div><b>${lab}</b><small>${sub}</small></div><div class="g27d">${r[k].dots.map((v,i)=>`<i class="${v}" title="${dshort(r.ds[i])}"></i>`).join('')}</div><div class="g27v ${r[k].ok?'ok':''}">${r[k].n}<small>/${r[k].goal}</small></div></div>`;
+  const wrow=`<div class="g27r"><div><b>Gewicht</b><small>${wk?`${dshort(wk.date)} · Pfad ${nf(wk.path,1)} kg`:`Sonntag morgens wiegen · Pfad heute ${nf(g27Path(today),1)} kg`}</small></div><div></div><div class="g27v ${wk&&wk.kg<=wk.path?'ok':''}">${wk?nf(wk.kg,1):'–'}${wk?'<small> kg</small>':''}</div></div>`;
+  const fr=x.friend, wv=tcUi.g27w??(x.weight!=null?String(x.weight).replace('.',','):''), fv=tcUi.g27f??'';
+  const inputs=`<div class="g27in"><div class="flab">Heute eintragen</div>
+    <div class="toggles"><button type="button" class="tg" data-tc="g27" data-a="sweet" data-v="1" aria-pressed="${x.nosweets===true}">Abend ohne Süßes</button><button type="button" class="tg" data-tc="g27" data-a="sweet" data-v="0" aria-pressed="${x.nosweets===false}">Süßes gegessen</button><button type="button" class="tg" data-tc="hb" data-k="ankle" aria-pressed="${!!(x.habits||{}).ankle}">5 min Dehnen &amp; Sprunggelenk</button></div>
+    ${fr?`<div class="row"><span>Freund getroffen: <b>${esc(fr)}</b></span><button type="button" class="btn ghost tc-mini" data-tc="g27" data-a="friendX">Entfernen</button></div>`
+      :`<div class="row"><input type="text" id="g27f" data-g27="f" placeholder="Freund heute getroffen? Name" value="${esc(fv)}" aria-label="Freund heute getroffen"><button type="button" class="btn" data-tc="g27" data-a="friend">Speichern</button></div>`}
+    <div class="row"><input type="text" inputmode="decimal" id="g27w" data-g27="w" placeholder="Gewicht heute in kg" value="${esc(wv)}" aria-label="Gewicht heute in kg"><button type="button" class="btn" data-tc="g27" data-a="weight">Speichern</button></div>
+    <p class="tiny muted">Training und Bettzeit kommen von der Uhr. Ohne Uhr zählt das Häkchen „Im Bett bis 22:30“ vom Vorabend. Was nicht eingetragen ist, zählt nicht.</p></div>`;
+  let hist='';
+  if(full){ const all=g27Weeks().map(g27Week), done=all.filter(z=>z.ds[6]<today), hitN=done.filter(z=>z.hit===5).length, c=(o,s='')=>`<td class="${o.ok?'ok':''}">${o.n}${s}</td>`;
+    hist=all.length?`<details style="margin-top:12px" ${tcUi.g27h?'open':''}><summary data-tc="g27" data-a="hist">Bisherige Wochen · ${hitN} von ${done.length} abgeschlossenen Wochen erreicht (Jahresziel: 40 von 52)</summary><div class="tw"><table class="g27tab"><thead><tr><th>Woche</th><th>Gewicht</th><th>Pfad</th><th>Train.</th><th>Bett</th><th>o. Süßes</th><th>Dehnen</th><th>Freund</th></tr></thead><tbody>
+      ${all.slice().reverse().slice(0,12).map(z=>`<tr><td>${dmini(z.w)}</td><td class="${z.weight&&z.weight.kg<=z.weight.path?'ok':''}">${z.weight?nf(z.weight.kg,1):'–'}</td><td>${nf(g27Path(z.weight?z.weight.date:z.ds[6]),1)}</td>${c(z.train)}${c(z.bed)}${c(z.sweets)}${c(z.stretch)}${c(z.friend)}</tr>`).join('')}</tbody></table></div></details>`:''; }
+  return `<section class="card s12" id="g27"><h2>Ziele 2027 <span class="chip">Woche ab ${dshort(r.ds[0])} · ${r.hit} von 5 erreicht</span></h2>
+    <div class="g27rows">${wrow}
+    ${row('train','Morgentraining',`ab 10 min vor 12 Uhr${g27TrainGoal(r.w)<5?' · bis Jahresende 3, ab Januar 5':''}`)}
+    ${row('bed','Bett bis '+G27.bed,'Nächte vor Mo–Fr, laut Uhr')}
+    ${row('sweets','Abende ohne Süßes','Ziel 5 von 7')}
+    ${row('stretch','Dehnen & Sprunggelenk','5 Minuten, Ziel 6 von 7')}
+    ${row('friend','Freund getroffen',r.friend.who.length?esc(r.friend.who.join(', ')):'persönlich, mindestens einmal')}</div>
+    ${full?`<div style="margin-top:12px"><div class="flab">Gewicht gegen den Pfad bis 105 kg (gestrichelt)</div>${g27Chart()}</div>`:''}
+    ${inputs}${hist}</section>`;
+}
+function g27Act(a,v){
+  if(a==='sweet'){ tcPatch(x=>{ const on=v==='1'; x.nosweets=x.nosweets===on?null:on; }); }
+  else if(a==='friend'){ const n=(tcUi.g27f||'').trim(); if(!n) return; tcUi.g27f=null; tcPatch(x=>{ x.friend=n.slice(0,60); }); }
+  else if(a==='friendX'){ tcPatch(x=>{ delete x.friend; }); }
+  else if(a==='weight'){ const kg=parseFloat(String(tcUi.g27w||'').replace(',','.')); if(!(kg>=40&&kg<=250)) return; tcUi.g27w=null; tcPatch(x=>{ x.weight=Math.round(kg*10)/10; }); }
+  else if(a==='hist'){ tcUi.g27h=!tcUi.g27h; }
+}
+
 /* ---------- ÜBERSICHT ---------- */
 function renderUebersicht(){
   const d14=tcLastN(14), d7=d14.slice(7), p7=d14.slice(0,7);
@@ -1158,7 +1259,7 @@ function renderUebersicht(){
     <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Liegestütze (Ziel diese Woche ${tcWeekGoal('push')}, Fernziel ${TC_GOALS.weekPush})</span><span><i class="sw" style="background:var(--good)"></i>Kniebeugen (Ziel diese Woche ${tcWeekGoal('squat')}, Fernziel ${TC_GOALS.weekSquat})</span></div></section>`;
   const sl=`<section class="card s6"><h2>Schlaf · 14 Nächte</h2>${lineChart({pts:d14.map(d=>({x:d,y:slp(d)})),label:'Schlaf',yfmt:v=>hc(v),avg:false,h:170,color:'var(--s-rem)',refLine:n7||8,ymin:Math.min(4,...d14.map(slp).filter(v=>v!=null)),ymax:Math.max((n7||8)+0.5,...d14.map(slp).filter(v=>v!=null))})}
     <p class="small muted">Gestrichelt: dein Schlafbedarf. ${DATA.plan&&DATA.plan.bedSD!=null?`Einschlafzeit schwankt um ± ${nf(DATA.plan.bedSD)} min${DATA.plan.bedSD>45?' – gleichmäßiger wäre besser.':'.'}`:''}</p></section>`;
-  return `<div class="grid tc">${renderGesamt()}<div class="s12 gz-ovh"><h2 class="gz-title">Woche und Gewohnheiten</h2></div>${tiles}${insHTML}${heat}${sl}${reps}</div>`;
+  return `<div class="grid tc">${g27Card(true)}${renderGesamt()}<div class="s12 gz-ovh"><h2 class="gz-title">Woche und Gewohnheiten</h2></div>${tiles}${insHTML}${heat}${sl}${reps}</div>`;
 }
 
 /* ================= Gesamtübersicht: Check-ins 1–10, Gesamtzustand, Verlauf ================= */
@@ -1459,6 +1560,7 @@ function tcClick(e){
         if(ad.ankle||(TC_NUDGE_POOL[ad.id]||{}).habit==='ankle') x.habits.ankle=true;
         if(rep&&ad.n){ x.reps=Object.assign({},x.reps); x.reps[rep]=(x.reps[rep]||0)+ad.n; } }); } }
   else if(a==='dtype'){ tcPatch(x=>{ x.daytype=v; }); }
+  else if(a==='g27'){ g27Act(b.dataset.a,v); }
   else if(a==='stretch'){ const s=tcStretchList().find(y=>y.key===v); tcPatch(x=>{ x.stretch=Object.assign({},x.stretch); x.stretch[v]=!x.stretch[v]; if(x.stretch[v]){ x.habits=Object.assign({},x.habits,{breaks:true}); if(s&&/Sprunggelenk/.test(s.zone)) x.habits.ankle=true; } }); }
   else if(a==='ev'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; if(k==='screen') x.evening.screen=!x.evening.screen; else x.evening[k]=x.evening[k]===+v?null:+v; }); }
   else if(a==='evt'){ tcUi.showEve=true; tcPatch(x=>{ x.evening=x.evening||{}; let l=(x.evening[k]||[]).slice(); const only=v==='nichts'||v==='ok';
@@ -2707,6 +2809,7 @@ function render(){
     try{ const j=Object.assign({date:DATA.today},store.journal[DATA.today]||{},{slot,updatedAt:new Date().toISOString()}); await db.doc('journal/'+DATA.today).set(j); }catch(e){}
     slotDraft=null; await coachNow(sg, st, slot); };
   v.querySelectorAll('[data-tc]').forEach(b=>b.addEventListener('click',tcClick));
+  v.querySelectorAll('[data-g27]').forEach(i=>i.addEventListener('input',()=>{ tcUi['g27'+i.dataset.g27]=i.value; }));
   v.querySelectorAll('[data-ci]').forEach(b=>b.addEventListener('click',()=>ciOpen(b.dataset.ci)));
   v.querySelectorAll('[data-gzper]').forEach(b=>b.addEventListener('click',()=>{ gzPer=+b.dataset.gzper; try{localStorage.setItem('cockpit.gzPer',gzPer);}catch(e){} render(); })); v.querySelectorAll('[data-tcev]').forEach(t=>t.addEventListener('input',tcInput));
   bindJournal(v); if(view==='coach') bindCoach(v); if(view==='workout') bindWorkout(v); if(view==='food') bindFood(v); if(view==='trd') bindTrd(v); tipBind(v);

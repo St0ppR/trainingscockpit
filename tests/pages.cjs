@@ -339,6 +339,35 @@ const tests = {
     assert.ok(ms < 2000, 'zu langsam: ' + ms + ' ms');
     assert.deepStrictEqual(errors, []);
   },
+  async 'Ziele 2027: Wochenzahlen gegen Ziel, Eingaben abends, Übersicht mit Pfad'(b) {
+    const days = {
+      '2026-11-16': { date: '2026-11-16', training: { tier: 'std', at: '2026-11-16T05:40:00.000Z' }, nosweets: true, habits: { ankle: true }, weight: 127.6 },
+      '2026-11-17': { date: '2026-11-17', training: { tier: 'min', at: '2026-11-17T19:00:00.000Z' }, nosweets: false, habits: { ankle: true, bed: true } },
+    };
+    const init = d => { localStorage.setItem('cockpit.days', d); };
+    const time = new Date('2026-11-18T20:00:00');
+    const { page, errors } = await open(b, 'cockpit', DATA, 390, time, `(${init})(${JSON.stringify(JSON.stringify(days))})`, { ci: null });
+    await page.waitForSelector('#g27');
+    const txt = await page.locator('#g27').innerText();
+    assert.match(txt, /Woche ab Mo 16\.11\./);
+    assert.match(txt, /Morgentraining[\s\S]*1\s*\/3/, 'nur das Training vor 12 Uhr zählt, Ziel 3 bis Jahresende: ' + txt);
+    assert.match(txt, /127,6/);
+    await page.click('#g27 [data-a="sweet"][data-v="1"]');
+    await page.fill('#g27f', 'Michi'); await page.click('#g27 [data-a="friend"]');
+    await page.fill('#g27w', '127,2'); await page.click('#g27 [data-a="weight"]');
+    const x = await page.evaluate(() => JSON.parse(localStorage.getItem('cockpit.days'))['2026-11-18']);
+    assert.deepStrictEqual([x.nosweets, x.friend, x.weight], [true, 'Michi', 127.2]);
+    const t2 = await page.locator('#g27').innerText();
+    assert.match(t2, /Abende ohne Süßes[\s\S]*2\s*\/5/);
+    assert.match(t2, /Freund getroffen[\s\S]*Michi \(Mi\)[\s\S]*1\s*\/1/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf Heute');
+    await page.click('#bnav button[data-t="uebersicht"]');
+    await page.waitForSelector('#g27 svg');
+    assert.match(await page.locator('#g27').innerText(), /0 von 0 abgeschlossenen Wochen/);
+    assert.ok(await noHScroll(page), 'horizontaler Bildlauf auf der Übersicht');
+    await page.screenshot({ path: path.join(require('os').tmpdir(), 'ziele2027.png'), fullPage: false });
+    assert.deepStrictEqual(errors, []);
+  },
   async 'Tagescoach: Check-in ausfüllen ohne Fehler'(b) {
     const { page, errors } = await open(b, 'tagescoach', DATA);
     await page.waitForSelector('[data-sc="energy"]');
