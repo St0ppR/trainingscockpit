@@ -494,6 +494,16 @@ body.ci-open{overflow:hidden}
 .ci-plan .lab{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
 .ci-plan>div:not(.lab):not(.toggles){background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;display:grid}
 .ci-plan>div>span{font-size:12.5px;color:var(--ink-3)}.ci-plan>div>b{font-size:16px}
+
+.co-at{display:inline-block;font:700 12.5px var(--f-body);color:var(--ink-2);letter-spacing:0;text-transform:none;margin-right:8px;font-variant-numeric:tabular-nums}
+.co-now{display:inline-block;background:var(--accent);color:#fff;border-radius:999px;padding:1px 8px;font:700 11px var(--f-body);letter-spacing:.02em;text-transform:none;margin-right:8px}
+.co-it.now{background:var(--accent-soft);border-radius:12px;margin:4px -10px;padding:12px 10px;border-top-color:transparent}
+.co-it.now+.co-it{border-top-color:transparent}
+.co-adhoc{margin-top:12px}
+.co-adhoc .btn.go.bigbtn{background:transparent;color:var(--accent);border:1px solid var(--line);box-shadow:none;font-size:15px;min-height:44px;text-transform:none;letter-spacing:0}
+.co-other{padding:4px 18px}
+.co-other .rowlink{background:none;border:0;padding:10px 0;width:100%}
+.co-other.open{padding-bottom:10px}
 </style>
 
 <div class="wrap">
@@ -1374,16 +1384,16 @@ function coItems(st){
 /* Kopfsatz: ein Urteil, verständlich, mit den Zahlen dahinter */
 function coHead(st,items){
   const due=ciDue(), hr=new Date().getHours(), x=tcDay(), done=items.filter(i=>i.done).length;
-  if(due==='am'&&!st.f&&hr<10) return {t:'Guten Morgen.',s:'Erst 30 Sekunden Check-in, dann steht dein Plan für heute.'};
-  if(due==='am'&&hr>=10) return {t:'Noch kein Check-in heute.',s:'Der Plan unten gilt trotzdem. Mit Check-in passt dein Trainer ihn an dich an.'};
+  if(due==='am'&&!st.f&&hr<10) return {t:'Guten Morgen.',s:'Erst 30 Sekunden Check-in, dann direkt das Training. Der Rest ergibt sich.'};
+  if(due==='am'&&hr>=10&&hr<17) return {t:'Noch kein Check-in heute.',s:'Der Ablauf unten gilt trotzdem. Mit Check-in passt dein Trainer ihn an dich an.'};
   const T={sick:['Heute nur gesund werden.','Viel trinken, früh schlafen, kein Training.'],
     low:['Heute: Sparflamme mit Plan.','Kurz bewegen, früh ins Bett, sonst nichts Großes. Genau das ist heute richtig.'],
-    mid:['Ein normaler Tag. Mach die drei Dinge.','Mehr braucht es heute nicht.'],
+    mid:['Ein normaler Tag.','Geh einfach der Reihe nach vor. Was gerade dran ist, ist blau markiert.'],
     good:['Guter Tag. Nutz ihn.','Du bist gut drauf, heute darf das Training etwas mehr sein.']}[st.lvl||'mid'];
   let t=T[0], s=T[1];
-  if(hr>=17){ t=done===items.length?'Alles erledigt. Stark.':done?`${done} von ${items.length} geschafft.`:'Der Abend zählt auch noch.';
+  if(hr>=17){ t=done===items.length?'Alles erledigt. Stark.':'Jetzt zählt der Abend.';
     s=items.find(i=>i.id==='sl').title+'. '+(ciDone(x,'pm')?'Danke für den Abend-Check-in.':'Vorher noch kurz einchecken.'); }
-  else if(done===items.length) { t='Alle drei erledigt.'; s='Mehr ist heute nicht nötig. Der Rest ist Bonus.'; }
+  else if(done===items.length) { t='Das Wichtigste ist erledigt.'; s='Training, Essen und Schlafplan stehen. Alles Weitere ist Bonus.'; }
   return {t,s};
 }
 function coFacts(st){
@@ -1393,7 +1403,7 @@ function coFacts(st){
   return out.map(f=>`<span>${f}</span>`).join('');
 }
 function coItemHTML(it){
-  const open=tcUi.coOpen===it.id, btn=it.tc?`data-tc="${it.tc}"${it.k?` data-k="${it.k}"`:''}${it.a?` data-a="${it.a}"`:''}${it.v?` data-v="${it.v}"`:''}`:'data-tc="co" data-a="mvdone"';
+  const open=tcUi.coOpen===it.id, btn=it.ci?`data-ci="${it.ci}"`:it.tc?`data-tc="${it.tc}"${it.k?` data-k="${it.k}"`:''}${it.a?` data-a="${it.a}"`:''}${it.v?` data-v="${it.v}"`:''}`:'data-tc="co" data-a="mvdone"';
   let body='';
   if(it.id==='mv'&&it.s){
     const tr=tcDay().training;
@@ -1408,12 +1418,12 @@ function coItemHTML(it){
   } else if(open&&it.breath){
     body=`<div class="breath co-breath"><div class="orb" id="orb">${tcBreath.on?'':'Start'}</div><div class="row" style="justify-content:center"><button class="btn ghost" data-tc="act" data-a="breath">${tcBreath.on?'Stopp':'2 Minuten Box-Atmung'}</button><span class="status" id="bleft">${tcBreath.on?'':'4 s ein · 4 halten · 4 aus · 4 halten'}</span></div></div>`;
   }
-  const expandable=(it.id==='mv'&&it.s&&!it.done)||it.breath||it.tip;
-  return `<div class="co-it ${it.done?'is-done':''} ${open?'open':''}" id="co-${it.id}">
+  const expandable=(it.id==='mv'&&it.s&&!it.done)||it.breath||it.tip||(it.compact&&it.why&&!it.done);
+  return `<div class="co-it ${it.done?'is-done':''} ${open?'open':''} ${/co-now/.test(it.area)?'now':''}" id="co-${it.id}">
     <button type="button" class="co-ck" ${btn} aria-pressed="${it.done}" aria-label="${esc(it.title)} ${it.done?'erledigt':'abhaken'}">✓</button>
     <div class="co-main">
       <button type="button" class="co-t" ${expandable?`data-tc="co" data-a="open" data-v="${it.id}" aria-expanded="${open}"`:'tabindex="-1"'}><span class="co-area">${it.area}</span><b>${esc(it.title)}</b>${expandable&&!it.done?`<span class="co-more">${open?'weniger':it.id==='mv'?'Übungen':'mehr'}</span>`:''}</button>
-      <p class="co-why">${esc(it.why)}</p>${open&&it.tip?`<p class="co-tip">${esc(it.tip)}</p>`:''}${body}
+      ${it.compact&&!open?'':`<p class="co-why">${esc(it.why)}</p>`}${it.extra||''}${open&&it.tip?`<p class="co-tip">${esc(it.tip)}</p>`:''}${body}
     </div></div>`;
 }
 /* Für zwischendurch: genau ein Vorschlag, passend zu Ort und Tag */
@@ -1426,24 +1436,90 @@ function coNudge(){
     <div><b>${esc(n.t)}</b><p class="co-why">${esc(n.s)}${n.why?' · '+esc(n.why):''}</p></div></div>
     ${open.length>1?`<button type="button" class="btn ghost tc-mini" data-tc="co" data-a="nd">Anderer Vorschlag</button>`:''}</section>`;
 }
+/* ================= HEUTE als Tagesablauf: Morgen · Arbeit · Abend ================= */
+/* Jede Phase zeigt nur, was zu ihr passt, in der Reihenfolge des Tages. Die aktuelle Phase ist offen,
+   „jetzt dran“ ist markiert, Offenes vom Morgen wandert mit. Die anderen Phasen sind eine Zeile. */
+const CO_ZONE_WHY={
+  'Hüfte':'Nach dem Vormittag im Sitzen ist der Hüftbeuger verkürzt und zieht am unteren Rücken.',
+  'Brust & Schulter':'Am Nachmittag sinkt die Haltung am Schreibtisch. Das öffnet Brust und Schultern wieder.',
+  'oberer Rücken':'Am Nachmittag sinkt die Haltung am Schreibtisch. Das löst den oberen Rücken.',
+  'Beinrückseite':'Nach Stunden im Sitzen ist die Beinrückseite am stärksten verkürzt.',
+  'Rücken':'Signal an den Körper: Der Tag ist vorbei. Danach schläfst du leichter ein.',
+  'Entspannung':'Beruhigt den Puls vor dem Schlafen. Danach schläfst du leichter ein.',
+  'Sprunggelenk & Hüfte':'Tiefe Hocke ist das beste Einzelmittel fürs Sprunggelenk.',
+  'Hüfte & Rücken':'Eine Übung für Hüfte, Brustwirbelsäule und Schultern zugleich.'};
+function coStretchStep(s,st){
+  const n=g27Week(tcMonday(TD())).stretch.n;
+  let why=CO_ZONE_WHY[s.zone]||'';
+  if(/Sprunggelenk/.test(s.zone)) why=`Dein Sprunggelenk: Ziel sind 6 Dehn-Tage pro Woche, diese Woche ${n}.`;
+  if(s.zone==='Nacken') why=st.ystress>=6?`Gestern Abend Stress ${st.ystress}/10, der sitzt oft im Nacken.`:'Nach langer Bildschirmarbeit sitzt die Spannung im Nacken.';
+  return {id:'st-'+s.key.replace(':','-'),h:s.h,at:'~'+(s.slot==='mi'?'12:30':s.h+' Uhr'),area:s.zone,title:`${s.t} · ${s.d}`,why:`${s.s}. ${why}`.replace('..','.'),done:!!(tcDay().stretch||{})[s.key],tc:'stretch',v:s.key};
+}
+function coDay(st){
+  const x=tcDay(), h=x.habits||{}, items=coItems(st), I=id=>items.find(i=>i.id===id), ty=tcDType(), office=tcAtDesk(ty)&&ty!=='frei';
+  const mv=I('mv'), sl=I('sl'), third=items.find(i=>i.id==='fd'||i.id==='kp');
+  const strs=tcStretchList(), S=id=>strs.find(s=>s.slot===id);
+  /* Morgen */
+  const morning=[
+    {id:'ci',h:5,at:'nach dem Aufstehen',area:'Check-in',title:'Morgen-Check-in, 30 Sekunden',why:'Vier Fragen. Danach legt dein Trainer den Tag für dich fest.',done:ciDone(x,'am'),ci:'am',seq:1},
+    Object.assign({},mv,{h:6,at:'direkt danach',seq:1}),
+    third&&third.id==='fd'&&third.title==='Eiweiß zum Frühstück'?Object.assign({},third,{h:7,at:'Frühstück'})
+      :{id:'pr',h:7,at:'Frühstück',area:'Essen',title:'Eiweiß zum Frühstück',why:'Skyr, Quark oder Eier halten bis mittags satt. Wer morgens genug Eiweiß isst, greift abends seltener zu Süßem.',done:!!h.protein,tc:'hb',k:'protein'}];
+  /* Arbeit bzw. tagsüber: passende Mini-Vorschläge in Uhrzeit-Reihenfolge */
+  const body=tcNudgeList(tcMode())[0], nd=x.nudges||{};
+  const kraft={id:'nd-'+body.id,h:11,at:'~11 Uhr',area:body.rep?'Kraft-Häppchen':'Bewegen',title:body.t,why:`${body.s}${body.why?'. '+body.why+'.':'.'}`,done:!!nd[body.id],tc:'nudge',v:body.id};
+  const snackFromFd=third&&third.id==='fd'&&third.k==='snack';
+  const snack=snackFromFd?Object.assign({},third,{h:15.5,at:'15:30'})
+    :{id:'fd',h:15.5,at:'15:30',area:'Essen',title:'Eiweiß-Snack um 15:30',why:'Skyr, Quark oder eine Handvoll Nüsse. Wer satt nach Hause kommt, isst abends ruhiger.',done:!!h.snack,tc:'hb',k:'snack'};
+  const arrive=third&&third.id==='kp'?Object.assign({},third,{h:16.75,at:'Feierabend'})
+    :{id:'kp',h:16.75,at:'Feierabend',area:'Kopf',title:'Ankommen, bevor du reingehst',why:'Im Auto oder vor der Tür: 3 tiefe Atemzüge, lang aus. So kommst du bei dir an und nimmst den Tag nicht mit zur Familie.',done:!!h.arrive,tc:'hb',k:'arrive',breath:true};
+  let day;
+  if(office) day=[coStretchStep(S('vm'),st),kraft,coStretchStep(S('mi'),st),coStretchStep(S('nm'),st),snack,arrive];
+  else day=[kraft,coStretchStep(S('mi'),st),{id:'nd-walk',h:15,at:'nachmittags',area:'Draußen',title:'30 Minuten raus',why:'Spaziergang oder Rad mit der Familie, ganz locker. Tageslicht am Nachmittag macht abends müde.',done:!!nd.walk&&body.id!=='walk',tc:'nudge',v:'walk'},snack];
+  if(body.id==='walk'&&!office) day=day.filter(s=>s.id!=='nd-walk');
+  /* Abend */
+  const sweets=third&&third.id==='fd'&&third.v==='1'?Object.assign({},third,{h:18.5,at:'Abendessen'})
+    :{id:'sw',h:18.5,at:'Abendessen',area:'Essen',title:'Heute Abend ohne Süßes',why:'Ziel 2027: 5 Abende pro Woche. Portion auf den Teller, Packung zurück in den Schrank.',done:x.nosweets===true,tc:'g27',a:'sweet',v:'1'};
+  const ab=S('ab');
+  const evening=[sweets,
+    {id:'cipm',h:20,at:'~20 Uhr',area:'Check-in',title:'Abend-Check-in, 1 Minute',why:'Fünf Fragen zu Stimmung, Stress und Essen. Daraus lernt dein Trainer, was dir hilft.',done:ciDone(x,'pm'),ci:'pm'},
+    coStretchStep(ab,st),
+    Object.assign({},sl,{h:21.5,at:sl.title.replace('Heute Licht aus um ','')+' Uhr',title:sl.title.replace('Heute ','')})];
+  if(!office&&!evening.some(s=>s.id==='kp')) {}   // am Wochenende kein Feierabend-Übergang
+  return {morning,day,evening,office,items};
+}
+function coStepHTML(it,now,compact){ return coItemHTML(Object.assign({},it,{compact:!!compact&&!now,area:`${it.at?`<span class="co-at">${esc(it.at)}</span>`:''}${now?'<span class="co-now">jetzt dran</span>':''}${esc(it.area)}`})); }
 function renderHeute(){
-  const st=coState(), items=coItems(st), hd=coHead(st,items), x=tcDay(), t=dt(TD()), hr=new Date().getHours(), due=ciDue();
+  const st=coState(), D=coDay(st), x=tcDay(), t=dt(TD()), now=new Date(), hr=now.getHours()+now.getMinutes()/60, due=ciDue();
+  const ph=hr<9&&!(D.morning.every(s=>s.done))?'morgen':hr<9?'tag':hr<17?'tag':'abend';
+  const hd=coHead(st,D.items);
   const week=tcWeek().map(d=>`<span class="${tcMoved(d)?'on':''} ${d===TD()?'today':''}" title="${dshort(d)}">${WD[dt(d).getDay()]}</span>`).join('');
   const save=dbState==='an'?(tcSaveErr?` · <b style="color:var(--crit)">nicht gespeichert (${esc(tcSaveErr)})</b>`:tcDirty.size?' · wird gespeichert …':''):dbState==='lade'?'':' · nur in diesem Browser';
-  const q=due&&CI_Q[due];
-  const ci=due?`<button class="btn go ci-go" data-ci="${due}">${q.title} <small>${q.qs.length} Fragen · ${q.dur}</small></button>`:'';
-  const planned=!!st.f||hr>=10;   // vor 10 Uhr erst der Check-in, danach steht der Plan auch ohne
   const sunday=t.getDay()===0&&hr<14&&x.weight==null?`<div class="co-weigh"><span>Sonntag: kurz wiegen</span><input type="text" inputmode="decimal" id="g27w" data-g27="w" placeholder="kg" value="${esc(tcUi.g27w??'')}" aria-label="Gewicht heute in kg"><button type="button" class="btn" data-tc="g27" data-a="weight">Speichern</button></div>`:'';
-  const tomorrow=hr>=17?(()=>{ const d=addDays(TD(),1), k=TC_ROT[dt(d).getDay()], L=TC_LIB[k]; return `<p class="small muted co-next">Morgen früh: ${esc(L.title)}. Dein Trainer legt die Stufe nach deinem Check-in fest.</p>`; })():'';
+  const P={morgen:{t:'Morgen',sub:'bis 9 Uhr',steps:D.morning},tag:{t:D.office?'Bei der Arbeit':'Tagsüber',sub:'9 bis 17 Uhr',steps:D.day},abend:{t:'Abend',sub:'ab 17 Uhr',steps:D.evening}};
+  // Offenes vom Morgen wandert mit: Training immer, der Check-in nur bis 17 Uhr
+  const carry=ph==='morgen'?[]:D.morning.filter(s=>!s.done&&(s.id==='mv'||(s.id==='ci'&&ph==='tag')));
+  const cur=P[ph], steps=carry.map(s=>Object.assign({},s,{at:'noch offen'})).concat(cur.steps);
+  const open=steps.filter(s=>!s.done&&s.at!=='noch offen'), dueNow=open.filter(s=>s.h<=hr+0.25).pop();
+  // Check-in und Training bauen aufeinander auf: morgens ist immer der erste offene davon dran
+  const nowId=(open.find(s=>s.seq)||dueNow||steps.find(s=>!s.done&&s.at==='noch offen')||open[0]||{}).id;
+  const doneN=cur.steps.filter(s=>s.done).length;
+  const phaseCard=`<section class="card s12 co-plan co-phase" id="coPlan" aria-label="${cur.t}"><h2>${cur.t} <span class="chip">${doneN} von ${cur.steps.length}</span></h2>
+    ${steps.map(s=>coStepHTML(s,s.id===nowId,true)).join('')}
+    ${ph==='tag'?`<div class="co-adhoc">${tcUi.adhoc?'':'<p class="small muted">Gerade Luft, aber nichts davon passt?</p>'}${tcAdhocBox()}</div>`:''}
+    ${ph==='abend'?(()=>{ const d=addDays(TD(),1), L=TC_LIB[TC_ROT[dt(d).getDay()]]; return `<p class="small muted co-next">Morgen früh: ${esc(L.title)}, direkt nach dem Check-in. Die Stufe legt dein Trainer dann fest.</p>`; })():''}</section>`;
+  const order=['morgen','tag','abend'], others=order.filter(k=>k!==ph).map(k=>{ const p=P[k], n=p.steps.filter(s=>s.done).length, open=tcUi['ph'+k], past=order.indexOf(k)<order.indexOf(ph);
+    return `<section class="card s12 co-other ${open?'open':''}"><button type="button" class="rowlink" data-tc="co" data-a="ph" data-v="${k}" aria-expanded="${!!open}"><span style="flex:1"><b>${p.t}</b> <span class="small muted">${p.sub}</span><br><span class="small muted">${past?`${n} von ${p.steps.length} erledigt`:p.steps.map(s=>s.area.replace(/<[^>]+>/g,'')).filter((v,i,a)=>a.indexOf(v)===i).join(' · ')}</span></span><span class="chev">${open?'⌄':'›'}</span></button>
+      ${open?p.steps.map(s=>coStepHTML(s,false,true)).join(''):''}</section>`; });
+  const rest=order.filter(k=>k!==ph), before=others.filter((_,i)=>order.indexOf(rest[i])<order.indexOf(ph)).join(''), after=others.filter((_,i)=>order.indexOf(rest[i])>order.indexOf(ph)).join('');
   return `<div class="grid tc co">
-    <div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${tcWeek().filter(tcMoved).length} Bewegungstage diese Woche${save}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>
+    <div class="tc-head s12"><div><div class="tc-date">${WDL[t.getDay()]}, ${t.getDate()}.${t.getMonth()+1}.</div><div class="small muted">${(n=>`${n} Bewegungstag${n===1?'':'e'}`)(tcWeek().filter(tcMoved).length)} diese Woche${save}</div></div><div class="week" aria-label="Bewegungstage diese Woche">${week}</div></div>
     <section class="card s12 co-hero" id="gzHero" aria-label="Dein Trainer heute">
       <div class="lab">Dein Trainer heute</div><h2 class="co-h">${esc(hd.t)}</h2><p class="co-s">${esc(hd.s)}</p>
-      <div class="co-facts">${coFacts(st)}</div>${ci}${sunday}</section>
-    ${planned?`<section class="card s12 co-plan" id="coPlan" aria-label="Deine drei für heute"><h2>Deine drei für heute <span class="chip">${items.filter(i=>i.done).length} von 3</span></h2>${items.map(coItemHTML).join('')}${tomorrow}</section>`:''}
-    ${planned&&hr>=10&&hr<17?coNudge():''}
+      <div class="co-facts">${coFacts(st)}</div>${due?`<button class="btn go ci-go" data-ci="${due}">${CI_Q[due].title} <small>${CI_Q[due].qs.length} Fragen · ${CI_Q[due].dur}</small></button>`:''}${sunday}</section>
+    ${before}${phaseCard}${after}
     <div class="s12 co-links">
-      <button class="rowlink" data-goview="tag"><span style="flex:1"><b>Alles von heute</b><br><span class="small muted">Gewohnheiten, Dehnen, Atmung, Zähler, Training im Detail</span></span><span class="chev">›</span></button>
+      <button class="rowlink" data-goview="tag"><span style="flex:1"><b>Alles von heute</b><br><span class="small muted">Gewohnheiten, Wasser, Atmung, Zähler, Training im Detail</span></span><span class="chev">›</span></button>
     </div></div>`;
 }
 
@@ -1853,6 +1929,7 @@ function tcClick(e){
     if(w==='open'){ tcUi.coOpen=tcUi.coOpen===v?null:v; render(); return; }
     if(w==='tier'){ tcUi.coTier=v; tcUi.coOpen='mv'; render(); return; }
     if(w==='nd'){ tcUi.coNd=(tcUi.coNd||0)+1; render(); return; }
+    if(w==='ph'){ tcUi['ph'+v]=!tcUi['ph'+v]; render(); return; }
     if(w==='mvdone'){ const st=coState(), t=tcUi.coTier||coTier(st);
       tcPatch(x=>{ const prev=x.training;
         if(prev&&prev.tier){ if(prev.tier==='quick'){ x.reps=Object.assign({},x.reps); x.reps.push=Math.max(0,(x.reps.push||0)-CO_QUICK.reps.push); x.reps.squat=Math.max(0,(x.reps.squat||0)-CO_QUICK.reps.squat); } delete x.training; return; }
