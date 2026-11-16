@@ -255,7 +255,7 @@ const tests = {
     assert.deepStrictEqual([x.checkin.sleep, x.checkin.energy, x.checkin.mood], [3, 3, 4], 'Spiegel 1–5 für ältere Teile');
     await closeCi(page);
     assert.match(await page.locator('#co-mv').innerText(), /6 Minuten|Minimum|Normal/);
-    assert.strictEqual(await page.locator('#coPlan .co-it').count(), 3, 'genau drei Dinge');
+    assert.match(await page.locator('#coPlan h2').innerText(), /Morgen|Bei der Arbeit|Tagsüber|Abend/i);
     assert.deepStrictEqual(errors, []);
   },
   async 'Gesamtübersicht 1: Check-in passend zur Uhrzeit, alte Einträge (1–5) bleiben lesbar'(b) {
@@ -369,49 +369,70 @@ const tests = {
     await page.screenshot({ path: path.join(require('os').tmpdir(), 'ziele2027.png'), fullPage: false });
     assert.deepStrictEqual(errors, []);
   },
-  async 'Heute neu: Trainer-Satz und genau drei Dinge, Abhaken, Feedback zur Einheit'(b) {
-    const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d; };
+  async 'Heute als Tagesablauf: morgens nur der Morgen, bei der Arbeit Vorschläge nach Uhrzeit, abends der Abend'(b) {
+    const at = h => { const d = new Date(); d.setHours(Math.floor(h), Math.round((h % 1) * 60), 0, 0); return d; };
+    const ids = p => p.locator('#coPlan .co-it').evaluateAll(es => es.map(e => e.id));
     let { page, errors } = await open(b, 'cockpit', DATA, 390, at(7), null, { ci: null });
-    await page.waitForSelector('#gzHero');
+    await page.waitForSelector('#coPlan');
     assert.match(await page.locator('#gzHero').innerText(), /Guten Morgen/);
-    assert.strictEqual(await page.locator('#coPlan').count(), 0, 'vor dem Check-in nur der Check-in');
     assert.ok(await page.locator('header.top').isHidden(), 'keine doppelte Kopfzeile');
     const box = await page.evaluate(() => { const h = document.querySelector('#gzHero .ci-go').getBoundingClientRect(), n = document.querySelector('.bnav').getBoundingClientRect(); return { b: h.bottom, n: n.top }; });
     assert.ok(box.b <= box.n, 'Check-in-Knopf ohne Scrollen sichtbar');
+    assert.match(await page.locator('#coPlan h2').innerText(), /^Morgen/i);
+    assert.deepStrictEqual((await ids(page)).slice(0, 2), ['co-ci', 'co-mv'], 'erst Check-in, dann Training');
+    assert.strictEqual(await page.locator('#coPlan .co-it.now').count(), 1, 'genau ein Schritt „jetzt dran“');
+    assert.match(await page.locator('#co-ci').innerText(), /jetzt dran/i);
+    assert.strictEqual(await page.locator('#coPlan [data-tc="stretch"], #coPlan #co-sl').count(), 0, 'morgens nichts vom Büro oder Abend');
     await checkin(page, 'am', [3, 3, 4, 5]);
     assert.match(await page.locator('#ci .ci-plan').innerText(), /Dein Trainer hat entschieden[\s\S]*Bewegung[\s\S]*Schlaf/i);
     await closeCi(page);
-    assert.strictEqual(await page.locator('#coPlan .co-it').count(), 3, 'genau drei Dinge');
     assert.match(await page.locator('#gzHero').innerText(), /Sparflamme/);
     assert.match(await page.locator('#co-mv').innerText(), /6 Minuten/, 'wenig Energie und wenig Zeit: 6 Minuten');
-    assert.match(await page.locator('#co-sl').innerText(), /Licht aus um 22:00/, 'kurze Nacht: früher ins Bett');
-    const why = await page.locator('#coPlan .co-why').allInnerTexts();
-    assert.ok(why.every(t => t.length > 30 && !/undefined|NaN|null/.test(t)), 'jeder Punkt mit Begründung: ' + why.join(' / '));
+    assert.match(await page.locator('#co-mv').innerText(), /jetzt dran/i, 'nach dem Check-in ist das Training dran');
     await page.click('#co-mv .co-t');
     assert.ok(await page.locator('#co-mv .block').count() >= 1, 'Übungen klappen auf');
     await page.click('#co-mv [data-a="mvdone"] >> nth=0');
     await page.click('#co-mv [data-tc="rpe"][data-v="4"]');
     assert.match(await page.locator('#co-mv').innerText(), /Zu leicht, notiert/);
-    await page.click('#co-sl .co-ck');
     assert.match(await page.locator('#coPlan h2').innerText(), /2 von 3/);
+    // spätere Phasen sind eine Zeile und lassen sich aufklappen
+    await page.click('[data-a="ph"][data-v="abend"]');
+    assert.match(await page.locator('#co-sl').innerText(), /Licht aus um 22:00/, 'kurze Nacht: früher ins Bett');
+    await page.click('#co-sl .co-ck');
     await page.reload(); await page.waitForSelector('#coPlan');
     const x = await page.evaluate(() => JSON.parse(localStorage.getItem('cockpit.days'))[todayISO()]);
     assert.deepStrictEqual([x.training.tier, x.training.rpe, x.reps.push, x.reps.squat, x.habits.bed, x.habits.move], ['quick', 4, 24, 30, true, true]);
     assert.ok(await noHScroll(page));
     assert.deepStrictEqual(errors, []); await page.close();
-    // abends: Abend-Check-in oben, Plan bleibt, kein Vorschlag für zwischendurch
+    // tagsüber: Vorschläge in Uhrzeit-Reihenfolge, „jetzt dran“ passt zur Uhrzeit, Abhaken speichert
+    for (const h of [10, 13.5]) {
+      ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(h), null, { ci: null }));
+      await page.waitForSelector('#coPlan');
+      assert.match(await page.locator('#coPlan h2').innerText(), /Bei der Arbeit|Tagsüber/i);
+      const hs = await page.evaluate(() => { const st = coDay(coState()); return st.day.map(s => s.h); });
+      assert.deepStrictEqual(hs, [...hs].sort((p, q) => p - q), 'Reihenfolge nach Uhrzeit');
+      const nowH = await page.evaluate(() => { const id = document.querySelector('#coPlan .co-it.now').id.slice(3); return (coDay(coState()).day.find(s => s.id === id) || {}).h; });
+      assert.ok(nowH != null && nowH <= h + 0.25, `${h} Uhr: dran ist ein Schritt von ${nowH} Uhr`);
+      assert.ok(await page.locator('#coPlan .co-other, .co-other').count() >= 1);
+      const whys = await page.locator('#coPlan .co-it:not(.is-done) .co-why').count();
+      assert.strictEqual(whys, 1, 'nur der aktuelle Schritt ist ausführlich, der Rest eine Zeile');
+      assert.deepStrictEqual(errors, []);
+      if (h === 10) {
+        const key = await page.getAttribute('#coPlan [data-tc="stretch"] >> nth=0', 'data-v');
+        await page.click('#coPlan [data-tc="stretch"] >> nth=0');
+        const y = await page.evaluate(() => JSON.parse(localStorage.getItem('cockpit.days'))[todayISO()]);
+        assert.strictEqual(y.stretch[key], true, 'Dehnen abgehakt');
+      }
+      await page.close();
+    }
+    // abends: Abend-Check-in oben, nur Abend-Schritte, Ausblick auf morgen
     ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(20), null, { ci: null }));
     await page.waitForSelector('#gzHero [data-ci="pm"]');
-    assert.strictEqual(await page.locator('.co-nd').count(), 0);
+    assert.match(await page.locator('#coPlan h2').innerText(), /^Abend/i);
+    assert.strictEqual(await page.locator('#coPlan [data-tc="nudge"]').count(), 0, 'abends keine Büro-Vorschläge');
+    assert.deepStrictEqual((await ids(page)).slice(-1), ['co-sl'], 'Licht aus kommt zuletzt');
     assert.match(await page.locator('#coPlan').innerText(), /Morgen früh/);
     assert.deepStrictEqual(errors, []); await page.close();
-    // mittags: genau ein Vorschlag für zwischendurch, „Anderer Vorschlag“ wechselt
-    ({ page, errors } = await open(b, 'cockpit', DATA, 390, at(13)));
-    await page.waitForSelector('.co-nd');
-    const t1 = await page.locator('.co-nd b').innerText();
-    await page.click('.co-nd [data-a="nd"]');
-    assert.notStrictEqual(await page.locator('.co-nd b').innerText(), t1);
-    assert.deepStrictEqual(errors, []);
   },
   async 'Woche: Wochenbrief, höchstens 3 Erkenntnisse mit Handlung, Ziele 2027'(b) {
     const { page, errors } = await open(b, 'cockpit', DATA);
